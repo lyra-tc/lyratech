@@ -1,0 +1,12 @@
+{
+  "localeSwitcher": {
+    "label": "Change language",
+    "locale": "{locale, select, es {🇪🇸 Español} en {🇬🇧 English} de {🇩🇪 Deutsch} fr {🇫🇷 Français} other {Unknown}}"
+  },
+  "buttonLanguage": {
+    "Spanish": "Spanish",
+    "English": "English",
+    "German": "German",
+    "French": "French"
+  }
+}
