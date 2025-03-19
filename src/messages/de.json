@@ -8,5 +8,16 @@
     "English": "Englisch",
     "German": "Deutsch",
     "French": "Französisch"
+  },
+  "profileCard": {
+    "position": "Softwareentwickler - Lyra Tech"
+  },
+  "contactCard": {
+    "whatsApp": "Kontaktiere mich über WhatsApp",
+    "mail": "Kontaktiere mich per E-Mail",
+    "qrCode": "Karte teilen",
+    "shareCard": "Teile diese Karte",
+    "scanCode": "Scanne diesen Code mit deiner Kamera oder QR-App",
+    "close": "Schließen"
   }
 }

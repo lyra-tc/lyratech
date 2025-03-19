@@ -1,16 +1,16 @@
 import React from "react";
 import Profile from "@/components/DigitalBusinessCard/Profile";
+import RichieImage from "@/assets/images/Richie.jpg";
 import Contact from "@/components/DigitalBusinessCard/Contact";
-import EzzatImage from "@/assets/images/Ezzat.jpg";
 
 export default function Ezzat() {
     return (
         <div className="bg-black">
-            <Profile imageSrc={EzzatImage} name="Ezzat Alzahouri Campos" />
+            <Profile imageSrc={RichieImage} name="Ricardo Sierra Roa" />
             <Contact
-                phone="524428804267"
-                email="drearyland22021@gmail.com"
-                qrEndpoint="ezzat"
+                phone="525564075229"
+                email="rickisierra919@gmail.com"
+                qrEndpoint="ricardo"
             />
         </div>
     );

@@ -8,5 +8,16 @@
     "English": "English",
     "German": "German",
     "French": "French"
+  },
+  "profileCard": {
+    "position": "Software Developer - Lyra Tech"
+  },
+  "contactCard": {
+    "whatsApp": "Contact me via WhatsApp",
+    "mail": "Contact me via Email",
+    "qrCode": "Share Card",
+    "shareCard": "Share this card",
+    "scanCode": "Scan this code with your camera or QR app",
+    "close": "Close"
   }
 }
