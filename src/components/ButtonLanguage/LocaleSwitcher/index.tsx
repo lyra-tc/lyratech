@@ -17,7 +17,7 @@ export default function LocaleSwitcher({ closeModalAction, currentLocale }: Prop
     const pathname = usePathname();
     const params = useParams();
 
-    const [activeButton, setActiveButton] = useState<string | null>(null);
+    const [activeButton] = useState<string | null>(null);
 
     function localeChange(locale: string) {
         console.log(`pathname: ${pathname} params: ${params} locale: ${locale}`);
