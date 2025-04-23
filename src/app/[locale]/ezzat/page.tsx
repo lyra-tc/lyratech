@@ -1,7 +1,7 @@
 import React from "react";
 import Profile from "@/components/DigitalBusinessCard/Profile";
 import Contact from "@/components/DigitalBusinessCard/Contact";
-import EzzatImage from "@/assets/images/Ezzat.jpg";
+import EzzatImage from "@/assets/images/DigitalBusinessCard/Ezzat.jpg";
 
 export default function Ezzat() {
     return (

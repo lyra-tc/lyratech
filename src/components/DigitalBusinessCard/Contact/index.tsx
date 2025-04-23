@@ -48,7 +48,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                     href={`https://wa.me/${phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between w-full bg-green-500 text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-green-600 transition-transform duration-200 ease-in-out active:scale-95"
+                    className="flex items-center justify-between w-full bg-lyratech-blue text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-green-600 transition-transform duration-200 ease-in-out active:scale-95"
                 >
                     {t("whatsApp")}
                     <FaWhatsapp size={24} />

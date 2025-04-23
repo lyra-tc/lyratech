@@ -1,6 +1,6 @@
 import React from "react";
 import Profile from "@/components/DigitalBusinessCard/Profile";
-import RichieImage from "@/assets/images/Richie.jpg";
+import RichieImage from "@/assets/images/DigitalBusinessCard/Richie.jpg";
 import Contact from "@/components/DigitalBusinessCard/Contact";
 
 export default function Ezzat() {

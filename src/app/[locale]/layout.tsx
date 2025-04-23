@@ -1,25 +1,52 @@
-import {NextIntlClientProvider, hasLocale} from 'next-intl';
-import {notFound} from 'next/navigation';
-import {routing} from '@/i18n/routing';
-import '../globals.css';
+import clsx from 'clsx';
+import {getMessages, unstable_setRequestLocale} from 'next-intl/server';
+import {ReactNode} from 'react';
+import {locales} from '@/config';
+import "../globals.css";
+import {NextIntlClientProvider} from "next-intl";
+// import AdSenseProvider from '../../components/AdSenseProvider'; // Importa el script de AdSense
 
-export default async function LocaleLayout({
-                                               children,
-                                               params
-                                           }: {
-    children: React.ReactNode;
-    params: Promise<{locale: string}>;
-}) {
-    // Ensure that the incoming `locale` is valid
-    const {locale} = await params;
-    if (!hasLocale(routing.locales, locale)) {
-        notFound();
-    }
+
+type Props = {
+    children: ReactNode;
+    params: Promise<{ locale: string }>;
+};
+
+
+export function generateStaticParams() {
+    return locales.map((locale) => ({locale}));
+}
+
+export const dynamic = 'force-dynamic'; // 🚀 Forzar actualización en cada render
+
+export async function generateMetadata() {
+    return {
+        title: "Lyra Technologies",
+        description: "Lyra Tech website",
+        icons: [
+            { rel: "icon", url: "/favicon-light.ico", media: "(prefers-color-scheme: light)" },
+            { rel: "icon", url: "/favicon-dark.ico", media: "(prefers-color-scheme: dark)" },
+        ],
+    };
+}
+
+
+
+export default async function LocaleLayout({children, params}: Props) {
+    // Enable static rendering
+    const { locale } = await params;
+    unstable_setRequestLocale(locale);
+    const messages = await getMessages();
 
     return (
-        <html lang={locale}>
-        <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+
+        <html className="h-full" lang={locale}>
+
+        <body className={clsx('flex h-full flex-col')}>
+        <NextIntlClientProvider messages={messages}>
+            {/*<AdSenseProvider/> Inyecta el script cuando el cliente se renderiza */}
+            {children}
+        </NextIntlClientProvider>
         </body>
         </html>
     );
