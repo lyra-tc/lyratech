@@ -5,8 +5,8 @@ import EzzatImage from "@/assets/images/DigitalBusinessCard/Ezzat.jpg";
 
 export default function Ezzat() {
     return (
-        <div className="bg-black">
-            <Profile imageSrc={EzzatImage} name="Ezzat Alzahouri Campos" />
+        <div className="bg-gradient-to-br from-lyratech-purple via-[#3f416e] to-lyratech-blue pb-20">
+            <Profile imageSrc={EzzatImage} name="Ezzat Alzahouri Campos"/>
             <Contact
                 phone="524428804267"
                 email="drearyland22021@gmail.com"

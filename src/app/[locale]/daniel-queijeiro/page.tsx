@@ -5,8 +5,8 @@ import DaniQImage from "@/assets/images/DigitalBusinessCard/DaniQ.jpg";
 
 export default function DanielQ() {
     return (
-        <div className="bg-black">
-            <Profile imageSrc={DaniQImage} name="Daniel Queijeiro Albo" />
+        <div className="bg-gradient-to-br from-lyratech-purple via-[#3f416e] to-lyratech-blue pb-20">
+            <Profile imageSrc={DaniQImage} name="Daniel Queijeiro Albo"/>
             <Contact
                 phone="524423015435"
                 email="dany.queijeiro@hotmail.com"
