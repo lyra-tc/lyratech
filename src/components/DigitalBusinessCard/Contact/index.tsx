@@ -4,6 +4,8 @@ import { FaWhatsapp } from "react-icons/fa";
 import { IoMailOutline, IoQrCodeOutline } from "react-icons/io5";
 import QRCode from "react-qr-code";
 import {useTranslations} from "next-intl";
+import { GrLanguage } from "react-icons/gr";
+import {Link} from "@/navigation";
 
 interface ContactProps {
     /** Teléfono para WhatsApp, por ejemplo: "524428804267" */
@@ -48,7 +50,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                     href={`https://wa.me/${phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between w-full bg-lyratech-blue text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-green-600 transition-transform duration-200 ease-in-out active:scale-95"
+                    className="flex items-center justify-between w-full bg-black text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-transform duration-200 ease-in-out active:scale-95"
                 >
                     {t("whatsApp")}
                     <FaWhatsapp size={24} />
@@ -57,7 +59,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                 {/* Botón de Correo */}
                 <a
                     href={`mailto:${email}`}
-                    className="flex items-center justify-between w-full bg-blue text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-transform duration-200 ease-in-out active:scale-95"
+                    className="flex items-center justify-between w-full bg-lyratech-blue text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-gray-400 transition-transform duration-200 ease-in-out active:scale-95"
                 >
                     {t("mail")}
                     <IoMailOutline size={24} />
@@ -66,11 +68,20 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                 {/* Botón de Compartir Tarjeta */}
                 <button
                     onClick={toggleModal}
-                    className="flex items-center justify-between w-full bg-gray-700 text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-transform duration-200 ease-in-out active:scale-95"
+                    className="flex items-center justify-between w-full bg-lyratech-purple text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-purple-300 transition-transform duration-200 ease-in-out active:scale-95"
                 >
                     {t("qrCode")}
                     <IoQrCodeOutline size={24} />
                 </button>
+
+                {/* Botón de página */}
+                <Link
+                    href="/"
+                    className="flex items-center justify-between w-full bg-[#3f416e] text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-gray-400 transition-transform duration-200 ease-in-out active:scale-95"
+                >
+                    {t("website")}
+                    <GrLanguage size={24} />
+                </Link>
             </div>
 
             {/* Modal (renderizado condicional) */}
@@ -92,7 +103,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                         </p>
                         {/* Botón para cerrar */}
                         <button
-                            className="mt-6 px-4 py-2 bg-[#f44336] text-white font-semibold rounded hover:bg-[#7d1004] transition-transform duration-200 active:scale-95"
+                            className="mt-6 px-4 py-2 bg-lyratech-blue text-white font-semibold rounded hover:bg-lyratech-purple transition-transform duration-200 active:scale-95"
                             onClick={toggleModal}
                         >
                             {t("close")}

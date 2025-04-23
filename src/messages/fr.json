@@ -13,11 +13,18 @@
     "position": "Développeur Logiciel - Lyra Tech"
   },
   "contactCard": {
-    "whatsApp": "Contactez-moi via WhatsApp",
-    "mail": "Contactez-moi par e-mail",
+    "whatsApp": "Me contacter via WhatsApp",
+    "mail": "Me contacter par e-mail",
     "qrCode": "Partager la carte",
     "shareCard": "Partagez cette carte",
-    "scanCode": "Scannez ce code avec votre caméra ou une application QR",
+    "website": "Aller sur notre site",
+    "scanCode": "Scannez ce code avec votre caméra ou une appli QR",
     "close": "Fermer"
+  },
+  "comingsoon": {
+    "title": "Lyra Tech",
+    "subtitle": "DÉVELOPPEMENT LOGICIEL",
+    "description": "Nous préparons quelque chose d’épique. Nous allons révolutionner la technologie... et tu en feras partie.",
+    "button": "Bientôt"
   }
 }

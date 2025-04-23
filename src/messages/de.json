@@ -17,7 +17,14 @@
     "mail": "Kontaktiere mich per E-Mail",
     "qrCode": "Karte teilen",
     "shareCard": "Teile diese Karte",
+    "website": "Besuche unsere Website",
     "scanCode": "Scanne diesen Code mit deiner Kamera oder QR-App",
     "close": "Schließen"
+  },
+  "comingsoon": {
+    "title": "Lyra Tech",
+    "subtitle": "SOFTWAREENTWICKLUNG",
+    "description": "Wir bereiten etwas Episches vor. Wir werden die Technologie revolutionieren... und du wirst ein Teil davon sein.",
+    "button": "Demnächst"
   }
 }

@@ -18,7 +18,7 @@ function Profile({ imageSrc, name }: ProfileProps) {
             <div
                 className="flex items-center justify-center p-[1px] mt-20
                             w-48 h-48 rounded-full
-                            bg-black border-4 border-white"
+                            border-4 border-white"
             >
                 {imageSrc ? (
                     <Image
