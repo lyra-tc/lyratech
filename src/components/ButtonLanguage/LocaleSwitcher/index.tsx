@@ -20,15 +20,14 @@ export default function LocaleSwitcher({ closeModalAction, currentLocale }: Prop
     const [activeButton, setActiveButton] = useState<string | null>(null);
 
     function localeChange(locale: string) {
-        setActiveButton(locale); // Marcar como "activo" para el efecto
-        setTimeout(() => {
-            startTransition(() => {
-                router.replace(
-                    { pathname },
-                    { locale: locale }
-                );
-            });
-        }, 500); // 500ms de delay antes de ejecutar
+        console.log(`pathname: ${pathname} params: ${params} locale: ${locale}`);
+        const nextLocale = locale;
+        startTransition(() => {
+            router.replace(
+                { pathname },
+                { locale: nextLocale }
+            );
+        });
     }
 
     const languages = [
