@@ -13,7 +13,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
     const t = useTranslations("navbar");
 
     return (
-        <div className="fixed inset-0 bg-dark-blue z-50 flex flex-col justify-center items-center text-white">
+        <div className="fixed inset-0 bg-dark-blue z-50 flex flex-col justify-center items-center text-white font-montserrat">
             <button
                 className="absolute top-4 right-4 text-3xl"
                 onClick={onClose}

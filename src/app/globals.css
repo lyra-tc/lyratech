@@ -29,4 +29,13 @@ html {
   src: url('../../src/assets/fonts/ZenDots-Regular.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('../../src/assets/fonts/Montserrat-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat-Regular';
+  src: url('../../src/assets/fonts/Montserrat-Regular.ttf') format('truetype');
+}
 

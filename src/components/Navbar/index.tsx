@@ -51,7 +51,7 @@ function Navbar() {
     };
 
     return (
-        <div className="w-full pb-0">
+        <div className="w-full pb-0 font-montserrat">
             {/* Barra superior */}
             <div className="bg-dark-blue -mb-[1px]">
                 <div className="relative flex justify-center items-center h-12 translate-y-4">
