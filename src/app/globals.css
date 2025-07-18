@@ -9,8 +9,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #000000;
-    --foreground: #ffffff;
+    --background: #ffffff;
+    --foreground: #000000;
   }
 }
 
@@ -29,4 +29,13 @@ html {
   src: url('../../src/assets/fonts/ZenDots-Regular.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('../../src/assets/fonts/Montserrat-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat-Regular';
+  src: url('../../src/assets/fonts/Montserrat-Regular.ttf') format('truetype');
+}
 

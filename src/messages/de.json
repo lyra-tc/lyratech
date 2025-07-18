@@ -23,8 +23,15 @@
   },
   "comingsoon": {
     "title": "Lyra Tech",
-    "subtitle": "SOFTWAREENTWICKLUNG",
+    "subtitle": "Deine Vision in Code",
     "description": "Wir bereiten etwas Episches vor. Wir werden die Technologie revolutionieren... und du wirst ein Teil davon sein.",
     "button": "Demnächst"
+  },
+  "navbar": {
+    "home": "Startseite",
+    "aboutUs": "Über uns",
+    "services": "Dienstleistungen",
+    "portafolio": "Portfolio",
+    "contact": "Kontaktieren Sie uns"
   }
 }

@@ -23,6 +23,7 @@ export default {
         "dark-red": "#7d1004",
         "lyratech-purple": "#5f66ae",
         "lyratech-blue":"#272a33",
+        "dark-blue": "#00020E",
       },
       animation: {
         "fade-in": "fadeIn 1s ease-out both",
@@ -56,10 +57,9 @@ export default {
       },
 
       fontFamily: {
-        titles: ['MODULAR-14', 'sans-serif'], // Usa 'custom' como referencia
-        cambay: ['Cambay-Regular'],
         zendots: ['ZenDots-Regular'],
         montserrat: ['Montserrat-Regular'],
+        "montserrat-bold": ['Montserrat-Bold'],
       },
     },
   },
