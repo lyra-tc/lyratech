@@ -33,5 +33,11 @@
     "services": "Services",
     "portafolio": "Portfolio",
     "contact": "Contact Us"
+  },
+  "heroHome": {
+    "title": "We build solutions that understand your business",
+    "subtitle": "From problem to implementation, we walk with you.",
+    "buttonContact1": "Tell us your idea",
+    "buttonContact2": "Schedule a call"
   }
 }
