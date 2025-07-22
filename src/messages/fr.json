@@ -33,5 +33,11 @@
     "services": "Services",
     "portafolio": "Portefeuille",
     "contact": "Contactez-nous"
+  },
+  "heroHome": {
+    "title": "Nous concevons des solutions qui comprennent votre entreprise",
+    "subtitle": "Du problème à la mise en œuvre, nous avançons avec vous.",
+    "buttonContact1": "Parlez-nous de votre idée",
+    "buttonContact2": "Planifiez un appel"
   }
 }
