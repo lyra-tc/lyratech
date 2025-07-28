@@ -27,9 +27,9 @@ function Footer() {
 
     return (
         <footer className="bg-gradient-to-br from-[#303950] to-[#141720] text-white font-montserrat">
-            {/* Contenido principal */}
+            {/* Main content */}
             <div className="px-6 md:px-10 lg:px-28 py-10 grid grid-cols-1 md:grid-cols-4 gap-y-10 gap-x-8">
-                {/* Columna Logo + Texto */}
+                {/* Logo + Text */}
                 <div className="flex flex-col gap-5 font-[100] items-center md:items-start">
                     <Image src={Logo} alt="Lyra Tech" className="w-40 h-auto" />
                     <p className="text-sm leading-relaxed">
@@ -66,7 +66,7 @@ function Footer() {
 
                 </div>
 
-                {/* Columnas generadas con map */}
+                {/* Columns */}
                 {footerLinks.map((section, idx) => (
                     <div key={idx} className="flex flex-col items-center">
                         <h3 className="font-bold mb-4">{section.title}</h3>
@@ -89,9 +89,9 @@ function Footer() {
                 ))}
             </div>
 
-            {/* Línea inferior */}
+            {/* Copyright */}
             <div className="bg-black text-center py-4 text-xs lg:text-lg">
-                © 2025 LyraTech. Todos los derechos reservados.
+                {t("copyright")}
             </div>
         </footer>
     );

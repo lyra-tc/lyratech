@@ -19,6 +19,7 @@ export default {
         "lyratech-purple": "#5f66ae",
         "button-dark-purple": "#5F67AF",
         "button-light-purple": "#999ed6",
+        "lyratech-light-purple": "#c6c9e5",
         "lyratech-blue":"#272a33",
         "dark-blue": "#00020E",
       },
