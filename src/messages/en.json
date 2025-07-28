@@ -40,7 +40,21 @@
     "buttonContact1": "Tell us your idea",
     "buttonContact2": "Schedule a call"
   },
-  "helpAndSupport": {
+  "portafolioHome": {
+    "title": "SUCCESSFUL PROJECTS",
+    "description": "Each project is a success story. Discover how we have transformed ideas into digital solutions that exceed expectations.",
+    "viewMore": "View More",
+    "avalia": "Corporate website for dental clinic",
+    "mindScope": "Web application for psychometric testing",
+    "nuovaVita": "Corporate website for condominium management",
+    "plenusHopeMun": "Model United Nations website for educational institution",
+    "pulsoVital": "Web platform for finance training",
+    "verderaiz": "Website and blog with dashboard for environmental organization",
+    "callToActionTitle": "Ready for the next successful project?",
+    "callToActionText": "Let’s transform your idea into a digital solution that exceeds all expectations.",
+    "callToActionButton": "Start Your Project"
+  },
+  "helpAndSupportHome": {
     "title": "Help and Support",
     "subtitle": "We are here to assist you every step of the way. Our technical support team is available whenever you need it.",
     "availability": "Availability:",
@@ -76,6 +90,7 @@
     "resources": "Resources",
     "resources1": "Support",
     "resources2": "FAQs",
-    "resources3": "Contact"
+    "resources3": "Contact",
+    "copyright": "© 2025 LyraTech. All rights reserved."
   }
 }
