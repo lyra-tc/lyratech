@@ -39,5 +39,43 @@
     "subtitle": "Vom Problem bis zur Umsetzung – wir gehen den Weg mit dir.",
     "buttonContact1": "Erzähl uns deine Idee",
     "buttonContact2": "Vereinbare ein Gespräch"
+  },
+  "helpAndSupport": {
+    "title": "Hilfe und Support",
+    "subtitle": "Wir sind hier, um Ihnen in jedem Schritt zu helfen. Unser technisches Supportteam steht Ihnen jederzeit zur Verfügung.",
+    "availability": "Verfügbarkeit:",
+    "responseTime": "Reaktionszeit:",
+    "titleWhatsApp": "WhatsApp-Chat",
+    "descriptionWhatsApp": "Erhalten Sie sofortige Unterstützung von unserem technischen Supportteam",
+    "availabilityWhatsApp": "Mo-Fr",
+    "responseTimeWhatsApp": "<5 Min",
+    "buttonTextWhatsApp": "Chat starten",
+    "titleMail": "E-Mail-Support",
+    "descriptionMail": "Senden Sie Ihre detaillierte Anfrage und erhalten Sie eine vollständige Antwort",
+    "availabilityMail": "Mo-Fr",
+    "responseTimeMail": "<2 Stunden",
+    "buttonTextMail": "E-Mail senden",
+    "titlePhone": "Telefonanruf",
+    "descriptionPhone": "Sprechen Sie direkt mit unseren technischen Experten",
+    "availabilityPhone": "9:00-18:00",
+    "responseTimePhone": "Sofort",
+    "buttonTextPhone": "Jetzt anrufen"
+  },
+  "footer": {
+    "description": "Wir entwickeln außergewöhnliche Software mit makellosem Design, überlegener Geschwindigkeit und perfekter Funktionalität. Ihr digitaler Erfolg ist unsere Mission.",
+    "location": "Querétaro, Mexiko",
+    "company": "Unternehmen",
+    "company1": "Über uns",
+    "company2": "Unser Team",
+    "company3": "Portfolio",
+    "services": "Dienstleistungen",
+    "services1": "Webentwicklung",
+    "services2": "Mobile Apps",
+    "services3": "Beratung",
+    "services4": "KI-Integration",
+    "resources": "Ressourcen",
+    "resources1": "Support",
+    "resources2": "FAQs",
+    "resources3": "Kontakt"
   }
 }

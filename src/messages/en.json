@@ -39,5 +39,43 @@
     "subtitle": "From problem to implementation, we walk with you.",
     "buttonContact1": "Tell us your idea",
     "buttonContact2": "Schedule a call"
+  },
+  "helpAndSupport": {
+    "title": "Help and Support",
+    "subtitle": "We are here to assist you every step of the way. Our technical support team is available whenever you need it.",
+    "availability": "Availability:",
+    "responseTime": "Response time:",
+    "titleWhatsApp": "WhatsApp Chat",
+    "descriptionWhatsApp": "Get immediate assistance from our technical support team",
+    "availabilityWhatsApp": "Mon-Fri",
+    "responseTimeWhatsApp": "<5 min",
+    "buttonTextWhatsApp": "Start Chat",
+    "titleMail": "Email Support",
+    "descriptionMail": "Send your detailed inquiry and receive a complete response",
+    "availabilityMail": "Mon-Fri",
+    "responseTimeMail": "<2 hours",
+    "buttonTextMail": "Send Email",
+    "titlePhone": "Phone Call",
+    "descriptionPhone": "Speak directly with our technical experts",
+    "availabilityPhone": "9:00-18:00",
+    "responseTimePhone": "Immediate",
+    "buttonTextPhone": "Call Now"
+  },
+  "footer": {
+    "description": "We create extraordinary software with flawless design, superior speed, and perfect functionality. Your digital success is our mission.",
+    "location": "Querétaro, Mexico",
+    "company": "Company",
+    "company1": "About Us",
+    "company2": "Our Team",
+    "company3": "Portfolio",
+    "services": "Services",
+    "services1": "Web Development",
+    "services2": "Mobile Apps",
+    "services3": "Consulting",
+    "services4": "AI Integration",
+    "resources": "Resources",
+    "resources1": "Support",
+    "resources2": "FAQs",
+    "resources3": "Contact"
   }
 }

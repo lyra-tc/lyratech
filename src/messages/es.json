@@ -60,5 +60,22 @@
     "availabilityPhone": "9:00-18:00",
     "responseTimePhone": "Inmediato",
     "buttonTextPhone": "Llamar Ahora"
+  },
+  "footer": {
+    "description": "Creamos software extraordinario con diseño impecable, velocidad superior y funcionalidad perfecta. Tu éxito digital es nuestra misión.",
+    "location": "Querétaro, México",
+    "company": "Empresa",
+    "company1": "Sobre Nosotros",
+    "company2": "Nuestro Equipo",
+    "company3": "Portafolio",
+    "services": "Servicios",
+    "services1": "Desarrollo Web",
+    "services2": "App Móviles",
+    "services3": "Consultoría",
+    "services4": "Integración de IA",
+    "resources": "Recursos",
+    "resources1": "Soporte",
+    "resources2": "FAQ's",
+    "resources3": "Contacto"
   }
 }
