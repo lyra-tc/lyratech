@@ -39,5 +39,26 @@
     "subtitle": "Desde el problema hasta la implementación, caminamos contigo.",
     "buttonContact1": "Cuéntanos tu idea",
     "buttonContact2": "Agenda una llamada"
+  },
+  "helpAndSupport": {
+    "title": "Ayuda y Soporte",
+    "subtitle": "Estamos aquí para ayudarte en cada paso del camino. Nuestro equipo de soporte técnico está disponible cuando lo necesites.",
+    "availability": "Disponibilidad:",
+    "responseTime": "Tiempo de respuesta:",
+    "titleWhatsApp": "Chat vía WhatsApp",
+    "descriptionWhatsApp": "Obtén ayuda inmediata con nuestro equipo de soporte técnico",
+    "availabilityWhatsApp": "Lun-Vie",
+    "responseTimeWhatsApp": "<5 min",
+    "buttonTextWhatsApp": "Iniciar Chat",
+    "titleMail": "Soporte por Email",
+    "descriptionMail": "Envía tu consulta detallada y recibe una respuesta completa",
+    "availabilityMail": "Lun-Vie",
+    "responseTimeMail": "<2 horas",
+    "buttonTextMail": "Enviar Email",
+    "titlePhone": "Llamada Telefónica",
+    "descriptionPhone": "Habla directamente con nuestros expertos técnicos",
+    "availabilityPhone": "9:00-18:00",
+    "responseTimePhone": "Inmediato",
+    "buttonTextPhone": "Llamar Ahora"
   }
 }
