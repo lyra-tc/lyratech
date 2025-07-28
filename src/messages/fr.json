@@ -39,5 +39,43 @@
     "subtitle": "Du problème à la mise en œuvre, nous avançons avec vous.",
     "buttonContact1": "Parlez-nous de votre idée",
     "buttonContact2": "Planifiez un appel"
+  },
+  "helpAndSupport": {
+    "title": "Aide et Support",
+    "subtitle": "Nous sommes là pour vous aider à chaque étape. Notre équipe de support technique est disponible quand vous en avez besoin.",
+    "availability": "Disponibilité :",
+    "responseTime": "Délai de réponse :",
+    "titleWhatsApp": "Chat WhatsApp",
+    "descriptionWhatsApp": "Obtenez une assistance immédiate de notre équipe de support technique",
+    "availabilityWhatsApp": "Lun-Ven",
+    "responseTimeWhatsApp": "<5 min",
+    "buttonTextWhatsApp": "Démarrer le chat",
+    "titleMail": "Support par Email",
+    "descriptionMail": "Envoyez votre demande détaillée et recevez une réponse complète",
+    "availabilityMail": "Lun-Ven",
+    "responseTimeMail": "<2 heures",
+    "buttonTextMail": "Envoyer un email",
+    "titlePhone": "Appel Téléphonique",
+    "descriptionPhone": "Parlez directement avec nos experts techniques",
+    "availabilityPhone": "9:00-18:00",
+    "responseTimePhone": "Immédiat",
+    "buttonTextPhone": "Appeler maintenant"
+  },
+  "footer": {
+    "description": "Nous créons des logiciels extraordinaires avec un design impeccable, une vitesse supérieure et une fonctionnalité parfaite. Votre succès numérique est notre mission.",
+    "location": "Querétaro, Mexique",
+    "company": "Entreprise",
+    "company1": "À propos de nous",
+    "company2": "Notre équipe",
+    "company3": "Portefeuille",
+    "services": "Services",
+    "services1": "Développement Web",
+    "services2": "Applications Mobiles",
+    "services3": "Conseil",
+    "services4": "Intégration IA",
+    "resources": "Ressources",
+    "resources1": "Support",
+    "resources2": "FAQ",
+    "resources3": "Contact"
   }
 }
