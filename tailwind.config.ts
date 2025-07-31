@@ -12,6 +12,7 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         'white': '#ffffff',
+        'beige': '#f4f4f4',
         'lyratech-green': '#0F8F26',
         "blue": "#3498db",
         "red": "#f44336",

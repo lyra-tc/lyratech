@@ -45,6 +45,14 @@
     "buttonContact1": "Erzähl uns deine Idee",
     "buttonContact2": "Vereinbare ein Gespräch"
   },
+  "aboutUsHome": {
+    "titleCard1": "Über uns",
+    "descriptionCard1": "Bei LyraTech entwickeln wir Software, die inspiriert – mit Design, Geschwindigkeit und Funktionalität. Aus einem leidenschaftlichen Team entstanden, sind wir heute ein Maßstab für digitale Lösungen, die Erwartungen übertreffen und echte Ergebnisse liefern.",
+    "buttonCard1": "Unser Team",
+    "titleCard2": "Werdegang",
+    "descriptionCard2": "Von unseren ersten Projekten bis heute sind wir gemeinsam mit unseren Kunden gewachsen, haben jede Codezeile und jedes Design perfektioniert. Unsere Erfahrung treibt uns an, zu innovieren, ohne die Essenz zu verlieren, die uns einzigartig macht.",
+    "buttonCard2": "Unsere Geschichte"
+  },
   "servicesHome": {
     "title": "Maßgeschneiderte Lösungen",
     "description": "Ihre Ideen verdienen mehr als nur Code. Deshalb haben wir LyraTech geschaffen: einen agilen, designorientierten Ansatz, um Ihre digitalen Produkte auf das nächste Level zu bringen.",
