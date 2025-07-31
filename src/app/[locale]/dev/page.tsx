@@ -1,5 +1,4 @@
 import React from "react";
-//import Image from "next/image";
 import Navbar from "@/components/Navbar/index";
 import Hero from "@/components/Home/HeroHome";
 import AboutUs from "@/components/Home/AboutUs";
