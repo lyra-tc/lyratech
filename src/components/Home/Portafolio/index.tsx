@@ -110,7 +110,7 @@ function Portafolio() {
     const handleClose = () => setExpandedSlideId(null);
 
     return (
-        <div className="font-montserrat mb-32 md:mb-40 lg:mb-52">
+        <div id="portfolio" className="font-montserrat mb-32 md:mb-40 lg:mb-52">
             {/* Title + Description */}
             <div className="text-center px-10 md:px-16 lg:px-20 xl:px-28">
                 <h1 className="uppercase font-extrabold text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
@@ -215,12 +215,15 @@ function Portafolio() {
                 <p className="text-center my-6 md:text-lg lg:text-xl">
                     {t("callToActionText")}
                 </p>
-                <button className="text-sm md:text-lg rounded-[12px] text-white px-3 py-3 md:px-12 bg-gradient-to-tr from-button-dark-purple to-button-light-purple shadow-button transition-transform duration-500 ease-in-out hover:scale-75">
-                    <div className="flex flex-row justify-center items-center gap-3">
-                        <p>{t("callToActionButton")}</p>
-                        <FaArrowRight />
-                    </div>
-                </button>
+                <a href="https://wa.me/525564075229" target="_blank" rel="noopener noreferrer">
+                    <button
+                        className="text-sm md:text-lg rounded-[12px] text-white px-3 py-3 md:px-12 bg-gradient-to-tr from-button-dark-purple to-button-light-purple shadow-button transition-transform duration-500 ease-in-out hover:scale-75">
+                        <div className="flex flex-row justify-center items-center gap-3">
+                            <p>{t("callToActionButton")}</p>
+                            <FaArrowRight/>
+                        </div>
+                    </button>
+                </a>
             </div>
         </div>
     );

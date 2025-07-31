@@ -36,16 +36,16 @@ function Footer() {
                         {t("description")}
                     </p>
                     <div className="flex flex-col gap-2 text-sm">
-                        <a href="#" className="flex items-center gap-2 relative group">
+                        <a href="mailto:ricardo.sierra@lyratech.com.mx" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 relative group">
                             <MdMailOutline className="text-lg text-lyratech-purple"/>
                             <span className="relative after:content-[''] after:absolute after:left-0 after:-bottom-0.5
                               after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300
                               group-hover:after:w-full">
-                              lyratech@lyratech.com.mx
+                              ricardo.sierra@lyratech.com.mx
                             </span>
                         </a>
 
-                        <a href="#" className="flex items-center gap-2 relative group">
+                        <a href="tel:+525564075229" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 relative group">
                             <FiPhone className="text-lg text-lyratech-purple"/>
                             <span className="relative after:content-[''] after:absolute after:left-0 after:-bottom-0.5
                               after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300
@@ -54,7 +54,7 @@ function Footer() {
                             </span>
                         </a>
 
-                        <a href="#" className="flex items-center gap-2 relative group">
+                        <a href="https://maps.app.goo.gl/WSgZHJXQ2pfQQftLA" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 relative group">
                             <HiOutlineLocationMarker className="text-lg text-lyratech-purple"/>
                             <span className="relative after:content-[''] after:absolute after:left-0 after:-bottom-0.5
                                 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300

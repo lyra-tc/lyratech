@@ -57,7 +57,7 @@ function Navbar() {
                 <div className="relative flex justify-center items-center h-12 translate-y-4">
                     {/* Botón de Contáctanos */}
                     <div className="hidden md:flex absolute right-8 top-16">
-                        <Link href="/">
+                        <Link href={t("contactLink")}>
                             <button className="flex items-center gap-2 bg-dark-blue text-white text-lg font-semibold px-6 py-5 rounded-full transition-transform duration-500 ease-in-out hover:scale-75 active:scale-90">
                                 <FaPhone className="text-lg" />
                                 {t("contact")}
@@ -77,12 +77,12 @@ function Navbar() {
                                     exit={{ opacity: 0, x: -10 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    <Link href="/">
+                                    <Link href={t("homeLink")}>
                                         <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
                                             {t("home")}
                                         </span>
                                     </Link>
-                                    <Link href="/">
+                                    <Link href={t("aboutUsLink")}>
                                         <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
                                             {t("aboutUs")}
                                         </span>
@@ -112,12 +112,12 @@ function Navbar() {
                                     exit={{ opacity: 0, x: 10 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    <Link href="/">
+                                    <Link href={t("servicesLink")}>
                                         <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
                                             {t("services")}
                                         </span>
                                     </Link>
-                                    <Link href="/">
+                                    <Link href={t("portafolioLink")}>
                                         <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
                                             {t("portafolio")}
                                         </span>
