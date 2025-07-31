@@ -84,7 +84,7 @@ function Services() {
     return (
         <div id="services" className="text-black flex flex-col items-center justify-center px-4 py-16 mb-10 md:mb-20 lg:mb-32">
             <div className="max-w-6xl w-full text-center px-6 md:px-12 lg:px-16 xl:px-20">
-                <h2 className="text-4xl font-montserrat-bold text-center lg:text-5xl xl:text-6xl mb-4 md:mb-6 lg:mb-8 uppercase">
+                <h2 className="text-3xl md:text-4xl font-montserrat-bold text-center lg:text-5xl mb-4 md:mb-6 lg:mb-8 uppercase">
                     {t("title")}
                 </h2>
                 <p className="text-black text-center font-montserrat text-base md:text-lg lg:text-xl xl:text-lg leading-[150%] mb-8 md:mb-12">
