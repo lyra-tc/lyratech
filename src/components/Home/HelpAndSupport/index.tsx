@@ -17,6 +17,7 @@ function HelpAndSupport() {
             availability: t("availabilityWhatsApp"),
             responseTime: t("responseTimeWhatsApp"),
             buttonText: t("buttonTextWhatsApp"),
+            buttonUrl: "https://wa.me/525564075229",
         },
         {
             icon: <MdMailOutline className="text-[40px] md:text-[50px] lg:text-[35px] xl:text-[50px]" />,
@@ -25,6 +26,7 @@ function HelpAndSupport() {
             availability: t("availabilityMail"),
             responseTime: t("responseTimeMail"),
             buttonText: t("buttonTextMail"),
+            buttonUrl: "mailto:ricardo.sierra@lyratech.com.mx",
         },
         {
             icon: <FiPhone className="text-[40px] md:text-[50px] lg:text-[35px] xl:text-[50px]" />,
@@ -33,11 +35,12 @@ function HelpAndSupport() {
             availability: t("availabilityPhone"),
             responseTime: t("responseTimePhone"),
             buttonText: t("buttonTextPhone"),
+            buttonUrl: "tel:+525564075229",
         },
     ];
 
     return (
-        <div className="text-black font-montserrat mb-14 md:mb-32">
+        <div id="contact" className="text-black font-montserrat mb-14 md:mb-32">
             {/*Title*/}
             <div className="flex flex-col text-center mx-6 py-8 gap-y-6 rounded-[30px] shadow-contact md:mx-16 md:py-12 lg:mx-20 lg:gap-y-10 xl:mx-28 xl:py-16 xl:gap-y-14">
                 <h1 className="font-bold text-2xl md:text-3xl lg:text-4xl xl:text-5xl uppercase">
@@ -73,9 +76,12 @@ function HelpAndSupport() {
                             </p>
                         </div>
                         <div className="mt-7 md:mt-10">
-                            <button className="text-lg lg:text-sm xl:text-lg rounded-[12px] text-white px-10 py-2 bg-gradient-to-tr from-button-dark-purple to-button-light-purple shadow-button transition-transform duration-500 ease-in-out hover:scale-75">
-                                {method.buttonText}
-                            </button>
+                            <a href={method.buttonUrl} target="_blank" rel="noopener noreferrer">
+                                <button
+                                    className="text-lg lg:text-sm xl:text-lg rounded-[12px] text-white px-10 py-2 bg-gradient-to-tr from-button-dark-purple to-button-light-purple shadow-button transition-transform duration-500 ease-in-out hover:scale-75">
+                                    {method.buttonText}
+                                </button>
+                            </a>
                         </div>
                     </div>
                 ))}

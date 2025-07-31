@@ -22,11 +22,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
             </button>
 
             <div className="flex flex-col gap-6 text-xl font-semibold text-center w-4/5 max-w-xs">
-                <Link href="/"><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("home")}</span></Link>
-                <Link href="/"><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("aboutUs")}</span></Link>
-                <Link href="/"><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("services")}</span></Link>
-                <Link href="/"><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("portafolio")}</span></Link>
-                <Link href="/"><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("contact")}</span></Link>
+                <Link href={t("homeLink")}><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("home")}</span></Link>
+                <Link href={t("aboutUsLink")}><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("aboutUs")}</span></Link>
+                <Link href={t("servicesLink")}><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("services")}</span></Link>
+                <Link href={t("portafolioLink")}><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("portafolio")}</span></Link>
+                <Link href={t("contactLink")}><span onClick={onClose} className="border-b pb-2 cursor-pointer">{t("contact")}</span></Link>
             </div>
         </div>
     );
