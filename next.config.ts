@@ -37,6 +37,21 @@ const nextConfig: NextConfig = {
                 source: "/:first/a-propos",
                 destination: "/:first/about-us",
             },
+            // =====================
+            // ==== Coming Soon ====
+            // =====================
+            {
+                source: "/:first/proximamente",
+                destination: "/:first/coming-soon",
+            },
+            {
+                source: "/:first/demnaechst",
+                destination: "/:first/coming-soon",
+            },
+            {
+                source: "/:first/bientot-disponible",
+                destination: "/:first/coming-soon",
+            },
         ];
     },
 };

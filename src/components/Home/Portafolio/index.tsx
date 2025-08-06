@@ -13,7 +13,7 @@ import NuovaVita from "@/assets/images/Home/Portafolio/NuovaVita.png";
 import PlenusHopeMun from "@/assets/images/Home/Portafolio/PlenusHopeMun.png";
 import PulsoVital from "@/assets/images/Home/Portafolio/PulsoVital.png";
 import Verderaiz from "@/assets/images/Home/Portafolio/Verderaiz.png";
-
+import OnceUponATime from "@/assets/images/Home/Portafolio/OnceUponATime.png";
 
 function Portafolio() {
     const t = useTranslations("portafolioHome");
@@ -25,6 +25,7 @@ function Portafolio() {
         { name: "Plenus HopeMun", img: PlenusHopeMun, content: t("plenusHopeMun"), link: "https://plenus.edu.mx/hopemun/" },
         { name: "Pulso Vital", img: PulsoVital, content: t("pulsoVital"), link: "https://pulsovital.com.mx/" },
         { name: "Verderaiz", img: Verderaiz, content: t("verderaiz"), link: "https://verderaiz.com.mx/" },
+        { name: "Once Upon a Time", img: OnceUponATime, content: t("onceUponATime"), link: "https://once-upona-time.netlify.app/" },
     ];
 
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,7 +56,7 @@ function Portafolio() {
         updateVisibleSlides();
         window.addEventListener("resize", updateVisibleSlides);
         return () => window.removeEventListener("resize", updateVisibleSlides);
-    }, []);
+    });
 
     useEffect(() => {
         if (slideRef.current) {

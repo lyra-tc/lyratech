@@ -13,6 +13,12 @@ export const pathnames = {
         de: "/ueber-uns",
         fr: "/a-propos",
     },
+    "/coming-soon": {
+        "en": "/coming-soon",
+        "es": "/proximamente",
+        "de": "/demnaechst",
+        "fr": "/bientot-disponible"
+    }
 } satisfies Pathnames<typeof locales>;
 
 export const { Link, redirect, usePathname, useRouter } =

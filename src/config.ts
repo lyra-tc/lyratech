@@ -9,6 +9,7 @@ export type Locales = typeof locales;
 export const pathnames: Pathnames<typeof locales> = {
     "/": "/",
     "about-us": "about-us",
+    "coming-soon": "coming-soon",
     "ricardo": "ricardo",
     "ezzat": "ezzat",
     "daniel-contreras": "daniel-contreras",
