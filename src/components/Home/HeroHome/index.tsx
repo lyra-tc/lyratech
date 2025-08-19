@@ -3,7 +3,9 @@
 import React from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import Logo from "@/assets/images/Home/Hero/CrystalLogo.png";
+//import Logo from "@/assets/images/Home/Hero/CrystalLogo.png";
+import Logo from "@/assets/images/Home/Hero/SolidLogo.png";
+//import Logo from "@/assets/images/Home/Hero/Logo.png";
 
 function HeroHome() {
     const t = useTranslations("heroHome");
