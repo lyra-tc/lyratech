@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import AboutUs1 from "@/assets/images/Home/AboutUs/AboutUs1.png";
+import AboutUs2 from "@/assets/images/Home/AboutUs/AboutUs2.png";
 
 export default function ScrollStack() {
     const t = useTranslations("aboutUsHome");
@@ -19,7 +20,7 @@ export default function ScrollStack() {
             title: t("titleCard2"),
             text: t("descriptionCard2"),
             button: t("buttonCard2"),
-            img: AboutUs1
+            img: AboutUs2
         },
     ];
 
