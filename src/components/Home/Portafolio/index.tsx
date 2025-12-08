@@ -8,24 +8,28 @@ import Image from "next/image";
 import {useTranslations} from "next-intl";
 
 import Avalia from "@/assets/images/Home/Portafolio/Avalia.png";
-import MindScope from "@/assets/images/Home/Portafolio/MindScope.svg";
-import NuovaVita from "@/assets/images/Home/Portafolio/NuovaVita.png";
-import PlenusHopeMun from "@/assets/images/Home/Portafolio/PlenusHopeMun.png";
+import Indeleble from "@/assets/images/Home/Portafolio/Indeleble.png";
 import PulsoVital from "@/assets/images/Home/Portafolio/PulsoVital.png";
+import CSV from "@/assets/images/Home/Portafolio/CSV.png";
 import Verderaiz from "@/assets/images/Home/Portafolio/Verderaiz.png";
+import NuovaVita from "@/assets/images/Home/Portafolio/NuovaVita.png";
+import MindScope from "@/assets/images/Home/Portafolio/MindScope.svg";
 import OnceUponATime from "@/assets/images/Home/Portafolio/OnceUponATime.png";
+import PlenusHopeMun from "@/assets/images/Home/Portafolio/PlenusHopeMun.png";
 
 function Portafolio() {
     const t = useTranslations("portafolioHome");
 
     const projects = [
-        { name: "Avalia Dental Group", img: Avalia, content: t("avalia"), link: "https://avaliadentalgroup.com/" },
-        { name: "MindScope", img: MindScope, content: t("mindScope"), link: "https://mindscope-landing.netlify.app/" },
-        { name: "Nuova Vita", img: NuovaVita, content: t("nuovaVita"), link: "https://nuova-vita.netlify.app/" },
-        { name: "Plenus HopeMun", img: PlenusHopeMun, content: t("plenusHopeMun"), link: "https://plenus.edu.mx/hopemun/" },
+        //{ name: "Avalia Dental Group", img: Avalia, content: t("avalia"), link: "https://avaliadentalgroup.com/" },
+        { name: "Indeleble", img: Indeleble, content: t("indeleble"), link: "https://indeleble.com.mx/" },
         { name: "Pulso Vital", img: PulsoVital, content: t("pulsoVital"), link: "https://pulsovital.com.mx/" },
+        { name: "CSV Logistics", img: CSV, content: t("csv"), link: "https://csv-logistics.netlify.app/" },
         { name: "Verderaiz", img: Verderaiz, content: t("verderaiz"), link: "https://verderaiz.com.mx/" },
+        { name: "Nuova Vita", img: NuovaVita, content: t("nuovaVita"), link: "https://nuova-vita.netlify.app/" },
+        { name: "MindScope", img: MindScope, content: t("mindScope"), link: "https://mindscope-landing.netlify.app/" },
         { name: "Once Upon a Time", img: OnceUponATime, content: t("onceUponATime"), link: "https://once-upona-time.netlify.app/" },
+        { name: "Plenus HopeMun", img: PlenusHopeMun, content: t("plenusHopeMun"), link: "https://plenus.edu.mx/hopemun/" },
     ];
 
     const [currentIndex, setCurrentIndex] = useState(0);
