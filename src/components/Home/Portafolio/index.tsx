@@ -7,7 +7,7 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import Image from "next/image";
 import {useTranslations} from "next-intl";
 
-import Avalia from "@/assets/images/Home/Portafolio/Avalia.png";
+//import Avalia from "@/assets/images/Home/Portafolio/Avalia.png";
 import Indeleble from "@/assets/images/Home/Portafolio/Indeleble.png";
 import PulsoVital from "@/assets/images/Home/Portafolio/PulsoVital.png";
 import CSV from "@/assets/images/Home/Portafolio/CSV.png";
@@ -24,7 +24,7 @@ function Portafolio() {
         //{ name: "Avalia Dental Group", img: Avalia, content: t("avalia"), link: "https://avaliadentalgroup.com/" },
         { name: "Indeleble", img: Indeleble, content: t("indeleble"), link: "https://indeleble.com.mx/" },
         { name: "Pulso Vital", img: PulsoVital, content: t("pulsoVital"), link: "https://pulsovital.com.mx/" },
-        { name: "CSV Logistics", img: CSV, content: t("csv"), link: "https://csv-logistics.netlify.app/" },
+        { name: "CSV Logistics", img: CSV, content: t("csv"), link: "https://www.csvlogistics.com.mx/" },
         { name: "Verderaiz", img: Verderaiz, content: t("verderaiz"), link: "https://verderaiz.com.mx/" },
         { name: "Nuova Vita", img: NuovaVita, content: t("nuovaVita"), link: "https://nuova-vita.netlify.app/" },
         { name: "MindScope", img: MindScope, content: t("mindScope"), link: "https://mindscope-landing.netlify.app/" },

@@ -1,18 +1,18 @@
 import React from "react";
 import Profile from "@/components/DigitalBusinessCard/Profile";
 import Contact from "@/components/DigitalBusinessCard/Contact";
-import EzzatImage from "@/assets/images/DigitalBusinessCard/Ezzat.jpg";
+import GaloImage from "@/assets/images/DigitalBusinessCard/Logo.png";
 import ButtonLanguage from "@/components/ButtonLanguage";
 
-export default function Ezzat() {
+export default function Galo() {
     return (
         <div className="bg-gradient-to-br from-lyratech-purple via-[#3f416e] to-lyratech-blue pb-20">
-            <Profile imageSrc={EzzatImage} name="Ezzat Alzahouri Campos" position="Lyra Tech Co-Founder & CTO"/>
+            <Profile imageSrc={GaloImage} name="Lyra Technologies"/>
             <ButtonLanguage />
             <Contact
-                phone="524428804267"
-                email="ezzat.alzahouri@lyratech.com.mx"
-                qrEndpoint="ezzat"
+                phone="524421113104"
+                email="galo.viggiano@lyratech.com.mx"
+                qrEndpoint="business-card"
             />
         </div>
     );
