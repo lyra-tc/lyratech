@@ -7,11 +7,11 @@ import ButtonLanguage from "@/components/ButtonLanguage";
 export default function Galo() {
     return (
         <div className="bg-gradient-to-br from-lyratech-purple via-[#3f416e] to-lyratech-blue pb-20">
-            <Profile imageSrc={GaloImage} name="Galo Alejandro Del Río Viggiano"/>
+            <Profile imageSrc={GaloImage} name="Galo Alejandro Del Río Viggiano" position="Lyra Tech Co-Founder & CMO"/>
             <ButtonLanguage />
             <Contact
                 phone="524421113104"
-                email="galoviggiano@gmail.com"
+                email="galo.viggiano@lyratech.com.mx"
                 qrEndpoint="galo"
             />
         </div>

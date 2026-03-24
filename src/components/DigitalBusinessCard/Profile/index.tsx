@@ -1,16 +1,17 @@
 "use client";
 import React from "react";
 import Image, { StaticImageData } from "next/image";
-import { useTranslations } from "next-intl";
+//import { useTranslations } from "next-intl";
 import { CgProfile } from "react-icons/cg";
 
 interface ProfileProps {
     imageSrc?: StaticImageData; // ahora es opcional
     name: string;
+    position?: string;
 }
 
-function Profile({ imageSrc, name }: ProfileProps) {
-    const t = useTranslations("profileCard");
+function Profile({ imageSrc, name, position }: ProfileProps) {
+    //const t = useTranslations("profileCard");
 
     return (
         <div className="text-white flex flex-col items-center justify-center">
@@ -38,7 +39,7 @@ function Profile({ imageSrc, name }: ProfileProps) {
 
             <p className="text-3xl mt-4 font-zendots mx-5 text-center">{name}</p>
 
-            <p className="mt-4 text-sm font-bold text-center">{t("position")}</p>
+            <p className="mt-4 text-sm font-bold text-center">{position}</p>
         </div>
     );
 }
