@@ -13,12 +13,14 @@
     "position": "Softwareentwickler - Lyra Tech"
   },
   "contactCard": {
-    "whatsApp": "Kontaktiere mich über WhatsApp",
-    "mail": "Kontaktiere mich per E-Mail",
+    "whatsApp": "Kontaktieren Sie mich über WhatsApp",
+    "whatsAppLyratech": "Kontaktieren Sie uns über WhatsApp",
+    "mail": "Kontaktieren Sie mich per E-Mail",
+    "mailLyratech": "Kontaktieren Sie uns per E-Mail",
     "qrCode": "Karte teilen",
-    "shareCard": "Teile diese Karte",
-    "website": "Besuche unsere Website",
-    "scanCode": "Scanne diesen Code mit deiner Kamera oder QR-App",
+    "shareCard": "Diese Karte teilen",
+    "website": "Unsere Website besuchen",
+    "scanCode": "Scannen Sie diesen Code mit Ihrer Kamera oder QR-App",
     "close": "Schließen"
   },
   "comingsoon": {

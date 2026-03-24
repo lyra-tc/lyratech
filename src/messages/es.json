@@ -14,7 +14,9 @@
   },
   "contactCard": {
     "whatsApp": "Contactarme por WhatsApp",
+    "whatsAppLyratech": "Contactarnos por WhatsApp",
     "mail": "Contactarme por Correo",
+    "mailLyratech": "Contactarnos por Correo",
     "qrCode": "Compartir Tarjeta",
     "shareCard": "Comparte esta tarjeta",
     "website": "Ir a nuestro sitio",

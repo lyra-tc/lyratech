@@ -14,11 +14,13 @@
   },
   "contactCard": {
     "whatsApp": "Me contacter via WhatsApp",
+    "whatsAppLyratech": "Nous contacter via WhatsApp",
     "mail": "Me contacter par e-mail",
+    "mailLyratech": "Nous contacter par e-mail",
     "qrCode": "Partager la carte",
-    "shareCard": "Partagez cette carte",
-    "website": "Aller sur notre site",
-    "scanCode": "Scannez ce code avec votre caméra ou une appli QR",
+    "shareCard": "Partager cette carte",
+    "website": "Visiter notre site",
+    "scanCode": "Scannez ce code avec votre caméra ou une app QR",
     "close": "Fermer"
   },
   "comingsoon": {
