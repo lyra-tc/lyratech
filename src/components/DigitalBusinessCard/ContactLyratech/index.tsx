@@ -52,7 +52,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                     rel="noopener noreferrer"
                     className="flex items-center justify-between w-full bg-black text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-transform duration-200 ease-in-out active:scale-95"
                 >
-                    {t("whatsApp")}
+                    {t("whatsAppLyratech")}
                     <FaWhatsapp size={24} />
                 </a>
 
@@ -61,7 +61,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                     href={`mailto:${email}`}
                     className="flex items-center justify-between w-full bg-lyratech-blue text-white py-3 px-5 rounded-lg text-sm font-semibold hover:bg-gray-400 transition-transform duration-200 ease-in-out active:scale-95"
                 >
-                    {t("mail")}
+                    {t("mailLyratech")}
                     <IoMailOutline size={24} />
                 </a>
 
