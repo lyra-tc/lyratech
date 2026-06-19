@@ -47,6 +47,14 @@
     "buttonContact1": "Erzähl uns deine Idee",
     "buttonContact2": "Vereinbare ein Gespräch"
   },
+  "teamSection": {
+    "title": "Unser Team",
+    "desc1": "Visionärer Stratege, der Ideen in digitale Produkte mit hoher Wirkung verwandelt.",
+    "desc2": "Koordiniert Prozesse und Teams, damit jedes Projekt pünktlich und mit Exzellenz geliefert wird.",
+    "desc3": "Architekt robuster, skalierbarer und hochmoderner Technologielösungen.",
+    "desc4": "Verbindet die Marke Lyratech mit der Welt durch kreative Strategien und Daten.",
+    "desc5": "Sichert die finanzielle Gesundheit und das nachhaltige Wachstum des Teams."
+  },
   "heroAboutUs": {
     "badge": "Über Uns",
     "titleLine1": "Brillante Köpfe,",

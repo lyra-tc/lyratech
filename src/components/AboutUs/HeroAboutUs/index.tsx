@@ -21,6 +21,7 @@ export default function HeroAboutUs() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
+                    onClick={() => document.getElementById("team")?.scrollIntoView({ behavior: "smooth" })}
                     className="flex items-center gap-3 bg-white border border-gray-200 rounded-full px-10 py-4 shadow-sm mb-10 cursor-pointer transition-all duration-300 hover:bg-lyratech-light-purple hover:border-lyratech-purple hover:shadow-md"
                 >
                     <HiOutlineUser className="text-lyratech-purple text-3xl transition-transform duration-300 group-hover:scale-110" />

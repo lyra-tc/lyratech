@@ -47,6 +47,14 @@
     "buttonContact1": "Cuéntanos tu idea",
     "buttonContact2": "Agenda una llamada"
   },
+  "teamSection": {
+    "title": "Nuestro equipo",
+    "desc1": "Estratega visionario que convierte ideas en productos digitales de alto impacto.",
+    "desc2": "Orquesta procesos y equipos para que cada proyecto llegue a tiempo y con excelencia.",
+    "desc3": "Arquitecto de soluciones tecnológicas sólidas, escalables y a la vanguardia.",
+    "desc4": "Conecta la marca Lyratech con el mundo a través de estrategias creativas y datos.",
+    "desc5": "Asegura la salud financiera y el crecimiento sostenible del equipo."
+  },
   "heroAboutUs": {
     "badge": "Nosotros",
     "titleLine1": "Mentes brillantes,",

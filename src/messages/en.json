@@ -47,6 +47,14 @@
     "buttonContact1": "Tell us your idea",
     "buttonContact2": "Schedule a call"
   },
+  "teamSection": {
+    "title": "Our team",
+    "desc1": "Visionary strategist who turns ideas into high-impact digital products.",
+    "desc2": "Orchestrates processes and teams so every project ships on time with excellence.",
+    "desc3": "Architect of solid, scalable, and cutting-edge technological solutions.",
+    "desc4": "Connects the Lyratech brand with the world through creative strategies and data.",
+    "desc5": "Ensures the financial health and sustainable growth of the team."
+  },
   "heroAboutUs": {
     "badge": "About Us",
     "titleLine1": "Brilliant minds,",
