@@ -52,6 +52,35 @@ const nextConfig: NextConfig = {
                 source: "/:first/bientot-disponible",
                 destination: "/:first/coming-soon",
             },
+            // =================
+            // ==== Contact ====
+            // =================
+            {
+                source: "/:first/contacto",
+                destination: "/:first/contact",
+            },
+            {
+                source: "/:first/kontakt",
+                destination: "/:first/contact",
+            },
+            // ==================
+            // ==== Services ====
+            // ==================
+            {
+                source: "/:first/servicios",
+                destination: "/:first/services",
+            },
+            {
+                source: "/:first/dienstleistungen",
+                destination: "/:first/services",
+            },
+            // ===================
+            // ==== Portfolio ====
+            // ===================
+            {
+                source: "/:first/portafolio",
+                destination: "/:first/portfolio",
+            },
         ];
     },
 };

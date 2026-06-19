@@ -65,66 +65,70 @@ function Navbar() {
                         </Link>
                     </div>
 
-                    {/* Grupo de navegación */}
-                    <div className="flex items-center gap-6 text-white text-sm font-semibold">
-                        {/* Textos izquierda */}
-                        <AnimatePresence>
-                            {!isMobile && isExpanded && (
-                                <motion.div
-                                    className="flex gap-4"
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    <Link href={t("homeLink")}>
-                                        <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
-                                            {t("home")}
-                                        </span>
-                                    </Link>
-                                    <Link href={t("aboutUsLink")}>
-                                        <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
-                                            {t("aboutUs")}
-                                        </span>
-                                    </Link>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                    {/* Logo — posición absoluta, nunca se mueve */}
+                    <Image
+                        alt="Lyra Tech Logo"
+                        src={Logo}
+                        width={20}
+                        height={20}
+                        className="cursor-pointer absolute left-1/2 -translate-x-1/2 z-10"
+                        onClick={handleLogoClick}
+                        priority
+                    />
 
-                        {/* Logo */}
-                        <Image
-                            alt="Lyra Tech Logo"
-                            src={Logo}
-                            width={20}
-                            height={20}
-                            className="cursor-pointer"
-                            onClick={handleLogoClick}
-                            priority
-                        />
+                    {/* Botones del menú — no afectan la posición del logo */}
+                    <div className="flex items-center text-white text-sm font-semibold w-full">
+                        {/* Textos izquierda */}
+                        <div className="flex-1 flex justify-end">
+                            <AnimatePresence>
+                                {!isMobile && isExpanded && (
+                                    <motion.div
+                                        className="flex gap-4 pr-8"
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -10 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <Link href={t("homeLink")}>
+                                            <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
+                                                {t("home")}
+                                            </span>
+                                        </Link>
+                                        <Link href={t("aboutUsLink")}>
+                                            <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
+                                                {t("aboutUs")}
+                                            </span>
+                                        </Link>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
                         {/* Textos derecha */}
-                        <AnimatePresence>
-                            {!isMobile && isExpanded && (
-                                <motion.div
-                                    className="flex gap-4"
-                                    initial={{ opacity: 0, x: 10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 10 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    <Link href={t("servicesLink")}>
-                                        <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
-                                            {t("services")}
-                                        </span>
-                                    </Link>
-                                    <Link href={t("portafolioLink")}>
-                                        <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
-                                            {t("portafolio")}
-                                        </span>
-                                    </Link>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        <div className="flex-1 flex justify-start">
+                            <AnimatePresence>
+                                {!isMobile && isExpanded && (
+                                    <motion.div
+                                        className="flex gap-4 pl-8"
+                                        initial={{ opacity: 0, x: 10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 10 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <Link href={t("servicesLink")}>
+                                            <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
+                                                {t("services")}
+                                            </span>
+                                        </Link>
+                                        <Link href={t("portafolioLink")}>
+                                            <span className="relative text-lg after:block after:h-[2px] after:bg-white after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 cursor-pointer">
+                                                {t("portafolio")}
+                                            </span>
+                                        </Link>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </div>
                 </div>
             </div>

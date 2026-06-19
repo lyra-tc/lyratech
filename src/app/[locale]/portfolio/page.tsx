@@ -1,15 +1,15 @@
 import React from "react";
 import Navbar from "@/components/Navbar/index";
-import AboutUs from "@/components/Home/AboutUs";
+import Portafolio from "@/components/Home/Portafolio";
 import ButtonLanguage from "@/components/ButtonLanguage";
 import Footer from "@/components/Footer";
 
-export default function AboutUsPage() {
+export default function PortfolioPage() {
     return (
         <div className="">
             <Navbar />
             <ButtonLanguage />
-            <AboutUs />
+            <Portafolio />
             <Footer />
         </div>
     );

@@ -35,11 +35,11 @@
     "services": "Services",
     "portafolio": "Portfolio",
     "contact": "Contactez-nous",
-    "homeLink": "#home",
-    "aboutUsLink": "#about-us",
-    "servicesLink": "#services",
-    "portafolioLink": "#portfolio",
-    "contactLink": "#contact"
+    "homeLink": "/",
+    "aboutUsLink": "/a-propos",
+    "servicesLink": "/services",
+    "portafolioLink": "/portfolio",
+    "contactLink": "/contact"
   },
   "heroHome": {
     "title": "Nous concevons des solutions qui comprennent votre entreprise",

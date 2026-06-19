@@ -1,15 +1,15 @@
 import React from "react";
 import Navbar from "@/components/Navbar/index";
-import AboutUs from "@/components/Home/AboutUs";
+import Services from "@/components/Home/Services";
 import ButtonLanguage from "@/components/ButtonLanguage";
 import Footer from "@/components/Footer";
 
-export default function AboutUsPage() {
+export default function ServicesPage() {
     return (
         <div className="">
             <Navbar />
             <ButtonLanguage />
-            <AboutUs />
+            <Services />
             <Footer />
         </div>
     );

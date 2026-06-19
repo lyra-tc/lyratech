@@ -18,6 +18,24 @@ export const pathnames = {
         "es": "/proximamente",
         "de": "/demnaechst",
         "fr": "/bientot-disponible"
+    },
+    "/contact": {
+        "en": "/contact",
+        "es": "/contacto",
+        "de": "/kontakt",
+        "fr": "/contact"
+    },
+    "/services": {
+        "en": "/services",
+        "es": "/servicios",
+        "de": "/dienstleistungen",
+        "fr": "/services"
+    },
+    "/portfolio": {
+        "en": "/portfolio",
+        "es": "/portafolio",
+        "de": "/portfolio",
+        "fr": "/portfolio"
     }
 } satisfies Pathnames<typeof locales>;
 
