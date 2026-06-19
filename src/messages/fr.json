@@ -47,6 +47,12 @@
     "buttonContact1": "Parlez-nous de votre idée",
     "buttonContact2": "Planifiez un appel"
   },
+  "heroAboutUs": {
+    "badge": "À Propos",
+    "titleLine1": "Esprits brillants,",
+    "titleLine2": "solutions extraordinaires",
+    "subtitle": "Chaque projet est une opportunité de créer quelque chose d'incroyable. Rencontrez les personnes qui transforment les idées en réalités numériques qui ont un impact et transcendent."
+  },
   "aboutUsHome": {
     "titleCard1": "À propos de nous",
     "descriptionCard1": "Chez LyraTech, nous créons des logiciels qui inspirent, en alliant design, rapidité et fonctionnalité. Né d’une équipe passionnée, nous sommes aujourd’hui une référence en solutions numériques qui dépassent les attentes et génèrent des résultats concrets.",

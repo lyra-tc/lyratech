@@ -47,6 +47,12 @@
     "buttonContact1": "Erzähl uns deine Idee",
     "buttonContact2": "Vereinbare ein Gespräch"
   },
+  "heroAboutUs": {
+    "badge": "Über Uns",
+    "titleLine1": "Brillante Köpfe,",
+    "titleLine2": "außergewöhnliche Lösungen",
+    "subtitle": "Jedes Projekt ist eine Chance, etwas Unglaubliches zu schaffen. Lernen Sie die Menschen kennen, die Ideen in digitale Realitäten verwandeln, die beeindrucken und überdauern."
+  },
   "aboutUsHome": {
     "titleCard1": "Über uns",
     "descriptionCard1": "Bei LyraTech entwickeln wir Software, die inspiriert – mit Design, Geschwindigkeit und Funktionalität. Aus einem leidenschaftlichen Team entstanden, sind wir heute ein Maßstab für digitale Lösungen, die Erwartungen übertreffen und echte Ergebnisse liefern.",

@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "@/components/Navbar/index";
-import AboutUs from "@/components/Home/AboutUs";
+import HeroAboutUs from "@/components/AboutUs/HeroAboutUs";
 import ButtonLanguage from "@/components/ButtonLanguage";
 import Footer from "@/components/Footer";
 
@@ -9,7 +9,7 @@ export default function AboutUsPage() {
         <div className="">
             <Navbar />
             <ButtonLanguage />
-            <AboutUs />
+            <HeroAboutUs />
             <Footer />
         </div>
     );
