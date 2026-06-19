@@ -10,6 +10,7 @@ type Service = {
 
 function Services() {
     const t = useTranslations("servicesHome");
+    const tNavbar = useTranslations("navbar");
     const indices = [0,1,2,3,4,5,6] as const;
     const servicesData: Service[] = [
         {
@@ -130,7 +131,7 @@ function Services() {
                 </div>
 
                 <div className="mt-8 md:mt-12 flex justify-center">
-                    <a href="mailto:ricardo.sierra@lyratech.com.mx" target="_blank" rel="noopener noreferrer">
+                    <a href={tNavbar("servicesLink")}>
                         <button
                             className="bg-[#5e67af] text-white w-[200px] md:w-[228px] h-14 md:h-16 rounded-[20px] shadow-[0px_6px_6px_0px_rgba(0,0,0,0.3)] hover:bg-[#525ba3] transition-colors duration-300 text-center font-montserrat-bold text-base md:text-lg leading-[150%] flex items-center justify-center">
                             {t("button")}

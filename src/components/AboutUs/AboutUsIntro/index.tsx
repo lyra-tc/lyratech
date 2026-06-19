@@ -24,7 +24,7 @@ export default function AboutUsIntro() {
     const [front, setFront] = useState(0);
 
     return (
-        <section className="py-24 px-6 md:px-16 lg:px-24 xl:px-32">
+        <section id="about-us-intro" className="py-24 px-6 md:px-16 lg:px-24 xl:px-32">
             <div className="flex flex-col lg:flex-row gap-16 xl:gap-20 items-center max-w-screen-xl mx-auto">
 
                 {/* ── Left — text + features ─────────────────── */}
