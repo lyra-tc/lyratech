@@ -47,6 +47,12 @@
     "buttonContact1": "Parlez-nous de votre idée",
     "buttonContact2": "Planifiez un appel"
   },
+  "visionMission": {
+    "visionTitle": "Vision",
+    "visionDesc": "Être leaders en solutions numériques qui comprennent les entreprises, améliorent la qualité de vie et transforment les industries grâce à l'innovation technologique, en créant un impact positif et durable sur chaque projet.",
+    "missionTitle": "Mission",
+    "missionDesc": "Nous développons des solutions technologiques sur mesure qui connectent les idées aux résultats. Nous nous concentrons sur l'écoute, la conception avec intention et la livraison de produits qui apportent de la valeur dès le premier jour."
+  },
   "teamSection": {
     "title": "Notre équipe",
     "desc1": "Stratège visionnaire qui transforme les idées en produits numériques à fort impact.",

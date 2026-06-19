@@ -47,6 +47,12 @@
     "buttonContact1": "Tell us your idea",
     "buttonContact2": "Schedule a call"
   },
+  "visionMission": {
+    "visionTitle": "Vision",
+    "visionDesc": "To be leaders in digital solutions that understand businesses, improve quality of life, and transform industries through technological innovation, creating a positive and lasting impact on every project.",
+    "missionTitle": "Mission",
+    "missionDesc": "We develop tailored technological solutions that connect ideas with results. We focus on listening, designing with purpose, and delivering products that add value from day one, accompanying our clients every step of the way."
+  },
   "teamSection": {
     "title": "Our team",
     "desc1": "Visionary strategist who turns ideas into high-impact digital products.",

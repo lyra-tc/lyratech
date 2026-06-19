@@ -47,6 +47,12 @@
     "buttonContact1": "Cuéntanos tu idea",
     "buttonContact2": "Agenda una llamada"
   },
+  "visionMission": {
+    "visionTitle": "Visión",
+    "visionDesc": "Ser líderes en soluciones digitales que entiendan los negocios, mejoren la calidad de vida y transformen industrias a través de la innovación tecnológica, creando un impacto positivo y duradero en cada proyecto.",
+    "missionTitle": "Misión",
+    "missionDesc": "Desarrollamos soluciones tecnológicas a medida que conectan ideas con resultados. Nos enfocamos en escuchar, diseñar con propósito y entregar productos que aportan valor desde el primer día, acompañando a nuestros clientes en cada paso del proceso."
+  },
   "teamSection": {
     "title": "Nuestro equipo",
     "desc1": "Estratega visionario que convierte ideas en productos digitales de alto impacto.",
