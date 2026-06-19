@@ -9,7 +9,7 @@ export default function HeroAboutUs() {
     const t = useTranslations("heroAboutUs");
 
     return (
-        <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+        <section className="relative min-h-[88vh] flex flex-col items-center justify-center px-6 overflow-hidden">
             {/* Decorative blobs */}
             <div className="absolute top-1/3 -left-20 w-80 h-80 bg-lyratech-light-purple rounded-full blur-3xl opacity-30 -z-10" />
             <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-lyratech-purple rounded-full blur-3xl opacity-10 -z-10" />

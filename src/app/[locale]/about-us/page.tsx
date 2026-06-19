@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "@/components/Navbar/index";
 import HeroAboutUs from "@/components/AboutUs/HeroAboutUs";
+import AboutUsIntro from "@/components/AboutUs/AboutUsIntro";
 import TeamSection from "@/components/AboutUs/TeamSection";
 import VisionMission from "@/components/AboutUs/VisionMission";
 import ButtonLanguage from "@/components/ButtonLanguage";
@@ -12,6 +13,7 @@ export default function AboutUsPage() {
             <Navbar />
             <ButtonLanguage />
             <HeroAboutUs />
+            <AboutUsIntro />
             <TeamSection />
             <VisionMission />
             <Footer />

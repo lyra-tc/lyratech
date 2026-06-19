@@ -47,6 +47,21 @@
     "buttonContact1": "Parlez-nous de votre idée",
     "buttonContact2": "Planifiez un appel"
   },
+  "aboutUsIntro": {
+    "badge": "À Propos",
+    "titleBlack": "Nous transformons les",
+    "titlePurple": "idées",
+    "titleBlack2": "en réalités numériques",
+    "description": "Chez LyraTech, nous ne faisons pas que coder, nous créons des expériences qui connectent, inspirent et génèrent une valeur réelle. Nous sommes une équipe multidisciplinaire passionnée.",
+    "feat1Title": "Passion",
+    "feat1Desc": "Nous aimons ce que nous faisons et cela se voit dans chaque ligne de code",
+    "feat2Title": "Précision",
+    "feat2Desc": "Chaque détail compte pour créer des expériences exceptionnelles",
+    "feat3Title": "Innovation",
+    "feat3Desc": "Nous cherchons toujours la prochaine grande solution technologique",
+    "feat4Title": "Excellence",
+    "feat4Desc": "Nous ne nous contentons pas du bien, nous visons l'extraordinaire"
+  },
   "visionMission": {
     "visionTitle": "Vision",
     "visionDesc": "Être leaders en solutions numériques qui comprennent les entreprises, améliorent la qualité de vie et transforment les industries grâce à l'innovation technologique, en créant un impact positif et durable sur chaque projet.",

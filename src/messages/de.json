@@ -47,6 +47,21 @@
     "buttonContact1": "Erzähl uns deine Idee",
     "buttonContact2": "Vereinbare ein Gespräch"
   },
+  "aboutUsIntro": {
+    "badge": "Über Uns",
+    "titleBlack": "Wir verwandeln",
+    "titlePurple": "Ideen",
+    "titleBlack2": "in digitale Realitäten",
+    "description": "Bei LyraTech schreiben wir nicht nur Code, wir schaffen Erlebnisse, die verbinden, inspirieren und echten Mehrwert erzeugen. Wir sind ein leidenschaftliches multidisziplinäres Team.",
+    "feat1Title": "Leidenschaft",
+    "feat1Desc": "Wir lieben was wir tun und das sieht man in jeder Zeile Code",
+    "feat2Title": "Präzision",
+    "feat2Desc": "Jedes Detail zählt, um außergewöhnliche Erlebnisse zu schaffen",
+    "feat3Title": "Innovation",
+    "feat3Desc": "Wir suchen immer nach der nächsten großen technologischen Lösung",
+    "feat4Title": "Exzellenz",
+    "feat4Desc": "Wir begnügen uns nicht mit gut, wir streben nach dem Außergewöhnlichen"
+  },
   "visionMission": {
     "visionTitle": "Vision",
     "visionDesc": "Führend in digitalen Lösungen zu sein, die Unternehmen verstehen, die Lebensqualität verbessern und Industrien durch technologische Innovation transformieren – mit einem positiven und nachhaltigen Einfluss auf jedes Projekt.",
