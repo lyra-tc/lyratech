@@ -13,8 +13,8 @@ export default function AboutUsPage() {
             <Navbar />
             <ButtonLanguage />
             <HeroAboutUs />
-            <AboutUsIntro />
             <TeamSection />
+            <AboutUsIntro />
             <VisionMission />
             <Footer />
         </div>
