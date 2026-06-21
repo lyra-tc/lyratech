@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineArrowRight } from "react-icons/hi";
 
 import Finnova from "@/assets/images/Home/Portafolio/Finnova.png";
+import RavePass from "@/assets/images/Home/Portafolio/RavePass.svg";
 import Indeleble from "@/assets/images/Home/Portafolio/Indeleble.png";
 import PulsoVital from "@/assets/images/Home/Portafolio/PulsoVital.png";
 import CSV from "@/assets/images/Home/Portafolio/CSV.png";
@@ -37,6 +38,14 @@ export default function PortfolioGrid() {
             link: "https://finnova.com.mx/",
             tech: ["React Native", "Node.js", "PostgreSQL", "LangChain"],
             categories: ["mobile", "ai"],
+        },
+        {
+            name: "RavePass",
+            img: RavePass,
+            description: t("ravepass"),
+            link: "https://www.ravepass.com.mx/",
+            tech: ["React", "Supabase"],
+            categories: ["web"],
         },
         {
             name: "Indeleble",
