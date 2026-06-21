@@ -131,11 +131,8 @@ function Services() {
                 </div>
 
                 <div className="mt-8 md:mt-12 flex justify-center">
-                    <a href={tNavbar("servicesLink")}>
-                        <button
-                            className="bg-[#5e67af] text-white w-[200px] md:w-[228px] h-14 md:h-16 rounded-[20px] shadow-[0px_6px_6px_0px_rgba(0,0,0,0.3)] hover:bg-[#525ba3] transition-colors duration-300 text-center font-montserrat-bold text-base md:text-lg leading-[150%] flex items-center justify-center">
-                            {t("button")}
-                        </button>
+                    <a href={tNavbar("servicesLink") + "#diagnostico"} className="bg-lyratech-purple text-white py-3 px-8 md:px-12 rounded-[15px] lg:rounded-[20px] font-montserrat-bold text-base md:text-lg transition-transform duration-500 ease-in-out hover:scale-75">
+                        {t("button")}
                     </a>
                 </div>
             </div>

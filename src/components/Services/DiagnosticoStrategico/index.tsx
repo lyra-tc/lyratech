@@ -40,7 +40,7 @@ export default function DiagnosticoStrategico() {
     ];
 
     return (
-        <section className="px-6 py-16 md:py-24 bg-gray-50/60">
+        <section id="diagnostico" className="px-6 py-16 md:py-24 bg-gray-50/60">
             <div className="max-w-6xl mx-auto">
 
                 {/* Header */}

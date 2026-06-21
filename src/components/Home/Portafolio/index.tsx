@@ -193,7 +193,7 @@ function Portafolio() {
                                             <div className="mt-28 text-center px-2">{project.content}</div>
                                             <div className="flex justify-center mb-10">
                                                 <a href={project.link} target="_blank" rel="noopener noreferrer">
-                                                    <button className="border border-white rounded-[20px] px-4 py-2 transform hover:scale-125 transition-transform duration-300">
+                                                    <button className="border border-white rounded-[15px] lg:rounded-[20px] px-6 py-2 font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
                                                         {t("viewMore")}
                                                     </button>
                                                 </a>
@@ -228,7 +228,7 @@ function Portafolio() {
                 </p>
                 <a href="https://wa.me/525564075229" target="_blank" rel="noopener noreferrer">
                     <button
-                        className="text-sm md:text-lg rounded-[12px] text-white px-3 py-3 md:px-12 bg-gradient-to-tr from-button-dark-purple to-button-light-purple shadow-button transition-transform duration-500 ease-in-out hover:scale-75">
+                        className="text-sm md:text-lg rounded-[15px] md:rounded-[20px] text-white px-8 py-3 md:px-12 bg-lyratech-purple font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p>{t("callToActionButton")}</p>
                             <FaArrowRight/>

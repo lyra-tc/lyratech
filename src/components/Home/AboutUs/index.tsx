@@ -45,7 +45,7 @@ export default function ScrollStack() {
                                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 lg:text-left">{card.title}</h2>
                                 <p className="mb-8 text-justify lg:text-xs xl:text-base">{card.text}</p>
                                 <div className="flex flex-col justify-start items-start">
-                                    <a href={i === 0 ? tNavbar("aboutUsLink") + "#team" : tNavbar("aboutUsLink") + "#about-us-intro"} className="bg-[#5F67AF] text-white px-6 py-3 shadow-button rounded-[10px] lg:rounded-[15px] transition-transform duration-500 ease-in-out hover:scale-75">
+                                    <a href={i === 0 ? tNavbar("aboutUsLink") + "#team" : tNavbar("aboutUsLink") + "#about-us-intro"} className="bg-lyratech-purple text-white px-6 py-3 rounded-[15px] lg:rounded-[20px] font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
                                         {card.button}
                                     </a>
                                 </div>

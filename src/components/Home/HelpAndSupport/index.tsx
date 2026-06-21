@@ -78,7 +78,7 @@ function HelpAndSupport() {
                         <div className="mt-7 md:mt-10">
                             <a href={method.buttonUrl} target="_blank" rel="noopener noreferrer">
                                 <button
-                                    className="text-lg lg:text-sm xl:text-lg rounded-[12px] text-white px-10 py-2 bg-gradient-to-tr from-button-dark-purple to-button-light-purple shadow-button transition-transform duration-500 ease-in-out hover:scale-75">
+                                    className="text-base lg:text-sm xl:text-lg rounded-[15px] lg:rounded-[20px] text-white px-10 py-3 bg-lyratech-purple font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
                                     {method.buttonText}
                                 </button>
                             </a>
