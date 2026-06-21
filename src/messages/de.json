@@ -76,6 +76,18 @@
     "desc4": "Verbindet die Marke Lyratech mit der Welt durch kreative Strategien und Daten.",
     "desc5": "Sichert die finanzielle Gesundheit und das nachhaltige Wachstum des Teams."
   },
+  "heroContact": {
+    "badge": "Kontakt",
+    "titleLine1": "Sprechen wir über Ihr",
+    "titleLine2": "Projekt",
+    "subtitle": "Haben Sie eine großartige Idee? Wir sind hier, um sie in die Realität umzusetzen. Erzählen Sie uns, was Sie brauchen, und starten wir gemeinsam."
+  },
+  "heroPortfolio": {
+    "badge": "Portfolio",
+    "titleLine1": "Projekte, die",
+    "titleLine2": "inspirieren",
+    "subtitle": "Jedes Projekt ist eine Geschichte von Innovation, Kreativität und außergewöhnlichen Ergebnissen, die Unternehmen verändert haben."
+  },
   "heroServices": {
     "badge": "Dienste",
     "titleLine1": "Technologie, die",

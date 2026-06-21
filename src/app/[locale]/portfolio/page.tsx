@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "@/components/Navbar/index";
-import Portafolio from "@/components/Home/Portafolio";
+import HeroPortfolio from "@/components/Portfolio/HeroPortfolio";
 import ButtonLanguage from "@/components/ButtonLanguage";
 import Footer from "@/components/Footer";
 
@@ -9,7 +9,7 @@ export default function PortfolioPage() {
         <div className="">
             <Navbar />
             <ButtonLanguage />
-            <Portafolio />
+            <HeroPortfolio />
             <Footer />
         </div>
     );

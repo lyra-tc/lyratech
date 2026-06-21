@@ -3,10 +3,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { HiOutlineCog } from "react-icons/hi";
+import { HiOutlineCollection } from "react-icons/hi";
 
-export default function HeroServices() {
-    const t = useTranslations("heroServices");
+export default function HeroPortfolio() {
+    const t = useTranslations("heroPortfolio");
 
     return (
         <section className="relative min-h-[88vh] flex flex-col items-center justify-center px-6 overflow-hidden">
@@ -21,10 +21,10 @@ export default function HeroServices() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" })}
                     className="flex items-center gap-2 sm:gap-3 bg-white border border-gray-200 rounded-full px-6 py-3 sm:px-10 sm:py-4 shadow-sm mb-8 sm:mb-10 cursor-pointer transition-all duration-300 hover:bg-lyratech-light-purple hover:border-lyratech-purple hover:shadow-md"
                 >
-                    <HiOutlineCog className="text-lyratech-purple text-2xl sm:text-3xl" />
+                    <HiOutlineCollection className="text-lyratech-purple text-2xl sm:text-3xl" />
                     <span className="font-montserrat text-gray-700 font-semibold text-base sm:text-lg">
                         {t("badge")}
                     </span>
@@ -35,7 +35,7 @@ export default function HeroServices() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.1 }}
-                    className="font-montserrat-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl leading-tight mb-6 sm:mb-8"
+                    className="font-montserrat-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight mb-6 sm:mb-8"
                 >
                     <span className="text-black">{t("titleLine1")} </span>
                     <span className="text-lyratech-purple">{t("titleLine2")}</span>
