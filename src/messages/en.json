@@ -140,6 +140,13 @@
     "s3F5": "Minimum 3-month commitment",
     "ctaContact": "Let's talk"
   },
+  "portfolioGrid": {
+    "filterAll": "All",
+    "filterWeb": "Web",
+    "filterMobile": "Mobile",
+    "filterAI": "AI & ML",
+    "visitProject": "Visit project"
+  },
   "faqContact": {
     "titleLine1": "Frequently asked",
     "titleLine2": "questions",

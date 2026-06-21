@@ -140,6 +140,13 @@
     "s3F5": "Engagement minimum 3 mois",
     "ctaContact": "Parlons-en"
   },
+  "portfolioGrid": {
+    "filterAll": "Tous",
+    "filterWeb": "Web",
+    "filterMobile": "Mobile",
+    "filterAI": "IA & ML",
+    "visitProject": "Voir le projet"
+  },
   "faqContact": {
     "titleLine1": "Questions",
     "titleLine2": "fréquentes",
