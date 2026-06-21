@@ -1,16 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 //import Logo from "@/assets/images/Home/Hero/CrystalLogo.png";
 import Logo from "@/assets/images/Home/Hero/SolidLogo.png";
 //import Logo from "@/assets/images/Home/Hero/Logo.png";
+import BookingModal from "@/components/shared/BookingModal";
 
 function HeroHome() {
     const t = useTranslations("heroHome");
     const tNavbar = useTranslations("navbar");
+    const [showBooking, setShowBooking] = useState(false);
 
     return (
         <div id="home" className="text-black flex flex-col items-center justify-center md:flex-row md:mt-16 xl:mt-2 mb-16 md:mb-16">
@@ -58,11 +60,20 @@ function HeroHome() {
                     <a href={tNavbar("contactLink")} className="text-center bg-lyratech-purple text-white py-3 px-6 xl:px-10 rounded-[15px] lg:text-sm lg:py-5 lg:rounded-[20px] xl:text-lg xl:py-4 transition-transform duration-500 ease-in-out hover:scale-75">
                         {t("buttonContact1")}
                     </a>
-                    <a href={tNavbar("contactLink")} className="text-center border border-black py-3 px-3 xl:px-10 rounded-[15px] lg:text-sm lg:py-5 lg:rounded-[20px] xl:text-lg xl:py-4 transition-transform duration-500 ease-in-out hover:scale-75">
+                    <button
+                        onClick={() => setShowBooking(true)}
+                        className="text-center border border-black py-3 px-3 xl:px-10 rounded-[15px] lg:text-sm lg:py-5 lg:rounded-[20px] xl:text-lg xl:py-4 transition-transform duration-500 ease-in-out hover:scale-75"
+                    >
                         {t("buttonContact2")}
-                    </a>
+                    </button>
                 </motion.div>
             </div>
+
+            <BookingModal
+                isOpen={showBooking}
+                onClose={() => setShowBooking(false)}
+                title={t("buttonContact2")}
+            />
         </div>
     );
 }

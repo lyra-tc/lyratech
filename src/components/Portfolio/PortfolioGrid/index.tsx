@@ -44,7 +44,7 @@ export default function PortfolioGrid() {
             img: RavePass,
             description: t("ravepass"),
             link: "https://www.ravepass.com.mx/",
-            tech: ["React", "Supabase"],
+            tech: ["React", "Supabase", "AWS", "BaaS"],
             categories: ["web"],
         },
         {
