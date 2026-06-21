@@ -76,6 +76,18 @@
     "desc4": "Connecte la marque Lyratech avec le monde grâce à des stratégies créatives et des données.",
     "desc5": "Assure la santé financière et la croissance durable de l'équipe."
   },
+  "faqContact": {
+    "titleLine1": "Questions",
+    "titleLine2": "fréquentes",
+    "q1": "Travaillez-vous avec des startups ou seulement de grandes entreprises ?",
+    "a1": "Nous travaillons avec tous types d'entreprises, des startups en phase précoce aux grandes corporations. Nous nous adaptons à la taille et aux besoins de chaque client.",
+    "q2": "Combien de temps mettez-vous à répondre ?",
+    "a2": "Nous répondons en moins de 24 heures ouvrables. Pour les projets urgents, nous disposons de canaux d'assistance prioritaire pour garantir une réponse rapide.",
+    "q3": "Proposez-vous une maintenance et un support après la livraison du projet ?",
+    "a3": "Oui, nous proposons des plans de maintenance et de support post-livraison pour que votre produit fonctionne toujours de manière optimale et reste à jour.",
+    "q4": "Puis-je demander des modifications une fois le développement commencé ?",
+    "a4": "Oui, nous travaillons avec des méthodologies agiles qui permettent d'intégrer des modifications durant le développement. Chaque demande est évaluée et intégrée de façon ordonnée."
+  },
   "heroContact": {
     "badge": "Contact",
     "titleLine1": "Parlons de votre",
