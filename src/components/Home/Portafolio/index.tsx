@@ -31,7 +31,7 @@ function Portafolio() {
         { name: "Nuova Vita", img: NuovaVita, content: t("nuovaVita"), link: "https://nuova-vita.netlify.app/" },
         { name: "MindScope", img: MindScope, content: t("mindScope"), link: "https://mindscope-landing.netlify.app/" },
         { name: "Once Upon a Time", img: OnceUponATime, content: t("onceUponATime"), link: "https://once-upona-time.netlify.app/" },
-        { name: "Plenus HopeMun", img: PlenusHopeMun, content: t("plenusHopeMun"), link: "https://plenus.edu.mx/hopemun/" },
+        //{ name: "Plenus HopeMun", img: PlenusHopeMun, content: t("plenusHopeMun"), link: "https://plenus.edu.mx/hopemun/" },
     ];
 
     const [currentIndex, setCurrentIndex] = useState(0);

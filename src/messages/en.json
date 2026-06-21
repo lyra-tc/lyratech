@@ -76,6 +76,12 @@
     "desc4": "Connects the Lyratech brand with the world through creative strategies and data.",
     "desc5": "Ensures the financial health and sustainable growth of the team."
   },
+  "heroServices": {
+    "badge": "Services",
+    "titleLine1": "Technology that",
+    "titleLine2": "transforms",
+    "subtitle": "From idea to launch, we build complete solutions that drive your business into the digital future."
+  },
   "heroAboutUs": {
     "badge": "About Us",
     "titleLine1": "Brilliant minds,",
