@@ -261,6 +261,28 @@
     "responseTimePhone": "Sofort",
     "buttonTextPhone": "Jetzt anrufen"
   },
+  "contactForm": {
+    "infoTitle": "Kontaktinformationen",
+    "scheduleButton": "Meeting planen",
+    "formTitle": "Erzählen Sie uns von Ihrem Projekt",
+    "labelEmail": "E-Mail",
+    "labelPhone": "Telefon",
+    "labelOffice": "Büro",
+    "successTitle": "Nachricht gesendet!",
+    "successSubtitle": "Wir werden uns in Kürze bei Ihnen melden.",
+    "namePlaceholder": "Ihr vollständiger Name",
+    "emailPlaceholder": "Ihre@email.com",
+    "companyPlaceholder": "Ihr Unternehmensname",
+    "phonePlaceholder": "Ihre Telefonnummer",
+    "servicePlaceholder": "Dienst auswählen",
+    "messagePlaceholder": "Erzählen Sie uns von Ihrem Projekt, Ihren Zielen und wichtigen Details...",
+    "requiredField": "Pflichtfeld",
+    "submitButton": "Nachricht senden",
+    "serviceOption1": "Diagnose",
+    "serviceOption2": "Automatisierungen",
+    "serviceOption3": "Festpreisprojekt",
+    "serviceOption4": "Dediziertes Team"
+  },
   "footer": {
     "description": "Wir entwickeln außergewöhnliche Software mit makellosem Design, überlegener Geschwindigkeit und perfekter Funktionalität. Ihr digitaler Erfolg ist unsere Mission.",
     "location": "Querétaro, Mexiko",

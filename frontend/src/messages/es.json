@@ -261,6 +261,28 @@
     "responseTimePhone": "Inmediato",
     "buttonTextPhone": "Llamar Ahora"
   },
+  "contactForm": {
+    "infoTitle": "Información de contacto",
+    "scheduleButton": "Agendar reunión",
+    "formTitle": "Cuéntanos sobre tu proyecto",
+    "labelEmail": "Email",
+    "labelPhone": "Teléfono",
+    "labelOffice": "Oficina",
+    "successTitle": "¡Mensaje enviado!",
+    "successSubtitle": "Te contactaremos a la brevedad.",
+    "namePlaceholder": "Tu nombre completo",
+    "emailPlaceholder": "Tu@email.com",
+    "companyPlaceholder": "Nombre de tu empresa",
+    "phonePlaceholder": "Tu teléfono",
+    "servicePlaceholder": "Selecciona el servicio",
+    "messagePlaceholder": "Cuéntanos tu proyecto, objetivos y cualquier detalle importante...",
+    "requiredField": "Campo requerido",
+    "submitButton": "Enviar mensaje",
+    "serviceOption1": "Diagnóstico",
+    "serviceOption2": "Automatizaciones",
+    "serviceOption3": "Proyecto a precio fijo",
+    "serviceOption4": "Equipo dedicado"
+  },
   "footer": {
     "description": "Creamos software extraordinario con diseño impecable, velocidad superior y funcionalidad perfecta. Tu éxito digital es nuestra misión.",
     "location": "Querétaro, México",
