@@ -127,7 +127,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                         </h2>
 
                         <div className="p-4 rounded-xl bg-white">
-                            <QRCode value={`https://lyratech.netlify.app/${qrEndpoint}`} size={160} />
+                            <QRCode value={`${typeof window !== "undefined" ? window.location.origin : ""}/${qrEndpoint}`} size={160} />
                         </div>
 
                         <p className="text-white/50 text-xs mt-5 text-center font-montserrat">

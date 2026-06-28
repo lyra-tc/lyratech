@@ -97,7 +97,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
                     >
                         <h2 className="text-xl font-semibold mb-4 text-black">{t("shareCard")}</h2>
                         {/* Genera el QR apuntando a qrEndpoint */}
-                        <QRCode value={`https://lyratech.netlify.app/${qrEndpoint}`} size={160} />
+                        <QRCode value={`${typeof window !== "undefined" ? window.location.origin : ""}/${qrEndpoint}`} size={160} />
                         <p className="text-gray-700 text-sm mt-4 text-center">
                             {t("scanCode")}
                         </p>
