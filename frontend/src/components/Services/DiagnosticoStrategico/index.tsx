@@ -16,7 +16,6 @@ export default function DiagnosticoStrategico() {
             key: "express",
             name: t("p1Name"),
             duration: t("p1Duration"),
-            price: t("p1Price"),
             features: [t("p1F1"), t("p1F2"), t("p1F3")],
             featured: false,
         },
@@ -24,7 +23,6 @@ export default function DiagnosticoStrategico() {
             key: "standard",
             name: t("p2Name"),
             duration: t("p2Duration"),
-            price: t("p2Price"),
             features: [t("p2F1"), t("p2F2"), t("p2F3")],
             featured: true,
         },
@@ -32,7 +30,6 @@ export default function DiagnosticoStrategico() {
             key: "pro",
             name: t("p3Name"),
             duration: t("p3Duration"),
-            price: t("p3Price"),
             features: [t("p3F1"), t("p3F2"), t("p3F3"), t("p3F4"), t("p3F5")],
             featured: false,
         },
@@ -127,15 +124,6 @@ export default function DiagnosticoStrategico() {
                                             ))}
                                         </ul>
 
-                                        <div className="mt-8 pt-6 border-t border-gray-100">
-                                            <p className="font-montserrat text-xs text-gray-400 uppercase tracking-widest mb-1">
-                                                {t("priceLabel")}
-                                            </p>
-                                            <p className={`font-montserrat-bold text-2xl ${plan.featured ? "text-lyratech-purple" : "text-gray-800"}`}>
-                                                {plan.price}
-                                            </p>
-                                            <p className="font-montserrat text-xs text-gray-400 mt-0.5">MXN + IVA</p>
-                                        </div>
                                     </div>
                                 </motion.div>
                             );

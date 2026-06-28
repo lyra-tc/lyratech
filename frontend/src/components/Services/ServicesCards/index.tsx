@@ -26,8 +26,6 @@ export default function ServicesCards() {
             Icon: HiOutlineLightningBolt,
             title: t("s1Title"),
             description: t("s1Desc"),
-            price: t("s1Price"),
-            priceLabel: t("s1PriceLabel"),
             features: [t("s1F1"), t("s1F2"), t("s1F3"), t("s1F4"), t("s1F5")],
         },
         {
@@ -35,8 +33,6 @@ export default function ServicesCards() {
             Icon: HiOutlineClipboardCheck,
             title: t("s2Title"),
             description: t("s2Desc"),
-            price: t("s2Price"),
-            priceLabel: t("s2PriceLabel"),
             features: [t("s2F1"), t("s2F2"), t("s2F3"), t("s2F4"), t("s2F5"), t("s2F6")],
         },
         {
@@ -44,8 +40,6 @@ export default function ServicesCards() {
             Icon: HiOutlineUserGroup,
             title: t("s3Title"),
             description: t("s3Desc"),
-            price: t("s3Price"),
-            priceLabel: t("s3PriceLabel"),
             features: [t("s3F1"), t("s3F2"), t("s3F3"), t("s3F4"), t("s3F5")],
         },
     ];
@@ -104,21 +98,13 @@ export default function ServicesCards() {
                                             {service.description}
                                         </p>
 
-                                        <div className="mt-6 pt-6 border-t border-gray-100 flex items-end justify-between">
-                                            <div>
-                                                <p className="font-montserrat text-xs text-gray-400 uppercase tracking-widest mb-1">
-                                                    {service.priceLabel}
-                                                </p>
-                                                <p className="font-montserrat-bold text-lyratech-purple text-base">
-                                                    {service.price}
-                                                </p>
-                                            </div>
+                                        <div className="mt-6 flex items-end justify-end">
                                             <button
                                                 onClick={() => setFlipped(index)}
-                                                className="bg-lyratech-purple text-white w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#5058a0] transition-colors duration-200"
-                                                aria-label="Ver detalles"
+                                                className="flex items-center gap-2 bg-lyratech-purple text-white px-4 py-2 rounded-full font-montserrat-bold text-sm hover:bg-[#5058a0] transition-colors duration-200"
                                             >
-                                                <HiOutlineArrowRight className="text-lg" />
+                                                {t("verMas")}
+                                                <HiOutlineArrowRight className="text-base" />
                                             </button>
                                         </div>
                                     </div>
@@ -156,9 +142,6 @@ export default function ServicesCards() {
                                         </ul>
 
                                         <div className="mt-6 pt-5 border-t border-white/10">
-                                            <p className="font-montserrat-bold text-lyratech-purple text-lg mb-4">
-                                                {service.price}
-                                            </p>
                                             <Link href={`/${locale}/contact`}>
                                                 <button className="w-full bg-lyratech-purple text-white rounded-xl py-3 font-montserrat-bold text-sm hover:bg-[#5058a0] transition-colors duration-200">
                                                     {t("ctaContact")}
