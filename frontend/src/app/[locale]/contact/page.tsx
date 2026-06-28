@@ -15,7 +15,6 @@ export default function ContactPage() {
             <HeroContact />
             <ContactForm />
             <FAQ />
-            <HelpAndSupport />
             <Footer />
         </div>
     );
