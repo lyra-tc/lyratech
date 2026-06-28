@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, useMotionValue, useSpring, useMotionValueEvent } from "framer-motion";
 import RichieBase from "@/assets/images/DigitalBusinessCardV3/Richie.png";
 import RichieHover from "@/assets/images/DigitalBusinessCardV3/Driver.png";
+import Link from 'next/link';
 
 interface HeroProps {
     name: string;
@@ -229,10 +230,10 @@ export default function Hero({ name, role, company, phone, email }: HeroProps) {
                     className="flex-1 min-w-[140px] max-w-[200px] text-center border border-[#5f66ae]/30 text-[#5f66ae] text-sm font-montserrat-bold py-3 px-4 rounded-xl hover:bg-[#5f66ae] hover:text-white transition-all duration-300 active:scale-95">
                     Email
                 </a>
-                <a href="/"
+                <Link href="/"
                     className="flex-1 min-w-[140px] max-w-[200px] text-center border border-[#272a33]/10 text-[#272a33]/50 text-sm font-montserrat-bold py-3 px-4 rounded-xl hover:border-[#272a33]/30 hover:text-[#272a33] transition-all duration-300 active:scale-95">
                     lyratech.com.mx
-                </a>
+                </Link>
             </motion.div>
         </div>
     );
