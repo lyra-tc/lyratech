@@ -8,11 +8,11 @@ import { BsPersonVcard } from "react-icons/bs";
 import { HiOutlineMail } from "react-icons/hi";
 import { FaLinkedinIn } from "react-icons/fa";
 
-import DaniCImage from "@/assets/images/DigitalBusinessCard/DaniC.jpg";
-import DaniQImage from "@/assets/images/DigitalBusinessCard/DaniQ.jpg";
+import DaniCImage from "@/assets/images/DigitalBusinessCard/DaniC.png";
+import DaniQImage from "@/assets/images/DigitalBusinessCard/DaniQ.png";
 import EzzatImage from "@/assets/images/DigitalBusinessCard/Ezzat.jpg";
 import GaloImage from "@/assets/images/DigitalBusinessCard/Galo.jpg";
-import RichieImage from "@/assets/images/DigitalBusinessCard/Richie.jpg";
+import RichieImage from "@/assets/images/DigitalBusinessCard/Richie.png";
 
 const members = [
     {
@@ -89,7 +89,7 @@ export default function TeamSection() {
                         className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_24px_-4px_rgba(0,0,0,0.12)] p-7 flex flex-col items-center text-center hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.18)] transition-shadow duration-300 cursor-pointer"
                     >
                         {/* Avatar */}
-                        <div className="w-32 h-32 rounded-full bg-lyratech-purple flex items-center justify-center mb-5 overflow-hidden ring-4 ring-lyratech-light-purple">
+                        <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center mb-5 overflow-hidden ring-4 ring-lyratech-light-purple">
                             <Image
                                 src={member.image}
                                 alt={member.name}

@@ -29,8 +29,18 @@ export default {
         "scale-in": "scaleIn 0.8s ease-out both",
         'spin-once': 'spin-once 0.5s linear forwards',
         slideInUp: 'slideInUp 0.5s ease-out forwards',
+        marquee: 'marquee 40s linear infinite',
+        'marquee-reverse': 'marqueeReverse 18s linear infinite',
       },
       keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        marqueeReverse: {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0%)' },
+        },
         fadeIn: {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },

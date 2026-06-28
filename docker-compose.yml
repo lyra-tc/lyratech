@@ -3,13 +3,16 @@ services:
   web:
     build:
       context: .
+    container_name: lyratech-web
+    restart: always
     ports:
-      - "3000:3000"
-    networks:
-      - frontend
+      - "3001:3000"
     environment:
       - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - frontend
 
 networks:
-  backend:
+  frontend:
     driver: bridge

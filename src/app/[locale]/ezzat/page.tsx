@@ -1,13 +1,22 @@
 import React from "react";
-import Profile from "@/components/DigitalBusinessCard/Profile";
-import Contact from "@/components/DigitalBusinessCard/Contact";
+import Profile from "@/components/DigitalBusinessCardV2/Profile";
+import Contact from "@/components/DigitalBusinessCardV2/Contact";
 import EzzatImage from "@/assets/images/DigitalBusinessCard/Ezzat.jpg";
 import ButtonLanguage from "@/components/ButtonLanguage";
 
 export default function Ezzat() {
     return (
-        <div className="bg-gradient-to-br from-lyratech-purple via-[#3f416e] to-lyratech-blue pb-20">
-            <Profile imageSrc={EzzatImage} name="Ezzat Alzahouri Campos" position="Lyra Tech Co-Founder & CTO"/>
+        <div
+            className="min-h-screen"
+            style={{
+                background: "linear-gradient(160deg, #1a1c2e 0%, #2d2f52 40%, #1e2035 70%, #0d0f1a 100%)",
+            }}
+        >
+            <Profile
+                imageSrc={EzzatImage}
+                name="Ezzat Alzahouri Campos"
+                position="Co-Founder & CTO"
+            />
             <ButtonLanguage />
             <Contact
                 phone="524428804267"
