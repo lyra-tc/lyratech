@@ -19,5 +19,5 @@ jobs:
           script: |
             cd /var/www/dev.lyratech
             git pull origin develop
-            docker compose down
-            docker compose up -d --build
+            docker compose -f docker-compose.dev.yml down
+            docker compose -f docker-compose.dev.yml up -d --build
