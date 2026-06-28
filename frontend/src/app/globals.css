@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@font-face {
+  font-family: 'ZenDots-Regular';
+  src: url('../../src/assets/fonts/ZenDots-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('../../src/assets/fonts/Montserrat-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat-Regular';
+  src: url('../../src/assets/fonts/Montserrat-Regular.ttf') format('truetype');
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes live-border {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1.5px rgba(95,102,174,0.6),
+      0 0 10px rgba(95,102,174,0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2.5px rgba(95,102,174,1),
+      0 0 22px rgba(95,102,174,0.45);
+  }
+}
+
