@@ -42,7 +42,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: lyratech-web-dev
+    container_name: lyratech-frontend-dev
     restart: always
     ports:
       - "3002:3000"
