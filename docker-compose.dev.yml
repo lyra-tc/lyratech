@@ -1,32 +1,32 @@
 services:
-  lyratech-mysql:
+  lyratech-mysql-dev:
     image: mysql:8.0
-    container_name: lyratech-mysql
+    container_name: lyratech-mysql-dev
     restart: unless-stopped
     env_file:
       - .env
     ports:
-      - "${DATABASE_PORT:-3307}:${DATABASE_PORT:-3307}"
+      - "${DATABASE_PORT:-3308}:${DATABASE_PORT:-3308}"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_USER: ${DATABASE_USER}
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_TCP_PORT: ${DATABASE_PORT:-3307}
+      MYSQL_TCP_PORT: ${DATABASE_PORT:-3308}
     volumes:
-      - lyratech_db_data:/var/lib/mysql
+      - lyratech_dev_db_data:/var/lib/mysql
     networks:
       - frontend
 
-  lyratech-mysql-backup:
+  lyratech-mysql-dev-backup:
     image: fradelg/mysql-cron-backup
-    container_name: lyratech-mysql-backup
+    container_name: lyratech-mysql-dev-backup
     restart: unless-stopped
     depends_on:
-      - lyratech-mysql
+      - lyratech-mysql-dev
     environment:
-      MYSQL_HOST: lyratech-mysql
-      MYSQL_PORT: ${DATABASE_PORT:-3307}
+      MYSQL_HOST: lyratech-mysql-dev
+      MYSQL_PORT: ${DATABASE_PORT:-3308}
       MYSQL_USER: ${DATABASE_USER}
       MYSQL_PASS: ${DATABASE_PASSWORD}
       MYSQL_DB: ${DATABASE_NAME}
@@ -34,7 +34,7 @@ services:
       CRON_TIME: ${BACKUP_CRON_TIME:-0 3 * * *}
       GZIP_LEVEL: ${BACKUP_GZIP_LEVEL:-6}
     volumes:
-      - lyratech_db_backups:/backup
+      - lyratech_dev_db_backups:/backup
     networks:
       - frontend
 
@@ -42,10 +42,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: lyratech-frontend
+    container_name: lyratech-frontend-dev
     restart: always
     ports:
-      - "3001:3000"
+      - "3002:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -57,5 +57,5 @@ networks:
     driver: bridge
 
 volumes:
-  lyratech_db_data:
-  lyratech_db_backups:
+  lyratech_dev_db_data:
+  lyratech_dev_db_backups:
