@@ -13,6 +13,8 @@ services:
       - PORT=3000
     networks:
       - frontend
+    labels:
+      - "dev.dozzle.group=lyratech"
 
 networks:
   frontend:
