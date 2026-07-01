@@ -299,6 +299,6 @@
     "resources1": "Support",
     "resources2": "FAQ",
     "resources3": "Contact",
-    "copyright": "© 2025 LyraTech. Tous droits réservés."
+    "copyright": "© {year} LyraTech. Tous droits réservés."
   }
 }

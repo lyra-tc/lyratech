@@ -103,7 +103,7 @@ function Footer() {
 
             {/* Copyright */}
             <div className="bg-black text-center py-4 text-xs lg:text-lg">
-                {t("copyright")}
+                {t("copyright", { year: new Date().getFullYear() })}
             </div>
         </footer>
     );

@@ -15,6 +15,30 @@ services:
       MYSQL_TCP_PORT: ${DATABASE_PORT:-3308}
     volumes:
       - lyratech_dev_db_data:/var/lib/mysql
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - frontend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lyratech-backend-dev
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_HOST: lyratech-mysql-dev
+      DATABASE_PORT: ${DATABASE_PORT:-3308}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-lyratech-super-secret-jwt-key-change-in-prod}
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 480
+      BACKEND_CORS_ORIGINS: '["http://localhost:3000","http://localhost:3002","http://localhost:3001"]'
+    depends_on:
+      - lyratech-mysql-dev
     networks:
       - frontend
 
