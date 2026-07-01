@@ -1,0 +1,132 @@
+"use client";
+
+import React, { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { auth } from "@/lib/api";
+import LogoColor from "@/assets/images/Logo/LogoColor.png";
+
+function LoginForm() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const registered = params.get("registered") === "1";
+
+  useEffect(() => {
+    if (localStorage.getItem("lyratech_token")) {
+      router.replace("/dashboard/leads");
+    }
+  }, [router]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const { access_token } = await auth.login(email, password);
+      localStorage.setItem("lyratech_token", access_token);
+      const user = await auth.me();
+      localStorage.setItem("lyratech_user", JSON.stringify(user));
+      router.push("/dashboard/leads");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-2xl">
+      {/* Logo */}
+      <div className="flex flex-col items-center mb-8">
+        <Image src={LogoColor} alt="Lyratech" width={72} height={72} className="mb-4" priority />
+        <h1 className="font-zendots text-white text-xl tracking-wide">Lyratech</h1>
+        <p className="font-montserrat text-white/50 text-sm mt-1">Panel de administración</p>
+      </div>
+
+      {registered && (
+        <div className="bg-lyratech-green/20 border border-lyratech-green/40 text-lyratech-green rounded-lg px-4 py-3 text-sm font-montserrat mb-5 animate-fade-in">
+          Cuenta creada exitosamente. Ya puedes iniciar sesión.
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block font-montserrat text-white/70 text-sm mb-1.5">
+            Correo electrónico
+          </label>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="admin@lyratech.com"
+            className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block font-montserrat text-white/70 text-sm mb-1.5">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
+          />
+        </div>
+
+        {error && (
+          <div className="bg-red/20 border border-red/40 text-red rounded-lg px-4 py-3 text-sm font-montserrat animate-fade-in">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-lyratech-purple hover:bg-button-light-purple disabled:opacity-50 disabled:cursor-not-allowed text-white font-montserrat font-semibold py-3 rounded-lg transition-all duration-200 shadow-button hover:scale-[1.02] active:scale-[0.98] text-sm"
+        >
+          {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+        </button>
+      </form>
+
+      <div className="mt-6 text-center">
+        <span className="font-montserrat text-white/40 text-sm">¿No tienes cuenta? </span>
+        <Link
+          href="/dashboard/register"
+          className="font-montserrat text-lyratech-light-purple hover:text-white text-sm transition-colors duration-200"
+        >
+          Crear cuenta
+        </Link>
+      </div>
+
+      <p className="font-montserrat text-white/30 text-xs text-center mt-4">
+        © {new Date().getFullYear()} Lyratech. Todos los derechos reservados.
+      </p>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen bg-dark-blue flex items-center justify-center px-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-lyratech-purple/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-lyratech-purple/10 rounded-full blur-3xl" />
+      </div>
+      <div className="relative w-full max-w-md">
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
+      </div>
+    </div>
+  );
+}

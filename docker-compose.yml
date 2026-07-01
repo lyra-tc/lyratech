@@ -38,12 +38,40 @@ services:
     networks:
       - frontend
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lyratech-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: ${JWT_ACCESS_TOKEN_EXPIRE_MINUTES}
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS}
+    depends_on:
+      - lyratech-mysql
+    networks:
+      - frontend
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_BOOKING_URL: ${NEXT_PUBLIC_BOOKING_URL}
     container_name: lyratech-frontend
     restart: always
+    depends_on:
+      - backend
     ports:
       - "3001:3000"
     environment:

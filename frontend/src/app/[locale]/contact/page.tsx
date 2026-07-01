@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "@/components/Navbar/index";
 import HeroContact from "@/components/Contact/HeroContact";
+import ContactForm from "@/components/Contact/ContactForm";
 import FAQ from "@/components/Contact/FAQ";
 import HelpAndSupport from "@/components/Home/HelpAndSupport";
 import ButtonLanguage from "@/components/ButtonLanguage";
@@ -12,8 +13,8 @@ export default function ContactPage() {
             <Navbar />
             <ButtonLanguage />
             <HeroContact />
+            <ContactForm />
             <FAQ />
-            <HelpAndSupport />
             <Footer />
         </div>
     );

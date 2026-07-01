@@ -261,6 +261,28 @@
     "responseTimePhone": "Immédiat",
     "buttonTextPhone": "Appeler maintenant"
   },
+  "contactForm": {
+    "infoTitle": "Informations de contact",
+    "scheduleButton": "Planifier une réunion",
+    "formTitle": "Parlez-nous de votre projet",
+    "labelEmail": "E-mail",
+    "labelPhone": "Téléphone",
+    "labelOffice": "Bureau",
+    "successTitle": "Message envoyé !",
+    "successSubtitle": "Nous vous contacterons dans les plus brefs délais.",
+    "namePlaceholder": "Votre nom complet",
+    "emailPlaceholder": "Votre@email.com",
+    "companyPlaceholder": "Nom de votre entreprise",
+    "phonePlaceholder": "Votre numéro de téléphone",
+    "servicePlaceholder": "Sélectionnez le service",
+    "messagePlaceholder": "Parlez-nous de votre projet, vos objectifs et tout détail important...",
+    "requiredField": "Champ obligatoire",
+    "submitButton": "Envoyer le message",
+    "serviceOption1": "Diagnostic",
+    "serviceOption2": "Automatisations",
+    "serviceOption3": "Projet à prix fixe",
+    "serviceOption4": "Équipe dédiée"
+  },
   "footer": {
     "description": "Nous créons des logiciels extraordinaires avec un design impeccable, une vitesse supérieure et une fonctionnalité parfaite. Votre succès numérique est notre mission.",
     "location": "Querétaro, Mexique",
@@ -277,6 +299,6 @@
     "resources1": "Support",
     "resources2": "FAQ",
     "resources3": "Contact",
-    "copyright": "© 2025 LyraTech. Tous droits réservés."
+    "copyright": "© {year} LyraTech. Tous droits réservés."
   }
 }
