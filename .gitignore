@@ -1,7 +1,26 @@
+# --- Node / Next.js ---
 node_modules/
 .next/
+out/
+.turbo/
+next-env.d.ts
+*.tsbuildinfo
+npm-debug.log*
 
+# --- Python / FastAPI ---
 .venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
-# env files
+# --- Env files ---
 .env
+.env.local
+.env.*.local
+
+# --- OS / Editor ---
+.DS_Store

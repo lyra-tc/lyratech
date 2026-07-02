@@ -120,10 +120,12 @@ export default function LeadsPage() {
 
   function validateForm(): boolean {
     const errors: Record<string, string> = {};
+    const email = form.email ?? "";
+    const phone = form.phone ?? "";
     if (!form.name.trim()) errors.name = "El nombre es requerido";
-    if (!form.email.trim() && !form.phone.trim())
+    if (!email.trim() && !phone.trim())
       errors.contact = "Ingresa al menos un email o teléfono";
-    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       errors.email = "Ingresa un correo válido";
     if (!form.source) errors.source = "La fuente es requerida";
     setFieldErrors(errors);
