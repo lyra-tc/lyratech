@@ -10,6 +10,7 @@ import {
   HiOutlineInboxIn,
   HiOutlineLogout,
   HiOutlineCog,
+  HiOutlineMail,
   HiChevronLeft,
   HiChevronRight,
 } from "react-icons/hi";
@@ -17,9 +18,10 @@ import Logo from "@/assets/images/Navbar/White_Logo.png";
 import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
-  { label: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
-  { label: "Prospects", href: "/dashboard/prospects", icon: HiOutlineInboxIn },
-  { label: "Settings", href: "/dashboard/settings", icon: HiOutlineCog },
+  { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
+  { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineInboxIn },
+  { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail },
+  { label: "Settings", mobileLabel: "Settings", href: "/dashboard/settings", icon: HiOutlineCog },
 ];
 
 interface DashboardShellProps {
@@ -198,7 +200,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
 
         {/* Floating pill nav */}
         <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-dark-blue rounded-full shadow-2xl border border-white/10 px-2.5 py-2 flex items-center gap-2">
-          {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+          {NAV_ITEMS.map(({ mobileLabel, href, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link key={href} href={href} className="relative flex flex-col items-center justify-center w-20 py-2.5 rounded-full">
@@ -211,7 +213,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
                 )}
                 <span className={`relative z-10 flex flex-col items-center gap-1 transition-colors duration-200 ${active ? "text-white" : "text-white/60"}`}>
                   <Icon size={19} />
-                  <span className="font-montserrat text-[9px] font-medium whitespace-nowrap">{label}</span>
+                  <span className="font-montserrat text-[9px] font-medium whitespace-nowrap">{mobileLabel}</span>
                 </span>
               </Link>
             );

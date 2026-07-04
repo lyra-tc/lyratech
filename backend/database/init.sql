@@ -55,3 +55,12 @@ CREATE TABLE IF NOT EXISTS prospects (
     created_at  DATETIME DEFAULT (now()),
     INDEX ix_prospects_id (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+-- Notification recipients (dashboard-configurable email list)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS notification_recipients (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    email       VARCHAR(255) NOT NULL UNIQUE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   HiOutlineUser,
   HiOutlineLockClosed,
@@ -17,13 +17,11 @@ export default function SettingsPage() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("cuenta");
 
-  // Cuenta
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
-  // Contraseña
   const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
@@ -40,7 +38,7 @@ export default function SettingsPage() {
       setFullName(u.full_name);
       setEmail(u.email);
     } catch {
-      /* ignore — request() already redirects to login on 401 */
+      /* ignore - request() already redirects to login on 401 */
     }
   }, []);
 
@@ -74,26 +72,28 @@ export default function SettingsPage() {
     e.preventDefault();
     setPwMsg(null);
     if (newPw !== confirmPw) {
-      setPwMsg({ type: "err", text: "Las contraseñas nuevas no coinciden." });
+      setPwMsg({ type: "err", text: "Las contrasenas nuevas no coinciden." });
       return;
     }
     if (newPw.length < 6) {
-      setPwMsg({ type: "err", text: "La contraseña debe tener al menos 6 caracteres." });
+      setPwMsg({ type: "err", text: "La contrasena debe tener al menos 6 caracteres." });
       return;
     }
     setPwSaving(true);
     try {
       await auth.changePassword(currentPw, newPw);
-      setCurrentPw(""); setNewPw(""); setConfirmPw("");
-      setPwMsg({ type: "ok", text: "Contraseña actualizada correctamente." });
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+      setPwMsg({ type: "ok", text: "Contrasena actualizada correctamente." });
     } catch (err: unknown) {
-      setPwMsg({ type: "err", text: err instanceof Error ? err.message : "Error al cambiar contraseña" });
+      setPwMsg({ type: "err", text: err instanceof Error ? err.message : "Error al cambiar contrasena" });
     } finally {
       setPwSaving(false);
     }
   }
 
-  const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
+  const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "cuenta", label: "Mi cuenta", icon: HiOutlineUser },
     { id: "seguridad", label: "Seguridad", icon: HiOutlineLockClosed },
   ];
@@ -103,17 +103,15 @@ export default function SettingsPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-2xl mx-auto">
-      {/* Header */}
       <div className="mb-6">
-        <h1 className="font-montserrat-bold text-dark-blue text-2xl">Configuración</h1>
+        <h1 className="font-montserrat-bold text-dark-blue text-2xl">Configuracion</h1>
         <p className="font-montserrat text-dark-blue/50 text-sm mt-0.5">
           Administra tu cuenta y preferencias
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-1 bg-white border border-black/5 rounded-xl p-1 mb-6 shadow-sm w-fit">
-        {TABS.map(({ id, label, icon: Icon }) => (
+        {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
@@ -129,10 +127,8 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {/* Tab: Mi cuenta */}
       {activeTab === "cuenta" && (
         <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6">
-          {/* Avatar */}
           <div className="flex items-center gap-4 mb-6 pb-6 border-b border-black/5">
             <div className="w-16 h-16 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
               {user?.full_name
@@ -146,7 +142,7 @@ export default function SettingsPage() {
                 Miembro desde{" "}
                 {user?.created_at
                   ? new Date(user.created_at).toLocaleDateString("es-MX", { month: "long", year: "numeric" })
-                  : "—"}
+                  : "-"}
               </p>
             </div>
           </div>
@@ -167,7 +163,7 @@ export default function SettingsPage() {
             </div>
             <div>
               <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                Correo electrónico
+                Correo electronico
               </label>
               <input
                 type="email"
@@ -203,21 +199,19 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Tab: Seguridad */}
       {activeTab === "seguridad" && (
         <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6">
           <h2 className="font-montserrat-bold text-dark-blue text-base mb-1">
-            Cambiar contraseña
+            Cambiar contrasena
           </h2>
           <p className="font-montserrat text-dark-blue/40 text-sm mb-5">
-            Usa una contraseña segura de al menos 6 caracteres.
+            Usa una contrasena segura de al menos 6 caracteres.
           </p>
 
           <form onSubmit={handlePasswordSave} className="space-y-4">
-            {/* Current password */}
             <div>
               <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                Contraseña actual
+                Contrasena actual
               </label>
               <div className="relative">
                 <input
@@ -226,7 +220,7 @@ export default function SettingsPage() {
                   value={currentPw}
                   onChange={(e) => setCurrentPw(e.target.value)}
                   className={`${inputClass} pr-10`}
-                  placeholder="••••••••"
+                  placeholder="********"
                 />
                 <button
                   type="button"
@@ -238,10 +232,9 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* New password */}
             <div>
               <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                Nueva contraseña
+                Nueva contrasena
               </label>
               <div className="relative">
                 <input
@@ -250,7 +243,7 @@ export default function SettingsPage() {
                   value={newPw}
                   onChange={(e) => setNewPw(e.target.value)}
                   className={`${inputClass} pr-10`}
-                  placeholder="••••••••"
+                  placeholder="********"
                 />
                 <button
                   type="button"
@@ -262,10 +255,9 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Confirm password */}
             <div>
               <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                Confirmar nueva contraseña
+                Confirmar nueva contrasena
               </label>
               <div className="relative">
                 <input
@@ -274,7 +266,7 @@ export default function SettingsPage() {
                   value={confirmPw}
                   onChange={(e) => setConfirmPw(e.target.value)}
                   className={`${inputClass} pr-10`}
-                  placeholder="••••••••"
+                  placeholder="********"
                 />
                 <button
                   type="button"
@@ -303,7 +295,7 @@ export default function SettingsPage() {
                 className="flex items-center gap-2 bg-lyratech-purple hover:bg-button-light-purple disabled:opacity-50 text-white font-montserrat font-semibold px-5 py-2.5 rounded-xl transition-all text-sm shadow-button hover:scale-[1.02]"
               >
                 <HiOutlineCheck size={16} />
-                {pwSaving ? "Guardando..." : "Cambiar contraseña"}
+                {pwSaving ? "Guardando..." : "Cambiar contrasena"}
               </button>
             </div>
           </form>

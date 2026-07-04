@@ -6,7 +6,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from .config import settings
 from .database import engine, Base
 from .core.limiter import limiter
-from .routers import auth, leads, prospects
+from .routers import auth, leads, prospects, notifications
 
 Base.metadata.create_all(bind=engine)
 
@@ -33,6 +33,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api")
 app.include_router(leads.router, prefix="/api")
 app.include_router(prospects.router, prefix="/api")
+app.include_router(notifications.router, prefix="/api")
 
 
 @app.get("/health")

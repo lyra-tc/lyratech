@@ -167,3 +167,28 @@ export async function submitProspect(data: ProspectSubmit): Promise<Prospect> {
   }
   return res.json();
 }
+
+export interface NotificationRecipient {
+  id: number;
+  email: string;
+  created_at: string;
+}
+
+export interface NotificationTestResponse {
+  message: string;
+}
+
+export const notificationsApi = {
+  list: () => request<NotificationRecipient[]>("/api/notifications/recipients"),
+  create: (email: string) =>
+    request<NotificationRecipient>("/api/notifications/recipients", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+  sendTest: (id: number) =>
+    request<NotificationTestResponse>(`/api/notifications/recipients/${id}/test`, {
+      method: "POST",
+    }),
+  remove: (id: number) =>
+    request<void>(`/api/notifications/recipients/${id}`, { method: "DELETE" }),
+};

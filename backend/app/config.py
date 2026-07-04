@@ -15,6 +15,11 @@ class Settings(BaseSettings):
 
     TURNSTILE_SECRET_KEY: str = ""
 
+    RESEND_API_KEY: str = ""
+    NOTIFICATION_FROM_EMAIL: str = "notificaciones@lyratech.com.mx"
+    NOTIFICATION_FROM_NAME: str = "Lyratech"
+    FRONTEND_URL: str = ""
+
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:3002",
