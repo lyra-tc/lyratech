@@ -1,17 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { HiOutlineSearch, HiOutlineTrash, HiOutlineSwitchHorizontal } from "react-icons/hi";
-import DashboardShell from "@/components/Dashboard/DashboardShell";
 import LeadFormModal from "@/components/Dashboard/LeadFormModal";
 import LoadingDots from "@/components/shared/LoadingDots";
-import { prospectsApi, auth, getCachedUser } from "@/lib/api";
-import type { Prospect, LeadCreate, UserInfo } from "@/lib/api";
+import { prospectsApi } from "@/lib/api";
+import type { Prospect, LeadCreate } from "@/lib/api";
 
 export default function ProspectsPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<UserInfo | null>(() => getCachedUser());
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [filtered, setFiltered] = useState<Prospect[]>([]);
   const [search, setSearch] = useState("");
@@ -21,23 +17,18 @@ export default function ProspectsPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [userData, prospectsData] = await Promise.all([auth.me(), prospectsApi.list()]);
-      setUser(userData);
+      const prospectsData = await prospectsApi.list();
       setProspects(prospectsData);
     } catch {
-      router.push("/dashboard/login");
+      /* ignore — request() already redirects to login on 401 */
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("lyratech_token")) {
-      router.push("/dashboard/login");
-      return;
-    }
     loadData();
-  }, [loadData, router]);
+  }, [loadData]);
 
   useEffect(() => {
     let list = prospects;
@@ -90,7 +81,7 @@ export default function ProspectsPage() {
     : "Aún no hay prospectos";
 
   return (
-    <DashboardShell user={user}>
+    <>
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -205,7 +196,7 @@ export default function ProspectsPage() {
                 Cancelar
               </button>
               <button
-                onClick={() => handleDelete(deleteId as number)}
+                onClick={() => handleDelete(deleteId)}
                 className="flex-1 bg-red hover:bg-dark-red text-white font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm"
               >
                 Eliminar
@@ -214,6 +205,6 @@ export default function ProspectsPage() {
           </div>
         </div>
       )}
-    </DashboardShell>
+    </>
   );
 }

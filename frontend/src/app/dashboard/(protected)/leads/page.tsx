@@ -1,20 +1,18 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import {
   HiOutlinePlus,
   HiOutlineSearch,
   HiOutlinePencil,
   HiOutlineTrash,
 } from "react-icons/hi";
-import DashboardShell from "@/components/Dashboard/DashboardShell";
 import LeadFormModal from "@/components/Dashboard/LeadFormModal";
 import LeadViewModal from "@/components/Dashboard/LeadViewModal";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Dropdown from "@/components/shared/Dropdown";
-import { leadsApi, auth, getCachedUser } from "@/lib/api";
-import type { Lead, LeadCreate, LeadStatus, UserInfo } from "@/lib/api";
+import { leadsApi } from "@/lib/api";
+import type { Lead, LeadCreate, LeadStatus } from "@/lib/api";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/leadConstants";
 
 const STATUS_FILTER_OPTIONS = [
@@ -33,8 +31,6 @@ const EMPTY_FORM: LeadCreate = {
 };
 
 export default function LeadsPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<UserInfo | null>(() => getCachedUser());
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filtered, setFiltered] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
@@ -47,23 +43,18 @@ export default function LeadsPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [userData, leadsData] = await Promise.all([auth.me(), leadsApi.list()]);
-      setUser(userData);
+      const leadsData = await leadsApi.list();
       setLeads(leadsData);
     } catch {
-      router.push("/dashboard/login");
+      /* ignore — request() already redirects to login on 401 */
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("lyratech_token")) {
-      router.push("/dashboard/login");
-      return;
-    }
     loadData();
-  }, [loadData, router]);
+  }, [loadData]);
 
   useEffect(() => {
     let list = leads;
@@ -200,7 +191,7 @@ export default function LeadsPage() {
   }
 
   return (
-    <DashboardShell user={user}>
+    <>
       {/* Page content */}
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Header */}
@@ -306,6 +297,6 @@ export default function LeadsPage() {
           </div>
         </div>
       )}
-    </DashboardShell>
+    </>
   );
 }
