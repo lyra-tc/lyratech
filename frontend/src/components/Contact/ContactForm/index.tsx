@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import Script from "next/script";
 import { motion } from "framer-motion";
 import { MdEmail, MdPhone } from "react-icons/md";
 import { FaBuilding } from "react-icons/fa";
 import { HiChevronDown, HiCalendar } from "react-icons/hi";
 import BookingModal from "@/components/shared/BookingModal";
 import { useTranslations } from "next-intl";
+import { submitProspect, ApiError } from "@/lib/api";
 
 type FormState = {
     name: string;
@@ -40,6 +42,12 @@ export default function ContactForm() {
     });
     const [errors, setErrors] = useState<Partial<Record<keyof FormState, boolean>>>({});
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+    const [turnstileToken, setTurnstileToken] = useState("");
+    const [turnstileReady, setTurnstileReady] = useState(false);
+    const turnstileContainerRef = useRef<HTMLDivElement>(null);
+    const widgetIdRef = useRef<string | null>(null);
 
     const SERVICES = [
         { value: "diagnostico", label: t("serviceOption1") },
@@ -79,6 +87,21 @@ export default function ContactForm() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const renderTurnstile = useCallback(() => {
+        if (!turnstileContainerRef.current || !window.turnstile || widgetIdRef.current) return;
+        widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+            sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+            callback: (token: string) => setTurnstileToken(token),
+            "expired-callback": () => setTurnstileToken(""),
+            theme: "light",
+            size: "flexible",
+        });
+    }, []);
+
+    useEffect(() => {
+        if (turnstileReady) renderTurnstile();
+    }, [turnstileReady, renderTurnstile]);
+
     const handleChange = (field: keyof FormState, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
         if (errors[field]) {
@@ -86,7 +109,7 @@ export default function ContactForm() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const newErrors: Partial<Record<keyof FormState, boolean>> = {};
         (Object.keys(form) as (keyof FormState)[]).forEach((key) => {
@@ -94,14 +117,51 @@ export default function ContactForm() {
         });
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
-        // TODO: Connect to API
-        setSubmitted(true);
+
+        setSubmitError("");
+        if (!turnstileToken) {
+            setSubmitError(t("errorTurnstile"));
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            await submitProspect({
+                name: form.name,
+                email: form.email,
+                phone: form.phone,
+                company: form.company,
+                service: form.service,
+                message: form.message,
+                turnstile_token: turnstileToken,
+            });
+            setSubmitted(true);
+        } catch (err) {
+            if (err instanceof ApiError && err.status === 429) {
+                setSubmitError(t("errorRateLimited"));
+            } else if (err instanceof ApiError && err.status === 400) {
+                setSubmitError(t("errorTurnstile"));
+            } else {
+                setSubmitError(t("errorGeneric"));
+            }
+            if (widgetIdRef.current && window.turnstile) {
+                window.turnstile.reset(widgetIdRef.current);
+            }
+            setTurnstileToken("");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const selectedService = SERVICES.find((s) => s.value === form.service);
 
     return (
         <section className="py-16 mx-6 md:mx-16 lg:mx-20 xl:mx-28 font-montserrat" id="contact-form">
+            <Script
+                src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+                strategy="afterInteractive"
+                onLoad={() => setTurnstileReady(true)}
+            />
             <BookingModal
                 isOpen={bookingOpen}
                 onClose={() => setBookingOpen(false)}
@@ -332,12 +392,26 @@ export default function ContactForm() {
                                 )}
                             </div>
 
+                            {/* Human verification */}
+                            <div className="mt-4 flex justify-center sm:justify-end">
+                                <div className="origin-center scale-[0.70] sm:origin-right sm:scale-[0.55]">
+                                    <div className="w-[300px] max-w-full" ref={turnstileContainerRef} />
+                                </div>
+                            </div>
+
+                            {submitError && (
+                                <div className="mt-4 bg-[#fff8f8] border border-red/30 text-red rounded-lg px-4 py-2.5 text-sm">
+                                    {submitError}
+                                </div>
+                            )}
+
                             {/* Submit */}
                             <button
                                 type="submit"
-                                className="mt-6 w-full bg-lyratech-purple text-white font-montserrat-bold py-4 rounded-xl hover:bg-button-dark-purple transition-colors duration-200"
+                                disabled={submitting}
+                                className="mt-6 w-full bg-lyratech-purple text-white font-montserrat-bold py-4 rounded-xl hover:bg-button-dark-purple transition-colors duration-200 disabled:opacity-60"
                             >
-                                {t("submitButton")}
+                                {submitting ? t("submittingButton") : t("submitButton")}
                             </button>
                         </form>
                     )}

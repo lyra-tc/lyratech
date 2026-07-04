@@ -3,22 +3,25 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
   HiOutlineUsers,
+  HiOutlineInboxIn,
   HiOutlineLogout,
   HiOutlineCog,
+  HiOutlineMail,
   HiChevronLeft,
   HiChevronRight,
-  HiMenuAlt2,
-  HiX,
 } from "react-icons/hi";
 import Logo from "@/assets/images/Navbar/White_Logo.png";
 import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
-  { label: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
-  { label: "Configuración", href: "/dashboard/settings", icon: HiOutlineCog },
+  { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
+  { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineInboxIn },
+  { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail },
+  { label: "Settings", mobileLabel: "Settings", href: "/dashboard/settings", icon: HiOutlineCog },
 ];
 
 interface DashboardShellProps {
@@ -31,7 +34,6 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -71,7 +73,6 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
             <Link
               key={href}
               href={href}
-              onClick={() => setMobileOpen(false)}
               title={collapsed ? label : undefined}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                 collapsed ? "justify-center" : ""
@@ -96,7 +97,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
           {/* Popup card */}
           {userMenuOpen && user && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+              <button
+                type="button"
+                aria-label="Cerrar menú"
+                onClick={() => setUserMenuOpen(false)}
+                className="fixed inset-0 z-10 cursor-default"
+              />
               <div className="absolute bottom-full left-3 right-3 mb-2 z-20 bg-[#1e2130] border border-white/10 rounded-xl shadow-2xl p-4 animate-fade-in">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
@@ -145,9 +151,6 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
       <div className="min-h-screen bg-beige flex flex-col">
         {/* Mobile top bar */}
         <header className="fixed top-0 left-0 right-0 z-40 bg-dark-blue flex items-center justify-between px-4 h-14 border-b border-white/10">
-          <button onClick={() => setMobileOpen(true)} className="text-white p-1">
-            <HiMenuAlt2 size={24} />
-          </button>
           <Link href="/dashboard" className="flex items-center gap-2">
             <Image src={Logo} alt="Lyratech" width={24} height={24} />
             <span className="font-zendots text-white text-sm">Lyratech</span>
@@ -164,7 +167,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
 
             {userMenuOpen && user && (
               <>
-                <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+                <button
+                  type="button"
+                  aria-label="Cerrar menú"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="fixed inset-0 z-10 cursor-default"
+                />
                 <div className="absolute right-0 top-full mt-2 z-20 w-56 bg-[#1e2130] border border-white/10 rounded-xl shadow-2xl p-4 animate-fade-in">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-9 h-9 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
@@ -188,24 +196,29 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
           </div>
         </header>
 
-        <div
-          className={`fixed inset-0 z-50 flex transition-all duration-300 ${mobileOpen ? "visible" : "invisible"}`}
-        >
-          <div
-            className={`fixed inset-0 bg-black/50 transition-opacity duration-300 ${mobileOpen ? "opacity-100" : "opacity-0"}`}
-            onClick={() => setMobileOpen(false)}
-          />
-          <div
-            className={`relative w-72 bg-dark-blue h-full shadow-2xl transition-transform duration-300 ease-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
-          >
-            <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-white/60 hover:text-white">
-              <HiX size={20} />
-            </button>
-            {sidebarContent}
-          </div>
-        </div>
+        <main className="flex-1 mt-14 pb-24">{children}</main>
 
-        <main className="flex-1 mt-14">{children}</main>
+        {/* Floating pill nav */}
+        <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-dark-blue rounded-full shadow-2xl border border-white/10 px-2.5 py-2 flex items-center gap-2">
+          {NAV_ITEMS.map(({ mobileLabel, href, icon: Icon }) => {
+            const active = pathname === href;
+            return (
+              <Link key={href} href={href} className="relative flex flex-col items-center justify-center w-20 py-2.5 rounded-full">
+                {active && (
+                  <motion.div
+                    layoutId="mobile-nav-active-pill"
+                    className="absolute inset-0 bg-lyratech-purple rounded-full"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className={`relative z-10 flex flex-col items-center gap-1 transition-colors duration-200 ${active ? "text-white" : "text-white/60"}`}>
+                  <Icon size={19} />
+                  <span className="font-montserrat text-[9px] font-medium whitespace-nowrap">{mobileLabel}</span>
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
       </div>
     );
   }

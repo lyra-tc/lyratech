@@ -1,5 +1,13 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("lyratech_token");
@@ -27,7 +35,7 @@ async function request<T>(
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
-    throw new Error(err.detail || "Error en la solicitud");
+    throw new ApiError(err.detail || "Error en la solicitud", res.status);
   }
 
   if (res.status === 204) return undefined as T;
@@ -40,6 +48,16 @@ export interface UserInfo {
   full_name: string;
   is_active: boolean;
   created_at: string;
+}
+
+export function getCachedUser(): UserInfo | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("lyratech_user");
+    return raw ? (JSON.parse(raw) as UserInfo) : null;
+  } catch {
+    return null;
+  }
 }
 
 export interface Lead {
@@ -109,4 +127,68 @@ export const leadsApi = {
     }),
   remove: (id: number) =>
     request<void>(`/api/leads/${id}`, { method: "DELETE" }),
+};
+
+export interface Prospect {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  service?: string;
+  message?: string;
+  created_at: string;
+}
+
+export interface ProspectSubmit {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  service?: string;
+  message?: string;
+  turnstile_token: string;
+}
+
+export const prospectsApi = {
+  list: () => request<Prospect[]>("/api/prospects/"),
+  remove: (id: number) => request<void>(`/api/prospects/${id}`, { method: "DELETE" }),
+};
+
+export async function submitProspect(data: ProspectSubmit): Promise<Prospect> {
+  const res = await fetch(`${API_URL}/api/prospects/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
+    throw new ApiError(err.detail || "Error en la solicitud", res.status);
+  }
+  return res.json();
+}
+
+export interface NotificationRecipient {
+  id: number;
+  email: string;
+  created_at: string;
+}
+
+export interface NotificationTestResponse {
+  message: string;
+}
+
+export const notificationsApi = {
+  list: () => request<NotificationRecipient[]>("/api/notifications/recipients"),
+  create: (email: string) =>
+    request<NotificationRecipient>("/api/notifications/recipients", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+  sendTest: (id: number) =>
+    request<NotificationTestResponse>(`/api/notifications/recipients/${id}/test`, {
+      method: "POST",
+    }),
+  remove: (id: number) =>
+    request<void>(`/api/notifications/recipients/${id}`, { method: "DELETE" }),
 };

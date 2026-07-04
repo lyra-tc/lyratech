@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { auth } from "@/lib/api";
 import LogoColor from "@/assets/images/Logo/LogoColor.png";
 
@@ -12,6 +13,7 @@ function LoginForm() {
   const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const registered = params.get("registered") === "1";
@@ -56,10 +58,11 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block font-montserrat text-white/70 text-sm mb-1.5">
+          <label htmlFor="login-email" className="block font-montserrat text-white/70 text-sm mb-1.5">
             Correo electrónico
           </label>
           <input
+            id="login-email"
             type="email"
             required
             value={email}
@@ -70,17 +73,27 @@ function LoginForm() {
         </div>
 
         <div>
-          <label className="block font-montserrat text-white/70 text-sm mb-1.5">
+          <label htmlFor="login-password" className="block font-montserrat text-white/70 text-sm mb-1.5">
             Contraseña
           </label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
-          />
+          <div className="relative">
+            <input
+              id="login-password"
+              type={showPassword ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 pr-10 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+            >
+              {showPassword ? <HiOutlineEye size={18} /> : <HiOutlineEyeOff size={18} />}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -92,8 +105,11 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-lyratech-purple hover:bg-button-light-purple disabled:opacity-50 disabled:cursor-not-allowed text-white font-montserrat font-semibold py-3 rounded-lg transition-all duration-200 shadow-button hover:scale-[1.02] active:scale-[0.98] text-sm"
+          className="w-full flex items-center justify-center gap-2 bg-lyratech-purple hover:bg-button-light-purple disabled:opacity-50 disabled:cursor-not-allowed text-white font-montserrat font-semibold py-3 rounded-lg transition-all duration-200 shadow-button hover:scale-[1.02] active:scale-[0.98] text-sm"
         >
+          {loading && (
+            <span className="w-4 h-4 border-2 border-white border-t-lyratech-purple rounded-full animate-spin" />
+          )}
           {loading ? "Iniciando sesión..." : "Iniciar sesión"}
         </button>
       </form>
