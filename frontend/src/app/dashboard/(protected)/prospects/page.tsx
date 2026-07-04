@@ -182,7 +182,12 @@ export default function ProspectsPage() {
 
       {deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-dark-blue/60 backdrop-blur-sm" onClick={() => setDeleteId(null)} />
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={() => setDeleteId(null)}
+            className="fixed inset-0 bg-dark-blue/60 backdrop-blur-sm cursor-default"
+          />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-scale-in">
             <h3 className="font-montserrat-bold text-dark-blue text-lg mb-2">Eliminar prospecto</h3>
             <p className="font-montserrat text-dark-blue/60 text-sm mb-6">

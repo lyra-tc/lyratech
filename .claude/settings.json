@@ -4,7 +4,8 @@
       "Bash(pip install *)",
       "Bash(python -m pytest app/tests -v)",
       "Bash(./.venv/Scripts/python -m pytest app/tests -v)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npm run *)"
     ]
   }
 }

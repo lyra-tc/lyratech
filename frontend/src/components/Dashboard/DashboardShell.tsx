@@ -95,7 +95,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
           {/* Popup card */}
           {userMenuOpen && user && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+              <button
+                type="button"
+                aria-label="Cerrar menú"
+                onClick={() => setUserMenuOpen(false)}
+                className="fixed inset-0 z-10 cursor-default"
+              />
               <div className="absolute bottom-full left-3 right-3 mb-2 z-20 bg-[#1e2130] border border-white/10 rounded-xl shadow-2xl p-4 animate-fade-in">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
@@ -160,7 +165,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
 
             {userMenuOpen && user && (
               <>
-                <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+                <button
+                  type="button"
+                  aria-label="Cerrar menú"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="fixed inset-0 z-10 cursor-default"
+                />
                 <div className="absolute right-0 top-full mt-2 z-20 w-56 bg-[#1e2130] border border-white/10 rounded-xl shadow-2xl p-4 animate-fade-in">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-9 h-9 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
