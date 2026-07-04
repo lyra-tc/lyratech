@@ -394,7 +394,9 @@ export default function ContactForm() {
 
                             {/* Human verification */}
                             <div className="mt-4 flex justify-center sm:justify-end">
-                                <div className="w-[300px] max-w-full" ref={turnstileContainerRef} />
+                                <div className="origin-center scale-[0.70] sm:origin-right sm:scale-[0.55]">
+                                    <div className="w-[300px] max-w-full" ref={turnstileContainerRef} />
+                                </div>
                             </div>
 
                             {submitError && (
