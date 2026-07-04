@@ -7,32 +7,21 @@ import {
   HiOutlineSearch,
   HiOutlinePencil,
   HiOutlineTrash,
-  HiOutlineX,
-  HiOutlineCheck,
 } from "react-icons/hi";
 import DashboardShell from "@/components/Dashboard/DashboardShell";
-import { leadsApi, auth } from "@/lib/api";
+import LeadFormModal from "@/components/Dashboard/LeadFormModal";
+import LeadViewModal from "@/components/Dashboard/LeadViewModal";
+import LoadingDots from "@/components/shared/LoadingDots";
+import Dropdown from "@/components/shared/Dropdown";
+import { leadsApi, auth, getCachedUser } from "@/lib/api";
 import type { Lead, LeadCreate, LeadStatus, UserInfo } from "@/lib/api";
+import { STATUS_LABELS, STATUS_COLORS } from "@/lib/leadConstants";
 
-const STATUS_LABELS: Record<LeadStatus, string> = {
-  new: "Nuevo",
-  contacted: "Contactado",
-  qualified: "Calificado",
-  proposal: "Propuesta",
-  closed: "Cerrado",
-  lost: "Perdido",
-};
+const STATUS_FILTER_OPTIONS = [
+  { value: "all", label: "Todos los estados" },
+  ...(Object.keys(STATUS_LABELS) as LeadStatus[]).map((s) => ({ value: s, label: STATUS_LABELS[s] })),
+];
 
-const STATUS_COLORS: Record<LeadStatus, string> = {
-  new: "bg-blue/20 text-blue border-blue/30",
-  contacted: "bg-lyratech-purple/20 text-lyratech-purple border-lyratech-purple/30",
-  qualified: "bg-lyratech-green/20 text-lyratech-green border-lyratech-green/30",
-  proposal: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30",
-  closed: "bg-lyratech-green/30 text-lyratech-green border-lyratech-green/40",
-  lost: "bg-red/20 text-red border-red/30",
-};
-
-const SOURCES = ["Web", "Referido", "Redes sociales", "Email", "Evento", "Otro"];
 const EMPTY_FORM: LeadCreate = {
   name: "",
   email: "",
@@ -45,7 +34,7 @@ const EMPTY_FORM: LeadCreate = {
 
 export default function LeadsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<UserInfo | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(() => getCachedUser());
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filtered, setFiltered] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
@@ -53,11 +42,8 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Lead | null>(null);
-  const [form, setForm] = useState<LeadCreate>(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [formError, setFormError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [viewing, setViewing] = useState<Lead | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -96,60 +82,20 @@ export default function LeadsPage() {
 
   function openCreate() {
     setEditing(null);
-    setForm(EMPTY_FORM);
-    setFormError("");
-    setFieldErrors({});
     setShowModal(true);
   }
 
   function openEdit(lead: Lead) {
     setEditing(lead);
-    setForm({
-      name: lead.name,
-      email: lead.email || "",
-      phone: lead.phone || "",
-      company: lead.company || "",
-      status: lead.status,
-      source: lead.source || "",
-      notes: lead.notes || "",
-    });
-    setFormError("");
-    setFieldErrors({});
     setShowModal(true);
   }
 
-  function validateForm(): boolean {
-    const errors: Record<string, string> = {};
-    const email = form.email ?? "";
-    const phone = form.phone ?? "";
-    if (!form.name.trim()) errors.name = "El nombre es requerido";
-    if (!email.trim() && !phone.trim())
-      errors.contact = "Ingresa al menos un email o teléfono";
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      errors.email = "Ingresa un correo válido";
-    if (!form.source) errors.source = "La fuente es requerida";
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  }
-
-  async function handleSave() {
-    if (!validateForm()) return;
-    setSaving(true);
-    setFormError("");
-    try {
-      if (editing) {
-        const updated = await leadsApi.update(editing.id, form);
-        setLeads((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
-      } else {
-        const created = await leadsApi.create(form);
-        setLeads((prev) => [created, ...prev]);
-      }
-      setShowModal(false);
-    } catch (err: unknown) {
-      setFormError(err instanceof Error ? err.message : "Error al guardar");
-    } finally {
-      setSaving(false);
-    }
+  function handleSaved(saved: Lead) {
+    setLeads((prev) =>
+      prev.some((l) => l.id === saved.id)
+        ? prev.map((l) => (l.id === saved.id ? saved : l))
+        : [saved, ...prev]
+    );
   }
 
   async function handleDelete(id: number) {
@@ -168,10 +114,87 @@ export default function LeadsPage() {
     closed: leads.filter((l) => l.status === "closed").length,
   };
 
+  const emptyMessage =
+    search || statusFilter !== "all"
+      ? "No hay leads que coincidan con la búsqueda"
+      : "Aún no hay leads. ¡Crea el primero!";
+
+  let tableContent: React.ReactNode;
   if (loading) {
-    return (
-      <div className="min-h-screen bg-dark-blue flex items-center justify-center">
-        <div className="text-white/60 font-montserrat text-sm animate-pulse">Cargando...</div>
+    tableContent = (
+      <div className="py-16 flex items-center justify-center">
+        <LoadingDots />
+      </div>
+    );
+  } else if (filtered.length === 0) {
+    tableContent = (
+      <div className="py-16 text-center">
+        <p className="font-montserrat text-dark-blue/40 text-sm">{emptyMessage}</p>
+      </div>
+    );
+  } else {
+    tableContent = (
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-black/5 bg-beige/60">
+              {["Nombre", "Empresa", "Contacto", "Estado", "Fuente", "Acciones"].map((h) => (
+                <th key={h} className="text-left px-4 py-3 font-montserrat-bold text-dark-blue/50 text-xs uppercase tracking-wide">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-black/5">
+            {filtered.map((lead) => (
+              <tr
+                key={lead.id}
+                onClick={() => setViewing(lead)}
+                className="hover:bg-beige/40 transition-colors group cursor-pointer"
+              >
+                <td className="px-4 py-3.5">
+                  <p className="font-montserrat font-semibold text-dark-blue text-sm">{lead.name}</p>
+                  <p className="font-montserrat text-dark-blue/40 text-xs mt-0.5">
+                    {new Date(lead.created_at).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+                  </p>
+                </td>
+                <td className="px-4 py-3.5">
+                  <span className="font-montserrat text-dark-blue/70 text-sm">{lead.company || "—"}</span>
+                </td>
+                <td className="px-4 py-3.5">
+                  <p className="font-montserrat text-dark-blue/70 text-sm">{lead.email || "—"}</p>
+                  <p className="font-montserrat text-dark-blue/40 text-xs">{lead.phone || ""}</p>
+                </td>
+                <td className="px-4 py-3.5">
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-montserrat font-semibold border ${STATUS_COLORS[lead.status]}`}>
+                    {STATUS_LABELS[lead.status]}
+                  </span>
+                </td>
+                <td className="px-4 py-3.5">
+                  <span className="font-montserrat text-dark-blue/60 text-sm">{lead.source || "—"}</span>
+                </td>
+                <td className="px-4 py-3.5">
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEdit(lead); }}
+                      className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors"
+                      title="Editar"
+                    >
+                      <HiOutlinePencil size={15} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeleteId(lead.id); }}
+                      className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors"
+                      title="Eliminar"
+                    >
+                      <HiOutlineTrash size={15} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }
@@ -227,222 +250,34 @@ export default function LeadsPage() {
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-black/10 rounded-xl text-sm font-montserrat text-dark-blue placeholder-dark-blue/30 outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as LeadStatus | "all")}
-            className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple transition-all"
-          >
-            <option value="all">Todos los estados</option>
-            {(Object.keys(STATUS_LABELS) as LeadStatus[]).map((s) => (
-              <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-            ))}
-          </select>
+          <div className="w-full sm:w-56">
+            <Dropdown
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v as LeadStatus | "all")}
+              options={STATUS_FILTER_OPTIONS}
+            />
+          </div>
         </div>
 
         {/* Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
-          {filtered.length === 0 ? (
-            <div className="py-16 text-center">
-              <p className="font-montserrat text-dark-blue/40 text-sm">
-                {search || statusFilter !== "all"
-                  ? "No hay leads que coincidan con la búsqueda"
-                  : "Aún no hay leads. ¡Crea el primero!"}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-black/5 bg-beige/60">
-                    {["Nombre", "Empresa", "Contacto", "Estado", "Fuente", "Acciones"].map((h) => (
-                      <th key={h} className="text-left px-4 py-3 font-montserrat-bold text-dark-blue/50 text-xs uppercase tracking-wide">
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-black/5">
-                  {filtered.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-beige/40 transition-colors group">
-                      <td className="px-4 py-3.5">
-                        <p className="font-montserrat font-semibold text-dark-blue text-sm">{lead.name}</p>
-                        <p className="font-montserrat text-dark-blue/40 text-xs mt-0.5">
-                          {new Date(lead.created_at).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className="font-montserrat text-dark-blue/70 text-sm">{lead.company || "—"}</span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <p className="font-montserrat text-dark-blue/70 text-sm">{lead.email || "—"}</p>
-                        <p className="font-montserrat text-dark-blue/40 text-xs">{lead.phone || ""}</p>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-montserrat font-semibold border ${STATUS_COLORS[lead.status]}`}>
-                          {STATUS_LABELS[lead.status]}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className="font-montserrat text-dark-blue/60 text-sm">{lead.source || "—"}</span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openEdit(lead)} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Editar">
-                            <HiOutlinePencil size={15} />
-                          </button>
-                          <button onClick={() => setDeleteId(lead.id)} className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors" title="Eliminar">
-                            <HiOutlineTrash size={15} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {tableContent}
         </div>
       </div>
 
+      {/* View Modal */}
+      {viewing && (
+        <LeadViewModal lead={viewing} onClose={() => setViewing(null)} />
+      )}
+
       {/* Create / Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-dark-blue/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-scale-in">
-            <div className="flex items-center justify-between p-6 border-b border-black/5">
-              <h2 className="font-montserrat-bold text-dark-blue text-lg">
-                {editing ? "Editar lead" : "Nuevo lead"}
-              </h2>
-              <button onClick={() => setShowModal(false)} className="p-1.5 rounded-lg hover:bg-beige text-dark-blue/50 hover:text-dark-blue transition-colors">
-                <HiOutlineX size={18} />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              {/* Nombre */}
-              <div>
-                <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                  Nombre <span className="text-red">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => { setForm({ ...form, name: e.target.value }); setFieldErrors((p) => ({ ...p, name: "" })); }}
-                  className={`w-full border rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none transition-all ${fieldErrors.name ? "border-red bg-red/5 focus:border-red focus:ring-1 focus:ring-red" : "border-black/15 focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple"}`}
-                  placeholder="Nombre completo"
-                />
-                {fieldErrors.name && <p className="text-red text-xs font-montserrat mt-1">{fieldErrors.name}</p>}
-              </div>
-
-              {/* Email + Teléfono */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                    Email <span className="text-red">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.email}
-                    onChange={(e) => { setForm({ ...form, email: e.target.value }); setFieldErrors((p) => ({ ...p, email: "", contact: "" })); }}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none transition-all ${fieldErrors.email || fieldErrors.contact ? "border-red bg-red/5 focus:border-red focus:ring-1 focus:ring-red" : "border-black/15 focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple"}`}
-                    placeholder="email@ejemplo.com"
-                  />
-                  {fieldErrors.email && <p className="text-red text-xs font-montserrat mt-1">{fieldErrors.email}</p>}
-                </div>
-                <div>
-                  <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                    Teléfono <span className="text-red">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={(e) => { setForm({ ...form, phone: e.target.value }); setFieldErrors((p) => ({ ...p, contact: "" })); }}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none transition-all ${fieldErrors.contact ? "border-red bg-red/5 focus:border-red focus:ring-1 focus:ring-red" : "border-black/15 focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple"}`}
-                    placeholder="+52 000 000 0000"
-                  />
-                </div>
-              </div>
-              {fieldErrors.contact && (
-                <p className="text-red text-xs font-montserrat -mt-2">{fieldErrors.contact}</p>
-              )}
-
-              {/* Empresa */}
-              <div>
-                <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Empresa</label>
-                <input
-                  type="text"
-                  value={form.company}
-                  onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
-                  placeholder="Nombre de la empresa"
-                />
-              </div>
-
-              {/* Estado + Fuente */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Estado</label>
-                  <select
-                    value={form.status}
-                    onChange={(e) => setForm({ ...form, status: e.target.value as LeadStatus })}
-                    className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple transition-all bg-white"
-                  >
-                    {(Object.keys(STATUS_LABELS) as LeadStatus[]).map((s) => (
-                      <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">
-                    Fuente <span className="text-red">*</span>
-                  </label>
-                  <select
-                    value={form.source}
-                    onChange={(e) => { setForm({ ...form, source: e.target.value }); setFieldErrors((p) => ({ ...p, source: "" })); }}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none transition-all bg-white ${fieldErrors.source ? "border-red bg-red/5 focus:border-red" : "border-black/15 focus:border-lyratech-purple"}`}
-                  >
-                    <option value="">Seleccionar...</option>
-                    {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                  {fieldErrors.source && <p className="text-red text-xs font-montserrat mt-1">{fieldErrors.source}</p>}
-                </div>
-              </div>
-
-              {/* Notas */}
-              <div>
-                <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Notas</label>
-                <textarea
-                  value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  rows={3}
-                  className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all resize-none"
-                  placeholder="Notas adicionales sobre el lead..."
-                />
-              </div>
-
-              {formError && (
-                <div className="bg-red/10 border border-red/30 text-red rounded-lg px-4 py-2.5 text-sm font-montserrat">
-                  {formError}
-                </div>
-              )}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 border border-black/15 text-dark-blue/70 hover:text-dark-blue font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm hover:bg-beige"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 bg-lyratech-purple hover:bg-button-light-purple disabled:opacity-50 text-white font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm shadow-button hover:scale-[1.02]"
-                >
-                  <HiOutlineCheck size={16} />
-                  {saving ? "Guardando..." : editing ? "Guardar cambios" : "Crear lead"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <LeadFormModal
+          editing={editing}
+          initialForm={EMPTY_FORM}
+          onClose={() => setShowModal(false)}
+          onSaved={handleSaved}
+        />
       )}
 
       {/* Delete Confirm */}
@@ -462,7 +297,7 @@ export default function LeadsPage() {
                 Cancelar
               </button>
               <button
-                onClick={() => handleDelete(deleteId as number)}
+                onClick={() => handleDelete(deleteId)}
                 className="flex-1 bg-red hover:bg-dark-red text-white font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm"
               >
                 Eliminar

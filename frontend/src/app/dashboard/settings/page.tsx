@@ -10,20 +10,20 @@ import {
   HiOutlineEyeOff,
 } from "react-icons/hi";
 import DashboardShell from "@/components/Dashboard/DashboardShell";
-import { auth } from "@/lib/api";
+import { auth, getCachedUser } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
 type Tab = "cuenta" | "seguridad";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cachedUser = getCachedUser();
+  const [user, setUser] = useState<UserInfo | null>(cachedUser);
   const [activeTab, setActiveTab] = useState<Tab>("cuenta");
 
   // Cuenta
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState(cachedUser?.full_name ?? "");
+  const [email, setEmail] = useState(cachedUser?.email ?? "");
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
@@ -45,8 +45,6 @@ export default function SettingsPage() {
       setEmail(u.email);
     } catch {
       router.push("/dashboard/login");
-    } finally {
-      setLoading(false);
     }
   }, [router]);
 
@@ -95,14 +93,6 @@ export default function SettingsPage() {
     } finally {
       setPwSaving(false);
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-dark-blue flex items-center justify-center">
-        <div className="text-white/60 font-montserrat text-sm animate-pulse">Cargando...</div>
-      </div>
-    );
   }
 
   const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
@@ -246,7 +236,7 @@ export default function SettingsPage() {
                     onClick={() => setShowCurrent((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-blue/30 hover:text-dark-blue transition-colors"
                   >
-                    {showCurrent ? <HiOutlineEyeOff size={16} /> : <HiOutlineEye size={16} />}
+                    {showCurrent ? <HiOutlineEye size={16} /> : <HiOutlineEyeOff size={16} />}
                   </button>
                 </div>
               </div>
@@ -270,7 +260,7 @@ export default function SettingsPage() {
                     onClick={() => setShowNew((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-blue/30 hover:text-dark-blue transition-colors"
                   >
-                    {showNew ? <HiOutlineEyeOff size={16} /> : <HiOutlineEye size={16} />}
+                    {showNew ? <HiOutlineEye size={16} /> : <HiOutlineEyeOff size={16} />}
                   </button>
                 </div>
               </div>
@@ -294,7 +284,7 @@ export default function SettingsPage() {
                     onClick={() => setShowConfirm((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-blue/30 hover:text-dark-blue transition-colors"
                   >
-                    {showConfirm ? <HiOutlineEyeOff size={16} /> : <HiOutlineEye size={16} />}
+                    {showConfirm ? <HiOutlineEye size={16} /> : <HiOutlineEyeOff size={16} />}
                   </button>
                 </div>
               </div>

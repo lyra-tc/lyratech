@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
 
+    TURNSTILE_SECRET_KEY: str = ""
+
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:3002",

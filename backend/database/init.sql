@@ -40,3 +40,18 @@ CREATE TABLE IF NOT EXISTS leads (
     INDEX idx_status (status),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Prospects (public contact form submissions)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS prospects (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    email       VARCHAR(255) NOT NULL,
+    phone       VARCHAR(50),
+    company     VARCHAR(255),
+    service     VARCHAR(100),
+    message     TEXT,
+    created_at  DATETIME DEFAULT (now()),
+    INDEX ix_prospects_id (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

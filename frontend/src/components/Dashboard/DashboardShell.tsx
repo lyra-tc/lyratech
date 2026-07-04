@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   HiOutlineUsers,
+  HiOutlineInboxIn,
   HiOutlineLogout,
   HiOutlineCog,
   HiChevronLeft,
@@ -18,6 +19,7 @@ import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
   { label: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
+  { label: "Prospectos", href: "/dashboard/prospects", icon: HiOutlineInboxIn },
   { label: "Configuración", href: "/dashboard/settings", icon: HiOutlineCog },
 ];
 

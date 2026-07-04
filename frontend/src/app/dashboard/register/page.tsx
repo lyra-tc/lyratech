@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { HiArrowLeft } from "react-icons/hi";
+import { HiArrowLeft, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { auth } from "@/lib/api";
 import LogoColor from "@/assets/images/Logo/LogoColor.png";
 
@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -85,14 +86,23 @@ export default function RegisterPage() {
               <label className="block font-montserrat text-white/70 text-sm mb-1.5">
                 Contraseña
               </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 pr-10 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                >
+                  {showPassword ? <HiOutlineEye size={18} /> : <HiOutlineEyeOff size={18} />}
+                </button>
+              </div>
             </div>
 
             {error && (
