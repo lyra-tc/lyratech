@@ -26,11 +26,9 @@ const NAV_ITEMS = [
   { label: "Diagnosticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
   { label: "Preguntas", mobileLabel: "Preg.", href: "/dashboard/diagnostics/questions", icon: HiOutlineClipboardList },
   { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail },
+  { label: "Users", mobileLabel: "Users", href: "/dashboard/users", icon: HiOutlineUsers, adminOnly: true },
   { label: "Settings", mobileLabel: "Settings", href: "/dashboard/settings", icon: HiOutlineCog },
 ];
-
-const MOBILE_PRIMARY_NAV_ITEMS = NAV_ITEMS.slice(0, 2);
-const MOBILE_MORE_NAV_ITEMS = NAV_ITEMS.slice(2);
 
 interface DashboardShellProps {
   user: UserInfo | null;
@@ -72,7 +70,10 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
         .toUpperCase()
     : "?";
 
-  const mobileMoreActive = MOBILE_MORE_NAV_ITEMS.some(({ href }) => pathname === href);
+  const visibleNavItems = NAV_ITEMS.filter((item) => !item.adminOnly || user?.is_admin);
+  const mobilePrimaryNavItems = visibleNavItems.slice(0, 2);
+  const mobileMoreNavItems = visibleNavItems.slice(2);
+  const mobileMoreActive = mobileMoreNavItems.some(({ href }) => pathname === href);
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
@@ -90,7 +91,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+        {visibleNavItems.map(({ label, href, icon: Icon }) => {
           const active = pathname === href;
 
           return (
@@ -236,7 +237,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
           >
             <div className="mx-auto mb-5 h-1.5 w-14 rounded-full bg-slate-200" />
             <div className="grid grid-cols-2 gap-3">
-              {MOBILE_MORE_NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+              {mobileMoreNavItems.map(({ label, href, icon: Icon }) => {
                 const active = pathname === href;
 
                 return (
@@ -265,7 +266,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
         </div>
 
         <nav className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-dark-blue px-2.5 py-2 shadow-2xl">
-          {MOBILE_PRIMARY_NAV_ITEMS.map(({ mobileLabel, href, icon: Icon }) => {
+          {mobilePrimaryNavItems.map(({ mobileLabel, href, icon: Icon }) => {
             const active = pathname === href;
 
             return (

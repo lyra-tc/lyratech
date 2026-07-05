@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,6 +28,7 @@ function LoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
       const { access_token } = await auth.login(email, password);
       localStorage.setItem("lyratech_token", access_token);
@@ -35,31 +36,30 @@ function LoginForm() {
       localStorage.setItem("lyratech_user", JSON.stringify(user));
       router.push("/dashboard/leads");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+      setError(err instanceof Error ? err.message : "Error al iniciar sesion");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-2xl">
-      {/* Logo */}
-      <div className="flex flex-col items-center mb-8">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm">
+      <div className="mb-8 flex flex-col items-center">
         <Image src={LogoColor} alt="Lyratech" width={72} height={72} className="mb-4" priority />
-        <h1 className="font-zendots text-white text-xl tracking-wide">Lyratech</h1>
-        <p className="font-montserrat text-white/50 text-sm mt-1">Panel de administración</p>
+        <h1 className="font-zendots text-xl tracking-wide text-white">Lyratech</h1>
+        <p className="mt-1 font-montserrat text-sm text-white/50">Panel de administracion</p>
       </div>
 
       {registered && (
-        <div className="bg-lyratech-green/20 border border-lyratech-green/40 text-lyratech-green rounded-lg px-4 py-3 text-sm font-montserrat mb-5 animate-fade-in">
-          Cuenta creada exitosamente. Ya puedes iniciar sesión.
+        <div className="mb-5 rounded-lg border border-lyratech-green/40 bg-lyratech-green/20 px-4 py-3 text-sm font-montserrat text-lyratech-green animate-fade-in">
+          Cuenta creada exitosamente. Un administrador debe activarla antes de que puedas iniciar sesion.
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="login-email" className="block font-montserrat text-white/70 text-sm mb-1.5">
-            Correo electrónico
+          <label htmlFor="login-email" className="mb-1.5 block font-montserrat text-sm text-white/70">
+            Correo electronico
           </label>
           <input
             id="login-email"
@@ -68,13 +68,13 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="admin@lyratech.com"
-            className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
+            className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm font-montserrat text-white outline-none transition-all duration-200 placeholder:text-white/30 focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple"
           />
         </div>
 
         <div>
-          <label htmlFor="login-password" className="block font-montserrat text-white/70 text-sm mb-1.5">
-            Contraseña
+          <label htmlFor="login-password" className="mb-1.5 block font-montserrat text-sm text-white/70">
+            Contrasena
           </label>
           <div className="relative">
             <input
@@ -83,13 +83,13 @@ function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-4 py-3 pr-10 text-sm font-montserrat outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all duration-200"
+              placeholder="........"
+              className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 pr-10 text-sm font-montserrat text-white outline-none transition-all duration-200 placeholder:text-white/30 focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple"
             />
             <button
               type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+              onClick={() => setShowPassword((value) => !value)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-white"
             >
               {showPassword ? <HiOutlineEye size={18} /> : <HiOutlineEyeOff size={18} />}
             </button>
@@ -97,7 +97,7 @@ function LoginForm() {
         </div>
 
         {error && (
-          <div className="bg-red/20 border border-red/40 text-red rounded-lg px-4 py-3 text-sm font-montserrat animate-fade-in">
+          <div className="rounded-lg border border-red/40 bg-red/20 px-4 py-3 text-sm font-montserrat text-red animate-fade-in">
             {error}
           </div>
         )}
@@ -105,26 +105,26 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-lyratech-purple hover:bg-button-light-purple disabled:opacity-50 disabled:cursor-not-allowed text-white font-montserrat font-semibold py-3 rounded-lg transition-all duration-200 shadow-button hover:scale-[1.02] active:scale-[0.98] text-sm"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-lyratech-purple py-3 text-sm font-montserrat font-semibold text-white shadow-button transition-all duration-200 hover:scale-[1.02] hover:bg-button-light-purple active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading && (
-            <span className="w-4 h-4 border-2 border-white border-t-lyratech-purple rounded-full animate-spin" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-lyratech-purple" />
           )}
-          {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+          {loading ? "Iniciando sesion..." : "Iniciar sesion"}
         </button>
       </form>
 
       <div className="mt-6 text-center">
-        <span className="font-montserrat text-white/40 text-sm">¿No tienes cuenta? </span>
+        <span className="font-montserrat text-sm text-white/40">No tienes cuenta? </span>
         <Link
           href="/dashboard/register"
-          className="font-montserrat text-lyratech-light-purple hover:text-white text-sm transition-colors duration-200"
+          className="font-montserrat text-sm text-lyratech-light-purple transition-colors duration-200 hover:text-white"
         >
           Crear cuenta
         </Link>
       </div>
 
-      <p className="font-montserrat text-white/30 text-xs text-center mt-4">
+      <p className="mt-4 text-center font-montserrat text-xs text-white/30">
         © {new Date().getFullYear()} Lyratech. Todos los derechos reservados.
       </p>
     </div>
@@ -133,10 +133,10 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-dark-blue flex items-center justify-center px-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-lyratech-purple/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-lyratech-purple/10 rounded-full blur-3xl" />
+    <div className="flex min-h-screen items-center justify-center bg-dark-blue px-4">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-lyratech-purple/20 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-lyratech-purple/10 blur-3xl" />
       </div>
       <div className="relative w-full max-w-md">
         <Suspense fallback={null}>

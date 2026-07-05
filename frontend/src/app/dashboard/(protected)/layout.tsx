@@ -17,7 +17,13 @@ export default function ProtectedDashboardLayout({ children }: { children: React
     }
     const cached = getCachedUser();
     if (cached) setUser(cached);
-    auth.me().then(setUser).catch(() => router.push("/dashboard/login"));
+    auth
+      .me()
+      .then((me) => {
+        setUser(me);
+        localStorage.setItem("lyratech_user", JSON.stringify(me));
+      })
+      .catch(() => router.push("/dashboard/login"));
   }, [router]);
 
   return <DashboardShell user={user}>{children}</DashboardShell>;

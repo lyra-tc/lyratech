@@ -47,6 +47,8 @@ export interface UserInfo {
   email: string;
   full_name: string;
   is_active: boolean;
+  is_admin: boolean;
+  is_superadmin: boolean;
   created_at: string;
 }
 
@@ -113,6 +115,24 @@ export const auth = {
     request<void>("/api/auth/change-password", {
       method: "PUT",
       body: JSON.stringify({ current_password, new_password }),
+    }),
+};
+
+export const usersApi = {
+  list: () => request<UserInfo[]>("/api/users/"),
+  update: (id: number, data: { is_active?: boolean; is_admin?: boolean }) =>
+    request<UserInfo>(`/api/users/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  resetPassword: (id: number, new_password: string) =>
+    request<void>(`/api/users/${id}/reset-password`, {
+      method: "PUT",
+      body: JSON.stringify({ new_password }),
+    }),
+  remove: (id: number) =>
+    request<void>(`/api/users/${id}`, {
+      method: "DELETE",
     }),
 };
 

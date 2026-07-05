@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS users (
     full_name     VARCHAR(255) NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
     is_active     BOOLEAN DEFAULT TRUE,
+    is_admin      BOOLEAN NOT NULL DEFAULT TRUE,
+    is_superadmin BOOLEAN NOT NULL DEFAULT FALSE,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email)

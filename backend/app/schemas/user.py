@@ -14,6 +14,8 @@ class UserResponse(BaseModel):
     email: str
     full_name: str
     is_active: bool
+    is_admin: bool
+    is_superadmin: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -22,3 +24,5 @@ class UserResponse(BaseModel):
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     is_active: Optional[bool] = None
+    is_admin: Optional[bool] = None
+    is_superadmin: Optional[bool] = None

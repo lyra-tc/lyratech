@@ -12,7 +12,7 @@ from ..database import Base
 from ..core.deps import get_db, get_current_user
 from ..core.limiter import limiter
 from ..models.user import User
-from ..routers import prospects, notifications, diagnostics
+from ..routers import auth, diagnostics, notifications, prospects, users
 
 engine = create_engine(
     "sqlite:///:memory:",
@@ -35,6 +35,8 @@ def _build_test_app() -> FastAPI:
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_middleware(SlowAPIMiddleware)
+    app.include_router(auth.router, prefix="/api")
+    app.include_router(users.router, prefix="/api")
     app.include_router(prospects.router, prefix="/api")
     app.include_router(notifications.router, prefix="/api")
     app.include_router(diagnostics.router, prefix="/api")
@@ -59,6 +61,11 @@ def client():
 def auth_client():
     app = _build_test_app()
     app.dependency_overrides[get_current_user] = lambda: User(
-        id=1, email="admin@lyratech.com.mx", full_name="Admin", is_active=True
+        id=1,
+        email="admin@lyratech.com.mx",
+        full_name="Admin",
+        is_active=True,
+        is_admin=True,
+        is_superadmin=False,
     )
     return TestClient(app)

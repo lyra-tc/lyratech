@@ -84,7 +84,7 @@ export default function NotificationsSettings() {
         <div className="mb-6">
           <h1 className="font-montserrat-bold text-dark-blue text-2xl">Notificaciones</h1>
           <p className="font-montserrat text-dark-blue/50 text-sm mt-0.5">
-            Administra los correos que reciben avisos de nuevos prospectos
+            Administra los correos que reciben avisos de nuevos prospectos y/o diagnósticos. Puedes agregar, eliminar y probar los correos de notificación desde esta sección.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export default function NotificationsSettings() {
             Correos de notificacion
           </h2>
           <p className="font-montserrat text-dark-blue/40 text-sm mb-5">
-            Estas direcciones reciben un aviso cada vez que llega un nuevo prospecto desde el formulario de contacto.
+            Estas direcciones reciben un aviso cada vez que llega un nuevo prospecto y/o diagnóstico desde el formulario de contacto o formulario de diagnóstico.
           </p>
 
           {recipientsLoading ? (

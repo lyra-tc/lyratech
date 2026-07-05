@@ -3,13 +3,49 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from sqlalchemy import inspect, text
+
 from .config import settings
-from .database import engine, Base, SessionLocal
-from .core.limiter import limiter
 from .core.diagnostic_seed import seed_diagnostic_questions
-from .routers import auth, leads, prospects, notifications, diagnostics
+from .core.limiter import limiter
+from .database import Base, SessionLocal, engine
+from .routers import auth, diagnostics, leads, notifications, prospects, users
+
+
+def ensure_user_management_schema() -> None:
+    inspector = inspect(engine)
+    columns = {column["name"] for column in inspector.get_columns("users")}
+
+    if "is_admin" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT TRUE"
+                )
+            )
+
+    if "is_superadmin" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "ALTER TABLE users ADD COLUMN is_superadmin BOOLEAN NOT NULL DEFAULT FALSE"
+                )
+            )
+
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                """
+                UPDATE users
+                SET is_superadmin = TRUE, is_admin = TRUE, is_active = TRUE
+                WHERE LOWER(TRIM(full_name)) = 'ricardo sierra roa'
+                """
+            )
+        )
+
 
 Base.metadata.create_all(bind=engine)
+ensure_user_management_schema()
 
 _seed_db = SessionLocal()
 try:
@@ -38,6 +74,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/api")
+app.include_router(users.router, prefix="/api")
 app.include_router(leads.router, prefix="/api")
 app.include_router(prospects.router, prefix="/api")
 app.include_router(notifications.router, prefix="/api")
