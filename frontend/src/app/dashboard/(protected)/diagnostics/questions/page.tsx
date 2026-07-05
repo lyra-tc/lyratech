@@ -1,18 +1,39 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { HiOutlinePlus, HiOutlinePencil, HiChevronUp, HiChevronDown } from "react-icons/hi";
+import { HiOutlineMenuAlt4, HiOutlinePencil, HiOutlinePlus } from "react-icons/hi";
 import LoadingDots from "@/components/shared/LoadingDots";
 import DiagnosticQuestionFormModal from "@/components/Dashboard/DiagnosticQuestionFormModal";
 import { diagnosticsApi } from "@/lib/api";
 import type { DiagnosticQuestion } from "@/lib/api";
+
+function reorderQuestionsList(
+  items: DiagnosticQuestion[],
+  fromId: number,
+  toId: number
+): DiagnosticQuestion[] {
+  if (fromId === toId) return items;
+
+  const fromIndex = items.findIndex((item) => item.id === fromId);
+  const toIndex = items.findIndex((item) => item.id === toId);
+
+  if (fromIndex === -1 || toIndex === -1) return items;
+
+  const reordered = [...items];
+  const [movedItem] = reordered.splice(fromIndex, 1);
+  reordered.splice(toIndex, 0, movedItem);
+  return reordered;
+}
 
 export default function DiagnosticQuestionsPage() {
   const [questions, setQuestions] = useState<DiagnosticQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<DiagnosticQuestion | null>(null);
   const [creating, setCreating] = useState(false);
-  const [reordering, setReordering] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [hasPendingOrder, setHasPendingOrder] = useState(false);
+  const [draggedQuestionId, setDraggedQuestionId] = useState<number | null>(null);
+  const [dragOverQuestionId, setDragOverQuestionId] = useState<number | null>(null);
   const [actionError, setActionError] = useState("");
 
   const loadData = useCallback(async () => {
@@ -20,8 +41,11 @@ export default function DiagnosticQuestionsPage() {
     try {
       const data = await diagnosticsApi.listQuestions();
       setQuestions([...data].sort((a, b) => a.sort_order - b.sort_order));
+      setHasPendingOrder(false);
+      setDraggedQuestionId(null);
+      setDragOverQuestionId(null);
     } catch {
-      /* ignore — request() already redirects to login on 401 */
+      /* ignore: request() already redirects to login on 401 */
     } finally {
       setLoading(false);
     }
@@ -41,108 +65,166 @@ export default function DiagnosticQuestionsPage() {
     }
   }
 
-  async function handleMove(index: number, direction: -1 | 1) {
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= questions.length) return;
-
-    const reordered = [...questions];
-    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
-    setQuestions(reordered);
-    setReordering(true);
+  function handleReorder(fromId: number, toId: number) {
+    setQuestions((prev) => reorderQuestionsList(prev, fromId, toId));
+    setHasPendingOrder(true);
     setActionError("");
+  }
+
+  async function handleSaveOrder() {
+    setSavingOrder(true);
+    setActionError("");
+
     try {
-      await diagnosticsApi.reorderQuestions(reordered.map((q) => q.id));
+      await diagnosticsApi.reorderQuestions(questions.map((question) => question.id));
       await loadData();
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "No se pudo reordenar; se restauró el orden guardado");
-      await loadData();
+      setActionError(err instanceof Error ? err.message : "No se pudo guardar el nuevo orden");
     } finally {
-      setReordering(false);
+      setSavingOrder(false);
     }
+  }
+
+  async function handleDiscardOrder() {
+    setActionError("");
+    await loadData();
   }
 
   return (
     <>
-      <div className="p-4 md:p-8 max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+      <div className="mx-auto max-w-4xl p-4 md:p-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="font-montserrat-bold text-dark-blue text-2xl">Preguntas del Diagnóstico</h1>
-            <p className="font-montserrat text-dark-blue/50 text-sm mt-0.5">
-              Administra el orden, contenido y opciones de Diagnóstico GO
+            <h1 className="font-montserrat-bold text-2xl text-dark-blue">Preguntas del Diagnostico</h1>
+            <p className="mt-0.5 font-montserrat text-sm text-dark-blue/50">
+              Administra el orden, contenido y opciones de Diagnostico GO
             </p>
           </div>
-          <button
-            onClick={() => setCreating(true)}
-            className="flex items-center gap-2 bg-lyratech-purple hover:bg-button-light-purple text-white font-montserrat font-semibold px-4 py-2.5 rounded-xl transition-all text-sm shadow-button hover:scale-[1.02]"
-          >
-            <HiOutlinePlus size={16} />
-            Nueva pregunta
-          </button>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {hasPendingOrder && (
+              <>
+                <button
+                  onClick={handleDiscardOrder}
+                  disabled={savingOrder}
+                  className="rounded-xl border border-black/15 px-4 py-2.5 text-sm font-montserrat font-semibold text-dark-blue/70 transition-all hover:bg-beige disabled:opacity-50"
+                >
+                  Descartar cambios
+                </button>
+                <button
+                  onClick={handleSaveOrder}
+                  disabled={savingOrder}
+                  className="rounded-xl bg-lyratech-green px-4 py-2.5 text-sm font-montserrat font-semibold text-white transition-all hover:scale-[1.02] disabled:opacity-50"
+                >
+                  {savingOrder ? "Guardando..." : "Guardar orden"}
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={() => setCreating(true)}
+              className="flex items-center gap-2 rounded-xl bg-lyratech-purple px-4 py-2.5 text-sm font-montserrat font-semibold text-white shadow-button transition-all hover:scale-[1.02] hover:bg-button-light-purple"
+            >
+              <HiOutlinePlus size={16} />
+              Nueva pregunta
+            </button>
+          </div>
         </div>
 
         {actionError && (
-          <div className="bg-red/10 border border-red/30 text-red rounded-lg px-4 py-2.5 text-sm font-montserrat mb-4">
+          <div className="mb-4 rounded-lg border border-red/30 bg-red/10 px-4 py-2.5 text-sm font-montserrat text-red">
             {actionError}
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
+        {hasPendingOrder && (
+          <div className="mb-4 rounded-xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm font-montserrat text-amber-900">
+            Reacomoda las preguntas con drag and drop y guarda al final para aplicar el nuevo orden.
+          </div>
+        )}
+
+        <div className="overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm">
           {loading ? (
-            <div className="py-16 flex items-center justify-center">
+            <div className="flex items-center justify-center py-16">
               <LoadingDots />
             </div>
           ) : questions.length === 0 ? (
             <div className="py-16 text-center">
-              <p className="font-montserrat text-dark-blue/40 text-sm">Aún no hay preguntas</p>
+              <p className="font-montserrat text-sm text-dark-blue/40">Aun no hay preguntas</p>
             </div>
           ) : (
             <ul className="divide-y divide-black/5">
-              {questions.map((question, index) => (
-                <li key={question.id} className="flex items-center gap-3 px-4 py-3.5">
-                  <div className="flex flex-col">
-                    <button
-                      onClick={() => handleMove(index, -1)}
-                      disabled={index === 0 || reordering}
-                      className="text-dark-blue/40 hover:text-dark-blue disabled:opacity-30"
-                    >
-                      <HiChevronUp size={14} />
-                    </button>
-                    <button
-                      onClick={() => handleMove(index, 1)}
-                      disabled={index === questions.length - 1 || reordering}
-                      className="text-dark-blue/40 hover:text-dark-blue disabled:opacity-30"
-                    >
-                      <HiChevronDown size={14} />
-                    </button>
-                  </div>
+              {questions.map((question, index) => {
+                const isDragged = draggedQuestionId === question.id;
+                const isDragOver = dragOverQuestionId === question.id && draggedQuestionId !== question.id;
 
-                  <div className="flex-1 min-w-0">
-                    <p className="font-montserrat font-semibold text-dark-blue text-sm truncate">
-                      {question.config_json.labels.es || question.key}
-                    </p>
-                    <p className="font-montserrat text-dark-blue/40 text-xs">
-                      {question.key} · {question.type}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => handleToggleActive(question)}
-                    className={`text-xs font-montserrat font-semibold px-3 py-1.5 rounded-full transition-colors ${
-                      question.is_active ? "bg-lyratech-green/10 text-lyratech-green" : "bg-gray-100 text-gray-500"
-                    }`}
+                return (
+                  <li
+                    key={question.id}
+                    draggable={!savingOrder}
+                    onDragStart={() => {
+                      setDraggedQuestionId(question.id);
+                      setDragOverQuestionId(question.id);
+                    }}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      if (draggedQuestionId !== null && draggedQuestionId !== question.id) {
+                        setDragOverQuestionId(question.id);
+                      }
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      if (draggedQuestionId !== null && draggedQuestionId !== question.id) {
+                        handleReorder(draggedQuestionId, question.id);
+                      }
+                      setDraggedQuestionId(null);
+                      setDragOverQuestionId(null);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedQuestionId(null);
+                      setDragOverQuestionId(null);
+                    }}
+                    className={`flex items-center gap-3 px-4 py-3.5 transition-all ${
+                      isDragged ? "cursor-grabbing opacity-60" : "cursor-grab"
+                    } ${isDragOver ? "bg-lyratech-purple/5" : ""}`}
                   >
-                    {question.is_active ? "Activa" : "Inactiva"}
-                  </button>
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-beige text-dark-blue/45">
+                      <HiOutlineMenuAlt4 size={18} />
+                    </div>
 
-                  <button
-                    onClick={() => setEditing(question)}
-                    className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors"
-                    title="Editar"
-                  >
-                    <HiOutlinePencil size={15} />
-                  </button>
-                </li>
-              ))}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex min-w-7 items-center justify-center rounded-full bg-dark-blue/5 px-2 py-1 text-[11px] font-montserrat font-semibold text-dark-blue/55">
+                          {index + 1}
+                        </span>
+                        <p className="truncate font-montserrat text-sm font-semibold text-dark-blue">
+                          {question.config_json.labels.es || question.key}
+                        </p>
+                      </div>
+                      <p className="mt-1 font-montserrat text-xs text-dark-blue/40">
+                        {question.key} · {question.type}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleToggleActive(question)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-montserrat font-semibold transition-colors ${
+                        question.is_active ? "bg-lyratech-green/10 text-lyratech-green" : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {question.is_active ? "Activa" : "Inactiva"}
+                    </button>
+
+                    <button
+                      onClick={() => setEditing(question)}
+                      className="rounded-lg p-1.5 text-lyratech-purple transition-colors hover:bg-lyratech-purple/10"
+                      title="Editar"
+                    >
+                      <HiOutlinePencil size={15} />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
