@@ -11,6 +11,8 @@ import {
   HiOutlineLogout,
   HiOutlineCog,
   HiOutlineMail,
+  HiOutlineChartBar,
+  HiOutlineClipboardList,
   HiChevronLeft,
   HiChevronRight,
 } from "react-icons/hi";
@@ -20,6 +22,8 @@ import type { UserInfo } from "@/lib/api";
 const NAV_ITEMS = [
   { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
   { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineInboxIn },
+  { label: "Diagnósticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
+  { label: "Preguntas", mobileLabel: "Preg.", href: "/dashboard/diagnostics/questions", icon: HiOutlineClipboardList },
   { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail },
   { label: "Settings", mobileLabel: "Settings", href: "/dashboard/settings", icon: HiOutlineCog },
 ];

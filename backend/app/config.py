@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     NOTIFICATION_FROM_EMAIL: str = "notificaciones@lyratech.com.mx"
     NOTIFICATION_FROM_NAME: str = "Lyratech"
     FRONTEND_URL: str = ""
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_MODEL: str = "openai/gpt-4o-mini"
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_TIMEOUT_SECONDS: float = 20.0
 
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",

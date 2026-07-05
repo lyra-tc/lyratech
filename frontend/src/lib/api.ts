@@ -192,3 +192,158 @@ export const notificationsApi = {
   remove: (id: number) =>
     request<void>(`/api/notifications/recipients/${id}`, { method: "DELETE" }),
 };
+
+// --- Diagnostic GO -----------------------------------------------------
+
+export interface DiagnosticActiveOption {
+  value: string;
+  label: string;
+}
+
+export interface DiagnosticActiveQuestion {
+  key: string;
+  type: "single_choice" | "multi_choice" | "open_text";
+  sort_order: number;
+  is_required: boolean;
+  label: string;
+  placeholder: string;
+  help_text: string;
+  options: DiagnosticActiveOption[];
+}
+
+export interface DiagnosticSubmitPayload {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  locale: string;
+  answers: Record<string, string[]>;
+  turnstile_token: string;
+}
+
+export interface DiagnosticSubmitResult {
+  submission_id: number;
+  headline: string;
+  summary: string;
+  recommended_service: string;
+  secondary_service?: string;
+  why_it_fits: string;
+  key_opportunities: string[];
+  suggested_next_steps: string[];
+  confidence_note: string;
+  service_scores: Record<string, number>;
+}
+
+export async function getActiveDiagnosticQuestions(
+  locale: string
+): Promise<DiagnosticActiveQuestion[]> {
+  const res = await fetch(
+    `${API_URL}/api/diagnostics/questions/active?locale=${encodeURIComponent(locale)}`
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
+    throw new ApiError(err.detail || "Error en la solicitud", res.status);
+  }
+  return res.json();
+}
+
+export async function submitDiagnostic(
+  data: DiagnosticSubmitPayload
+): Promise<DiagnosticSubmitResult> {
+  const res = await fetch(`${API_URL}/api/diagnostics/submit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
+    throw new ApiError(err.detail || "Error en la solicitud", res.status);
+  }
+  return res.json();
+}
+
+export interface DiagnosticSubmissionListItem {
+  id: number;
+  name: string;
+  email: string;
+  company?: string;
+  locale: string;
+  recommended_primary_service: string;
+  recommended_secondary_service?: string;
+  email_delivery_status: string;
+  created_at: string;
+}
+
+export interface DiagnosticSubmissionDetail extends DiagnosticSubmissionListItem {
+  phone?: string;
+  raw_answers_json: Record<string, string[]>;
+  normalized_answers_en_json: Record<string, string[]>;
+  service_scores_json: Record<string, number>;
+  automation_approach?: string;
+  llm_provider?: string;
+  llm_model?: string;
+  llm_response_json?: Record<string, unknown>;
+  llm_status: string;
+  email_delivery_error?: string;
+}
+
+export interface DiagnosticQuestionOption {
+  value: string;
+  labels: Record<string, string>;
+  score_weights: Record<string, number>;
+}
+
+export interface DiagnosticQuestionConfig {
+  labels: Record<string, string>;
+  placeholder: Record<string, string>;
+  help_text: Record<string, string>;
+  options: DiagnosticQuestionOption[];
+}
+
+export interface DiagnosticQuestion {
+  id: number;
+  key: string;
+  type: string;
+  sort_order: number;
+  is_active: boolean;
+  is_required: boolean;
+  config_json: DiagnosticQuestionConfig;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiagnosticQuestionInput {
+  key: string;
+  type: string;
+  sort_order: number;
+  is_active: boolean;
+  is_required: boolean;
+  config_json: DiagnosticQuestionConfig;
+}
+
+export const diagnosticsApi = {
+  listSubmissions: (search = "") =>
+    request<DiagnosticSubmissionListItem[]>(
+      `/api/diagnostics/submissions${search ? `?search=${encodeURIComponent(search)}` : ""}`
+    ),
+  getSubmission: (id: number) =>
+    request<DiagnosticSubmissionDetail>(`/api/diagnostics/submissions/${id}`),
+  removeSubmission: (id: number) =>
+    request<void>(`/api/diagnostics/submissions/${id}`, { method: "DELETE" }),
+  listQuestions: () => request<DiagnosticQuestion[]>("/api/diagnostics/questions"),
+  createQuestion: (data: DiagnosticQuestionInput) =>
+    request<DiagnosticQuestion>("/api/diagnostics/questions", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateQuestion: (id: number, data: Partial<DiagnosticQuestionInput>) =>
+    request<DiagnosticQuestion>(`/api/diagnostics/questions/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  reorderQuestions: (orderedIds: number[]) =>
+    request<void>("/api/diagnostics/questions/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ordered_ids: orderedIds }),
+    }),
+};
