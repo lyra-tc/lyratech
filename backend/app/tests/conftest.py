@@ -12,7 +12,7 @@ from ..database import Base
 from ..core.deps import get_db, get_current_user
 from ..core.limiter import limiter
 from ..models.user import User
-from ..routers import prospects, notifications
+from ..routers import prospects, notifications, diagnostics
 
 engine = create_engine(
     "sqlite:///:memory:",
@@ -37,6 +37,7 @@ def _build_test_app() -> FastAPI:
     app.add_middleware(SlowAPIMiddleware)
     app.include_router(prospects.router, prefix="/api")
     app.include_router(notifications.router, prefix="/api")
+    app.include_router(diagnostics.router, prefix="/api")
     app.dependency_overrides[get_db] = _override_get_db
     return app
 

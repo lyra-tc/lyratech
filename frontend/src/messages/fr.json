@@ -1,4 +1,31 @@
 {
+  "diagnosticGo": {
+    "floatingButtonLabel": "Diagnostic GO",
+    "modalTitle": "Diagnostic GO",
+    "stepOf": "Étape {current} sur {total}",
+    "contactStepTitle": "Dites-nous qui vous êtes",
+    "namePlaceholder": "Nom complet",
+    "emailPlaceholder": "Adresse e-mail",
+    "companyPlaceholder": "Entreprise",
+    "phonePlaceholder": "Téléphone",
+    "requiredField": "Ce champ est requis",
+    "backButton": "Retour",
+    "nextButton": "Suivant",
+    "submitButton": "Voir mon diagnostic",
+    "submittingButton": "Calcul en cours...",
+    "openAnswerPlaceholderFallback": "Écrivez ici (facultatif)",
+    "errorTurnstile": "Veuillez vérifier que vous êtes humain pour continuer",
+    "errorRateLimited": "Vous avez envoyé trop de demandes, réessayez plus tard",
+    "errorGeneric": "Une erreur s'est produite, veuillez réessayer",
+    "errorLoadingQuestions": "Nous n'avons pas pu charger le diagnostic, veuillez réessayer",
+    "closeButton": "Fermer",
+    "resultWhyItFits": "Pourquoi c'est adapté",
+    "resultOpportunities": "Opportunités détectées",
+    "resultNextSteps": "Plan d'action suggéré",
+    "resultCta": "Réserver un appel avec un expert",
+    "resultAffinityLabel": "Affinité calculée",
+    "resultRestart": "Faire un autre diagnostic"
+  },
   "localeSwitcher": {
     "label": "Change language",
     "locale": "{locale, select, es {🇪🇸 Español} en {🇬🇧 English} de {🇩🇪 Deutsch} fr {🇫🇷 Français} other {Unknown}}"

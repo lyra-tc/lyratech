@@ -1,4 +1,31 @@
 {
+  "diagnosticGo": {
+    "floatingButtonLabel": "GO-Diagnose",
+    "modalTitle": "GO-Diagnose",
+    "stepOf": "Schritt {current} von {total}",
+    "contactStepTitle": "Erzähl uns, wer du bist",
+    "namePlaceholder": "Vollständiger Name",
+    "emailPlaceholder": "E-Mail-Adresse",
+    "companyPlaceholder": "Unternehmen",
+    "phonePlaceholder": "Telefon",
+    "requiredField": "Dieses Feld ist erforderlich",
+    "backButton": "Zurück",
+    "nextButton": "Weiter",
+    "submitButton": "Meine Diagnose ansehen",
+    "submittingButton": "Wird berechnet...",
+    "openAnswerPlaceholderFallback": "Hier schreiben (optional)",
+    "errorTurnstile": "Bitte bestätige, dass du ein Mensch bist, um fortzufahren",
+    "errorRateLimited": "Du hast zu viele Anfragen gesendet, versuche es später erneut",
+    "errorGeneric": "Etwas ist schiefgelaufen, bitte versuche es erneut",
+    "errorLoadingQuestions": "Wir konnten die Diagnose nicht laden, bitte versuche es erneut",
+    "closeButton": "Schließen",
+    "resultWhyItFits": "Warum es passt",
+    "resultOpportunities": "Erkannte Chancen",
+    "resultNextSteps": "Empfohlener Aktionsplan",
+    "resultCta": "Gespräch mit einem Experten buchen",
+    "resultAffinityLabel": "Berechnete Übereinstimmung",
+    "resultRestart": "Weitere Diagnose durchführen"
+  },
   "localeSwitcher": {
     "label": "Change language",
     "locale": "{locale, select, es {🇪🇸 Español} en {🇬🇧 English} de {🇩🇪 Deutsch} fr {🇫🇷 Français} other {Unknown}}"
