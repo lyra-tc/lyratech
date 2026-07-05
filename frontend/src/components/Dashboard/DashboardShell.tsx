@@ -1,20 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  HiOutlineUsers,
-  HiOutlineInboxIn,
-  HiOutlineLogout,
-  HiOutlineCog,
-  HiOutlineMail,
-  HiOutlineChartBar,
-  HiOutlineClipboardList,
   HiChevronLeft,
   HiChevronRight,
+  HiDotsHorizontal,
+  HiOutlineChartBar,
+  HiOutlineClipboardList,
+  HiOutlineCog,
+  HiOutlineInboxIn,
+  HiOutlineLogout,
+  HiOutlineMail,
+  HiOutlineUsers,
 } from "react-icons/hi";
 import Logo from "@/assets/images/Navbar/White_Logo.png";
 import type { UserInfo } from "@/lib/api";
@@ -22,11 +23,14 @@ import type { UserInfo } from "@/lib/api";
 const NAV_ITEMS = [
   { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
   { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineInboxIn },
-  { label: "Diagnósticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
+  { label: "Diagnosticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
   { label: "Preguntas", mobileLabel: "Preg.", href: "/dashboard/diagnostics/questions", icon: HiOutlineClipboardList },
   { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail },
   { label: "Settings", mobileLabel: "Settings", href: "/dashboard/settings", icon: HiOutlineCog },
 ];
+
+const MOBILE_PRIMARY_NAV_ITEMS = NAV_ITEMS.slice(0, 2);
+const MOBILE_MORE_NAV_ITEMS = NAV_ITEMS.slice(2);
 
 interface DashboardShellProps {
   user: UserInfo | null;
@@ -39,6 +43,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -47,6 +52,11 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  useEffect(() => {
+    setUserMenuOpen(false);
+    setMobileMoreOpen(false);
+  }, [pathname]);
+
   function handleLogout() {
     localStorage.removeItem("lyratech_token");
     localStorage.removeItem("lyratech_user");
@@ -54,31 +64,41 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
   }
 
   const initials = user?.full_name
-    ? user.full_name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase()
+    ? user.full_name
+        .split(" ")
+        .slice(0, 2)
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
     : "?";
 
+  const mobileMoreActive = MOBILE_MORE_NAV_ITEMS.some(({ href }) => pathname === href);
+
   const sidebarContent = (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className={`flex items-center px-4 py-5 border-b border-white/10 ${collapsed ? "justify-center" : "gap-3"}`}>
+    <div className="flex h-full flex-col">
+      <div
+        className={`flex items-center border-b border-white/10 px-4 py-5 ${
+          collapsed ? "justify-center" : "gap-3"
+        }`}
+      >
         <Link href="/dashboard" className="flex items-center gap-3">
           <Image src={Logo} alt="Lyratech" width={32} height={32} priority />
           {!collapsed && (
-            <span className="font-zendots text-white text-sm tracking-wide">Lyratech</span>
+            <span className="font-zendots text-sm tracking-wide text-white">Lyratech</span>
           )}
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
           const active = pathname === href;
+
           return (
             <Link
               key={href}
               href={href}
               title={collapsed ? label : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ${
                 collapsed ? "justify-center" : ""
               } ${
                 active
@@ -87,61 +107,56 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
               }`}
             >
               <Icon size={20} className="flex-shrink-0" />
-              {!collapsed && (
-                <span className="font-montserrat text-sm font-medium">{label}</span>
-              )}
+              {!collapsed && <span className="font-montserrat text-sm font-medium">{label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* User button — solo en desktop */}
       {!isMobile && (
-        <div className="px-3 pb-4 border-t border-white/10 pt-4 relative">
-          {/* Popup card */}
+        <div className="relative border-t border-white/10 px-3 pb-4 pt-4">
           {userMenuOpen && user && (
             <>
               <button
                 type="button"
-                aria-label="Cerrar menú"
+                aria-label="Cerrar menu"
                 onClick={() => setUserMenuOpen(false)}
                 className="fixed inset-0 z-10 cursor-default"
               />
-              <div className="absolute bottom-full left-3 right-3 mb-2 z-20 bg-[#1e2130] border border-white/10 rounded-xl shadow-2xl p-4 animate-fade-in">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              <div className="absolute bottom-full left-3 right-3 z-20 mb-2 rounded-xl border border-white/10 bg-[#1e2130] p-4 shadow-2xl animate-fade-in">
+                <div className="mb-3 flex items-center gap-3">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-lyratech-purple text-sm font-bold text-white">
                     {initials}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-white text-sm font-semibold truncate">{user.full_name}</p>
-                    <p className="text-white/50 text-xs truncate">{user.email}</p>
+                    <p className="truncate text-sm font-semibold text-white">{user.full_name}</p>
+                    <p className="truncate text-xs text-white/50">{user.email}</p>
                   </div>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white/70 hover:bg-red/20 hover:text-red transition-all duration-200 text-sm font-montserrat"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-montserrat text-white/70 transition-all duration-200 hover:bg-red/20 hover:text-red"
                 >
                   <HiOutlineLogout size={16} />
-                  Cerrar sesión
+                  Cerrar sesion
                 </button>
               </div>
             </>
           )}
 
-          {/* Trigger */}
           <button
-            onClick={() => setUserMenuOpen((o) => !o)}
-            className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200 ${
+            onClick={() => setUserMenuOpen((open) => !open)}
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 hover:bg-white/10 ${
               collapsed ? "justify-center" : ""
             }`}
           >
-            <div className="w-8 h-8 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-lyratech-purple text-xs font-bold text-white">
               {initials}
             </div>
             {!collapsed && user && (
               <div className="min-w-0 text-left">
-                <p className="text-white text-xs font-semibold truncate">{user.full_name}</p>
-                <p className="text-white/50 text-xs truncate">{user.email}</p>
+                <p className="truncate text-xs font-semibold text-white">{user.full_name}</p>
+                <p className="truncate text-xs text-white/50">{user.email}</p>
               </div>
             )}
           </button>
@@ -153,18 +168,19 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
   if (isMobile) {
     return (
       <div className="min-h-screen bg-beige flex flex-col">
-        {/* Mobile top bar */}
-        <header className="fixed top-0 left-0 right-0 z-40 bg-dark-blue flex items-center justify-between px-4 h-14 border-b border-white/10">
+        <header className="fixed left-0 right-0 top-0 z-40 flex h-14 items-center justify-between border-b border-white/10 bg-dark-blue px-4">
           <Link href="/dashboard" className="flex items-center gap-2">
             <Image src={Logo} alt="Lyratech" width={24} height={24} />
-            <span className="font-zendots text-white text-sm">Lyratech</span>
+            <span className="font-zendots text-sm text-white">Lyratech</span>
           </Link>
 
-          {/* Avatar + popup */}
           <div className="relative">
             <button
-              onClick={() => setUserMenuOpen((o) => !o)}
-              className="w-8 h-8 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-xs font-bold"
+              onClick={() => {
+                setMobileMoreOpen(false);
+                setUserMenuOpen((open) => !open);
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-lyratech-purple text-xs font-bold text-white"
             >
               {initials}
             </button>
@@ -173,26 +189,26 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
               <>
                 <button
                   type="button"
-                  aria-label="Cerrar menú"
+                  aria-label="Cerrar menu"
                   onClick={() => setUserMenuOpen(false)}
                   className="fixed inset-0 z-10 cursor-default"
                 />
-                <div className="absolute right-0 top-full mt-2 z-20 w-56 bg-[#1e2130] border border-white/10 rounded-xl shadow-2xl p-4 animate-fade-in">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-9 h-9 rounded-full bg-lyratech-purple flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-xl border border-white/10 bg-[#1e2130] p-4 shadow-2xl animate-fade-in">
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-lyratech-purple text-xs font-bold text-white">
                       {initials}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-white text-xs font-semibold truncate">{user.full_name}</p>
-                      <p className="text-white/50 text-xs truncate">{user.email}</p>
+                      <p className="truncate text-xs font-semibold text-white">{user.full_name}</p>
+                      <p className="truncate text-xs text-white/50">{user.email}</p>
                     </div>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white/70 hover:bg-red/20 hover:text-red transition-all duration-200 text-sm font-montserrat"
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-montserrat text-white/70 transition-all duration-200 hover:bg-red/20 hover:text-red"
                   >
                     <HiOutlineLogout size={16} />
-                    Cerrar sesión
+                    Cerrar sesion
                   </button>
                 </div>
               </>
@@ -200,28 +216,111 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
           </div>
         </header>
 
-        <main className="flex-1 mt-14 pb-24">{children}</main>
+        <main className="mt-14 flex-1 pb-24">{children}</main>
 
-        {/* Floating pill nav */}
-        <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-dark-blue rounded-full shadow-2xl border border-white/10 px-2.5 py-2 flex items-center gap-2">
-          {NAV_ITEMS.map(({ mobileLabel, href, icon: Icon }) => {
+        <div className="pointer-events-none fixed inset-0 z-[60]">
+          {mobileMoreOpen && (
+            <button
+              type="button"
+              aria-label="Cerrar menu adicional"
+              onClick={() => setMobileMoreOpen(false)}
+              className="pointer-events-auto absolute inset-0 bg-black/30"
+            />
+          )}
+
+          <motion.div
+            initial={false}
+            animate={mobileMoreOpen ? { y: 0 } : { y: "100%" }}
+            transition={{ type: "spring", stiffness: 320, damping: 28 }}
+            className="pointer-events-auto absolute bottom-0 left-0 right-0 rounded-t-[28px] bg-white px-5 pb-8 pt-4 shadow-[0_-18px_50px_rgba(15,23,42,0.2)]"
+          >
+            <div className="mx-auto mb-5 h-1.5 w-14 rounded-full bg-slate-200" />
+            <div className="grid grid-cols-2 gap-3">
+              {MOBILE_MORE_NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+                const active = pathname === href;
+
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`flex items-center gap-3 rounded-2xl border px-4 py-3 transition-all duration-200 ${
+                      active
+                        ? "border-lyratech-purple bg-lyratech-purple/10 text-lyratech-purple"
+                        : "border-slate-200 bg-white text-slate-700"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                        active ? "bg-lyratech-purple text-white" : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      <Icon size={20} />
+                    </span>
+                    <span className="font-montserrat text-sm font-semibold">{label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
+
+        <nav className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-dark-blue px-2.5 py-2 shadow-2xl">
+          {MOBILE_PRIMARY_NAV_ITEMS.map(({ mobileLabel, href, icon: Icon }) => {
             const active = pathname === href;
+
             return (
-              <Link key={href} href={href} className="relative flex flex-col items-center justify-center w-20 py-2.5 rounded-full">
+              <Link
+                key={href}
+                href={href}
+                className="relative flex w-20 flex-col items-center justify-center rounded-full py-2.5"
+              >
                 {active && (
                   <motion.div
                     layoutId="mobile-nav-active-pill"
-                    className="absolute inset-0 bg-lyratech-purple rounded-full"
+                    className="absolute inset-0 rounded-full bg-lyratech-purple"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
-                <span className={`relative z-10 flex flex-col items-center gap-1 transition-colors duration-200 ${active ? "text-white" : "text-white/60"}`}>
+                <span
+                  className={`relative z-10 flex flex-col items-center gap-1 transition-colors duration-200 ${
+                    active ? "text-white" : "text-white/60"
+                  }`}
+                >
                   <Icon size={19} />
-                  <span className="font-montserrat text-[9px] font-medium whitespace-nowrap">{mobileLabel}</span>
+                  <span className="font-montserrat whitespace-nowrap text-[9px] font-medium">
+                    {mobileLabel}
+                  </span>
                 </span>
               </Link>
             );
           })}
+
+          <button
+            type="button"
+            onClick={() => {
+              setUserMenuOpen(false);
+              setMobileMoreOpen((open) => !open);
+            }}
+            className="relative flex w-20 flex-col items-center justify-center rounded-full py-2.5"
+          >
+            {(mobileMoreOpen || mobileMoreActive) && (
+              <motion.div
+                layoutId="mobile-nav-active-pill"
+                className="absolute inset-0 rounded-full bg-lyratech-purple"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span
+              className={`relative z-10 flex flex-col items-center gap-1 transition-colors duration-200 ${
+                mobileMoreOpen || mobileMoreActive ? "text-white" : "text-white/60"
+              }`}
+            >
+              <HiDotsHorizontal size={19} />
+              <span className="font-montserrat whitespace-nowrap text-[9px] font-medium">
+                More
+              </span>
+            </span>
+          </button>
         </nav>
       </div>
     );
@@ -229,27 +328,22 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
 
   return (
     <div className="min-h-screen bg-beige flex">
-      {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full bg-dark-blue border-r border-white/10 z-30 transition-all duration-300 ${
+        className={`fixed left-0 top-0 z-30 h-full border-r border-white/10 bg-dark-blue transition-all duration-300 ${
           collapsed ? "w-16" : "w-60"
         }`}
       >
         {sidebarContent}
 
-        {/* Toggle pill */}
         <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="absolute top-1/2 -translate-y-1/2 -right-3.5 w-7 h-7 rounded-full bg-dark-blue border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-lyratech-purple transition-all duration-200 shadow-md"
+          onClick={() => setCollapsed((current) => !current)}
+          className="absolute top-1/2 -right-3.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-dark-blue text-white/60 shadow-md transition-all duration-200 hover:border-lyratech-purple hover:text-white"
         >
           {collapsed ? <HiChevronRight size={14} /> : <HiChevronLeft size={14} />}
         </button>
       </aside>
 
-      {/* Content — margin matches sidebar width */}
-      <main
-        className={`flex-1 transition-all duration-300 ${collapsed ? "ml-16" : "ml-60"}`}
-      >
+      <main className={`flex-1 transition-all duration-300 ${collapsed ? "ml-16" : "ml-60"}`}>
         {children}
       </main>
     </div>
