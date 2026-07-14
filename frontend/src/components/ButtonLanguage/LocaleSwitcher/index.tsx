@@ -1,6 +1,6 @@
 'use client';
 import { useParams } from 'next/navigation';
-import React, { useEffect, useRef, useState, useTransition } from 'react';
+import React, { useState, useTransition } from 'react';
 import { useRouter, usePathname } from '@/navigation';
 import Image from 'next/image';
 import { useTranslations } from "next-intl";
@@ -10,7 +10,7 @@ type Props = {
     currentLocale: string;
 };
 
-export default function LocaleSwitcher({ closeModalAction, currentLocale }: Readonly<Props>) {
+export default function LocaleSwitcher({ closeModalAction, currentLocale }: Props) {
     const t = useTranslations("buttonLanguage");
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -18,20 +18,9 @@ export default function LocaleSwitcher({ closeModalAction, currentLocale }: Read
     const params = useParams();
 
     const [activeButton] = useState<string | null>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-                closeModalAction();
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [closeModalAction]);
 
     function localeChange(locale: string) {
-        console.log(`pathname: ${pathname} params: ${JSON.stringify(params)} locale: ${locale}`);
+        console.log(`pathname: ${pathname} params: ${params} locale: ${locale}`);
         const nextLocale = locale;
         startTransition(() => {
             router.replace(
@@ -49,37 +38,39 @@ export default function LocaleSwitcher({ closeModalAction, currentLocale }: Read
     ];
 
     return (
-        <div className="fixed bottom-20 right-4 z-50" ref={containerRef}>
-            <div className="flex flex-col justify-center gap-y-3 bg-white/30 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+        <div className="fixed bottom-20 right-4 z-50" onClick={closeModalAction}>
+            <div onClick={(e) => e.stopPropagation()}>
+                <div className="flex flex-col justify-center gap-y-3 bg-white/30 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
 
-                {languages.map((lang, i) => {
-                    const isSelected = currentLocale === lang.code;
-                    const isActive = activeButton === lang.code;
+                    {languages.map((lang, i) => {
+                        const isSelected = currentLocale === lang.code;
+                        const isActive = activeButton === lang.code;
 
-                    return (
-                        <button
-                            key={lang.code}
-                            disabled={isPending}
-                            onClick={() => localeChange(lang.code)}
-                            className={`
-                                group relative inline-flex items-center justify-start overflow-hidden transition-all rounded-full border-2 px-4 py-2 text-sm font-semibold tracking-wider
-                                ${isSelected || isActive ? 'bg-gradient-to-br from-lyratech-purple to-lyratech-blue text-white border-transparent' : 'bg-white text-lyratech-blue border-lyratech-purple'}
-                                hover:bg-gradient-to-br hover:from-lyratech-purple hover:to-lyratech-blue hover:text-white hover:shadow-lg
-                                animate-slideInUp
-                            `}
-                            style={{ animationDelay: `${0.1 * (i + 1)}s` }}
-                        >
-                            <Image
-                                src={lang.flag}
-                                alt={`${lang.label} Flag`}
-                                width={20}
-                                height={14}
-                                className="mr-2"
-                            />
-                            {lang.label}
-                        </button>
-                    );
-                })}
+                        return (
+                            <button
+                                key={lang.code}
+                                disabled={isPending}
+                                onClick={() => localeChange(lang.code)}
+                                className={`
+                                    group relative inline-flex items-center justify-start overflow-hidden transition-all rounded-full border-2 px-4 py-2 text-sm font-semibold tracking-wider
+                                    ${isSelected || isActive ? 'bg-gradient-to-br from-lyratech-purple to-lyratech-blue text-white border-transparent' : 'bg-white text-lyratech-blue border-lyratech-purple'}
+                                    hover:bg-gradient-to-br hover:from-lyratech-purple hover:to-lyratech-blue hover:text-white hover:shadow-lg
+                                    animate-slideInUp
+                                `}
+                                style={{ animationDelay: `${0.1 * (i + 1)}s` }}
+                            >
+                                <Image
+                                    src={lang.flag}
+                                    alt={`${lang.label} Flag`}
+                                    width={20}
+                                    height={14}
+                                    className="mr-2"
+                                />
+                                {lang.label}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

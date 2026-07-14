@@ -5,7 +5,6 @@ import { FaArrowRight, FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight } from 
 import { CiCirclePlus } from "react-icons/ci";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import Image from "next/image";
-import Link from "next/link";
 import {useTranslations} from "next-intl";
 
 //import Avalia from "@/assets/images/Home/Portafolio/Avalia.png";
@@ -22,7 +21,6 @@ import OnceUponATime from "@/assets/images/Home/Portafolio/OnceUponATime.png";
 
 function Portafolio() {
     const t = useTranslations("portafolioHome");
-    const tNavbar = useTranslations("navbar");
 
     const projects = [
         //{ name: "Avalia Dental Group", img: Avalia, content: t("avalia"), link: "https://avaliadentalgroup.com/" },
@@ -228,7 +226,7 @@ function Portafolio() {
                 <p className="text-center my-6 md:text-lg lg:text-xl">
                     {t("callToActionText")}
                 </p>
-                <Link href={`${tNavbar("contactLink")}#contact-form`}>
+                <a href="https://wa.me/525564075229" target="_blank" rel="noopener noreferrer">
                     <button
                         className="text-sm md:text-lg rounded-[15px] md:rounded-[20px] text-white px-8 py-3 md:px-12 bg-lyratech-purple font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
                         <div className="flex flex-row justify-center items-center gap-3">
@@ -236,7 +234,7 @@ function Portafolio() {
                             <FaArrowRight/>
                         </div>
                     </button>
-                </Link>
+                </a>
             </div>
         </div>
     );

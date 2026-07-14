@@ -2,45 +2,26 @@
 
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import Logo from "@/assets/images/Footer/FooterLogo.png";
 import { MdMailOutline } from "react-icons/md";
 import { FiPhone } from "react-icons/fi";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 
-const linkClass =
-    "relative inline-block text-gray-400 after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:w-0 after:h-[3px] after:bg-gray-400 after:transition-all after:duration-300 hover:after:w-full";
-
 function Footer() {
     const t = useTranslations("footer");
-    const tNav = useTranslations("navbar");
-
     const footerLinks = [
         {
             title: t("company"),
-            links: [
-                { label: t("company1"), href: `${tNav("aboutUsLink")}#about-us-intro` },
-                { label: t("company2"), href: `${tNav("aboutUsLink")}#team` },
-                { label: t("company3"), href: tNav("portafolioLink") },
-            ],
+            links: [t("company1"), t("company2"), t("company3")],
         },
         {
             title: t("services"),
-            links: [
-                { label: t("services1"), href: `${tNav("servicesLink")}#servicios-cards` },
-                { label: t("services2"), href: `${tNav("servicesLink")}#servicios-cards` },
-                { label: t("services3"), href: `${tNav("servicesLink")}#diagnostico` },
-                { label: t("services4"), href: `${tNav("servicesLink")}#servicios-cards` },
-            ],
+            links: [t("services1"), t("services2"), t("services3"), t("services4")],
         },
         {
             title: t("resources"),
-            links: [
-                { label: t("resources1"), href: `${tNav("homeLink")}#contact` },
-                { label: t("resources2"), href: `${tNav("contactLink")}#faq` },
-                { label: t("resources3"), href: `${tNav("contactLink")}#contact-form` },
-            ],
+            links: [t("resources1"), t("resources2"), t("resources3")],
         },
     ];
 
@@ -82,6 +63,7 @@ function Footer() {
                             </span>
                         </a>
                     </div>
+
                 </div>
 
                 {/* Columns */}
@@ -91,19 +73,25 @@ function Footer() {
                         <ul className="flex flex-col gap-2 text-sm text-gray-400">
                             {section.links.map((link, i) => (
                                 <li key={i}>
-                                    <Link href={link.href} className={linkClass}>
-                                        {link.label}
-                                    </Link>
+                                    <a
+                                        href="#"
+                                        className="relative inline-block text-gray-400
+                                          after:content-[''] after:absolute after:left-0 after:-bottom-0.5
+                                          after:w-0 after:h-[3px] after:bg-gray-400
+                                          after:transition-all after:duration-300 hover:after:w-full">
+                                        {link}
+                                    </a>
                                 </li>
                             ))}
                         </ul>
+
                     </div>
                 ))}
             </div>
 
             {/* Copyright */}
             <div className="bg-black text-center py-4 text-xs lg:text-lg">
-                {t("copyright", { year: new Date().getFullYear() })}
+                {t("copyright")}
             </div>
         </footer>
     );

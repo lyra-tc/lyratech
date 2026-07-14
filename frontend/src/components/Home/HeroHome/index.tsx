@@ -8,12 +8,11 @@ import { useTranslations } from "next-intl";
 import Logo from "@/assets/images/Home/Hero/SolidLogo.png";
 //import Logo from "@/assets/images/Home/Hero/Logo.png";
 import BookingModal from "@/components/shared/BookingModal";
-import DiagnosticGoModal from "@/components/Services/DiagnosticGo/Modal";
 
 function HeroHome() {
     const t = useTranslations("heroHome");
+    const tNavbar = useTranslations("navbar");
     const [showBooking, setShowBooking] = useState(false);
-    const [showDiagnostic, setShowDiagnostic] = useState(false);
 
     return (
         <div id="home" className="text-black flex flex-col items-center justify-center md:flex-row md:mt-16 xl:mt-2 mb-16 md:mb-16">
@@ -58,13 +57,9 @@ function HeroHome() {
                     transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
                     className="flex flex-col px-10 md:px-12 lg:px-0 font-montserrat-bold gap-y-3 md:flex-row md:gap-3 md:gap-y-0"
                 >
-                    <button
-                        type="button"
-                        onClick={() => setShowDiagnostic(true)}
-                        className="text-center bg-lyratech-purple text-white py-3 px-6 xl:px-10 rounded-[15px] lg:text-sm lg:py-5 lg:rounded-[20px] xl:text-lg xl:py-4 transition-transform duration-500 ease-in-out hover:scale-75"
-                    >
+                    <a href={tNavbar("contactLink")} className="text-center bg-lyratech-purple text-white py-3 px-6 xl:px-10 rounded-[15px] lg:text-sm lg:py-5 lg:rounded-[20px] xl:text-lg xl:py-4 transition-transform duration-500 ease-in-out hover:scale-75">
                         {t("buttonContact1")}
-                    </button>
+                    </a>
                     <button
                         onClick={() => setShowBooking(true)}
                         className="text-center border border-black py-3 px-3 xl:px-10 rounded-[15px] lg:text-sm lg:py-5 lg:rounded-[20px] xl:text-lg xl:py-4 transition-transform duration-500 ease-in-out hover:scale-75"
@@ -79,8 +74,6 @@ function HeroHome() {
                 onClose={() => setShowBooking(false)}
                 title={t("buttonContact2")}
             />
-
-            {showDiagnostic && <DiagnosticGoModal onClose={() => setShowDiagnostic(false)} />}
         </div>
     );
 }
