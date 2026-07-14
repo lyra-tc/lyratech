@@ -1,21 +1,10 @@
 import clsx from 'clsx';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
 import { ReactNode } from 'react';
 import { locales } from '@/config';
 import '../globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import type { Metadata } from 'next';
-import deMessages from '@/messages/de.json';
-import enMessages from '@/messages/en.json';
-import esMessages from '@/messages/es.json';
-import frMessages from '@/messages/fr.json';
-
-const messagesByLocale = {
-    de: deMessages,
-    en: enMessages,
-    es: esMessages,
-    fr: frMessages,
-} as const;
 
 type Props = {
     children: ReactNode;
@@ -42,14 +31,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function LocaleLayout({ children, params }: Props) {
     const { locale } = await params;
     unstable_setRequestLocale(locale);
+    const messages = await getMessages();
 
     return (
         <html className="h-full" lang={locale}>
         <body className={clsx('flex h-full flex-col')}>
-        <NextIntlClientProvider
-            messages={messagesByLocale[locale as keyof typeof messagesByLocale]}
-            locale={locale}
-        >
+        <NextIntlClientProvider messages={messages} locale={locale}>
             {children}
         </NextIntlClientProvider>
         </body>
