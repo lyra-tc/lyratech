@@ -353,5 +353,33 @@
     "resources2": "FAQs",
     "resources3": "Kontakt",
     "copyright": "© {year} LyraTech. Alle Rechte vorbehalten."
+  },
+  "terms": {
+    "title": "Allgemeine Geschäftsbedingungen",
+    "lastUpdated": "Zuletzt aktualisiert: Juli 2026",
+    "section1Title": "1. Annahme der Bedingungen",
+    "section1Body": "Durch den Zugriff auf und die Nutzung der Website von LyraTech erklären Sie sich mit diesen Allgemeinen Geschäftsbedingungen einverstanden. Wenn Sie mit einem Teil dieser Bedingungen nicht einverstanden sind, nutzen Sie bitte weder die Website noch ihre Kontakt- oder Diagnoseformulare.",
+    "section2Title": "2. Nutzung der Website und der Dienste",
+    "section2Body": "Der Inhalt dieser Website dient Informations- und geschäftlichen Zwecken. Sie verpflichten sich, die Website rechtmäßig zu nutzen, ohne deren Sicherheit zu gefährden, Inhalte automatisiert auszulesen (Scraping) oder den normalen Betrieb zu beeinträchtigen. LyraTech behält sich das Recht vor, den Zugriff für Nutzer einzuschränken, die gegen diese Bedingungen verstoßen.",
+    "section3Title": "3. Kontakt- und Diagnoseformulare",
+    "section3Body": "Durch das Ausfüllen eines unserer Formulare (Kontakt, strategische Diagnose oder andere) bestätigen Sie, dass die angegebenen Informationen wahrheitsgemäß sind und Sie zur Weitergabe berechtigt sind. Wie wir diese Daten verwenden, wird ausführlich in unserer Datenschutzerklärung beschrieben.",
+    "section4Title": "4. Geistiges Eigentum",
+    "section4Body": "Sämtliche Inhalte dieser Website (Texte, Logos, Bilder, Design und Code) sind Eigentum von LyraTech oder seinen Lizenzgebern und durch die geltenden Gesetze zum geistigen Eigentum geschützt. Die vollständige oder teilweise Vervielfältigung ohne vorherige schriftliche Genehmigung ist untersagt.",
+    "section5Title": "5. Änderungen dieser Bedingungen",
+    "section5Body": "Wir können diese Allgemeinen Geschäftsbedingungen jederzeit aktualisieren, um rechtliche, betriebliche oder website-bezogene Änderungen widerzuspiegeln. Maßgeblich ist stets die auf dieser Seite veröffentlichte Fassung mit dem entsprechenden Datum der letzten Aktualisierung."
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "lastUpdated": "Zuletzt aktualisiert: Juli 2026",
+    "section1Title": "1. Verantwortlicher für die Datenverarbeitung",
+    "section1Body": "LyraTech ist verantwortlich für die Verarbeitung der personenbezogenen Daten, die Sie uns über diese Website zur Verfügung stellen. Bei Fragen zur Verarbeitung Ihrer Daten können Sie uns unter ricardo.sierra@lyratech.com.mx kontaktieren.",
+    "section2Title": "2. Welche Daten wir erheben",
+    "section2Body": "Wir erheben ausschließlich die Daten, die Sie uns freiwillig durch das Ausfüllen unserer Kontakt- oder Diagnoseformulare zur Verfügung stellen: Name des Interessenten, E-Mail-Adresse, Unternehmen sowie die von Ihnen im Formular geteilten Antworten. Wir erheben keine sensiblen Daten oder zusätzliche Informationen ohne Ihr Wissen.",
+    "section3Title": "3. Zweck und Rechtsgrundlage der Verarbeitung",
+    "section3Body": "Wir verwenden diese Daten, um auf Ihre Anfrage zu antworten, die von Ihnen geteilte Formulardaten auszuwerten und eine geschäftliche Nachverfolgung durchzuführen. Rechtsgrundlage für diese Verarbeitung ist Ihre Einwilligung, die Sie bei Absenden des Formulars erteilen, im Einklang mit den Grundsätzen der Datenschutz-Grundverordnung (DSGVO/GDPR): Rechtmäßigkeit, Datenminimierung und Zweckbindung.",
+    "section4Title": "4. Ihre Rechte bezüglich Ihrer Daten",
+    "section4Body": "Gemäß der DSGVO und anderen anwendbaren Datenschutzgesetzen haben Sie das Recht auf: Auskunft über Ihre Daten, Berichtigung bei Unrichtigkeit, Löschung, Widerspruch gegen die Verarbeitung, Datenübertragbarkeit und den jederzeitigen Widerruf Ihrer Einwilligung. Um eines dieser Rechte auszuüben, schreiben Sie uns an ricardo.sierra@lyratech.com.mx.",
+    "section5Title": "5. Speicherdauer und Sicherheit der Daten",
+    "section5Body": "Wir speichern Ihre Daten nur so lange, wie es für den Zweck erforderlich ist, für den sie erhoben wurden, oder bis Sie deren Löschung beantragen. Wir wenden angemessene technische und organisatorische Maßnahmen an, um Ihre Daten vor unbefugtem Zugriff, Verlust oder Missbrauch zu schützen. Wir geben Ihre Daten ohne Ihre Einwilligung nicht an Dritte weiter und verkaufen sie nicht, außer bei gesetzlicher Verpflichtung."
   }
 }

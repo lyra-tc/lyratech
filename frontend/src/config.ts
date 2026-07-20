@@ -45,4 +45,5 @@ export const pathnames: Pathnames<typeof locales> = {
     "/galo": "/galo",
     "/business-card": "/business-card",
     "/dev": "/dev",
+    "/legal": "/legal",
 };

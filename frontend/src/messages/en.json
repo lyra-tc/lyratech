@@ -353,5 +353,33 @@
     "resources2": "FAQs",
     "resources3": "Contact",
     "copyright": "© {year} LyraTech. All rights reserved."
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "lastUpdated": "Last updated: July 2026",
+    "section1Title": "1. Acceptance of terms",
+    "section1Body": "By accessing and using the LyraTech website, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use the site or its contact and diagnostic forms.",
+    "section2Title": "2. Use of the site and services",
+    "section2Body": "The content on this site is provided for informational and commercial purposes. You agree to use the site lawfully, without attempting to compromise its security, automatically scraping its content, or interfering with its normal operation. LyraTech reserves the right to restrict access to any user who breaches these conditions.",
+    "section3Title": "3. Contact and diagnostic forms",
+    "section3Body": "By completing any of our forms (contact, strategic diagnostic, or others), you confirm that the information provided is accurate and that you are authorized to share it. How we use this data is described in detail in our Privacy Policy.",
+    "section4Title": "4. Intellectual property",
+    "section4Body": "All content on this site (text, logos, images, design, and code) is the property of LyraTech or its licensors and is protected under applicable intellectual property laws. Reproduction, in whole or in part, without prior written authorization is prohibited.",
+    "section5Title": "5. Changes to these terms",
+    "section5Body": "We may update these Terms and Conditions at any time to reflect legal, operational, or site changes. The version in effect will always be the one published on this page, together with its corresponding last-updated date."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: July 2026",
+    "section1Title": "1. Data controller",
+    "section1Body": "LyraTech is the data controller responsible for processing the personal data you provide through this website. If you have any questions about how your data is handled, you can contact us at ricardo.sierra@lyratech.com.mx.",
+    "section2Title": "2. What data we collect",
+    "section2Body": "We only collect the data you voluntarily provide when filling out our contact or strategic diagnostic forms: the prospect's name, email address, company, and the answers you share in the form. We do not collect sensitive data or any additional information without your knowledge.",
+    "section3Title": "3. Purpose and legal basis for processing",
+    "section3Body": "We use this data to respond to your inquiry, review the forms information you share with us, and follow up commercially. The legal basis for this processing is your consent, given when you submit the form, in line with the principles of the General Data Protection Regulation (GDPR): lawfulness, data minimization, and purpose limitation.",
+    "section4Title": "4. Your rights over your data",
+    "section4Body": "Under the GDPR and other applicable data protection laws, you have the right to: access your data, rectify it if inaccurate, request its deletion, object to its processing, request data portability, and withdraw your consent at any time. To exercise any of these rights, write to us at ricardo.sierra@lyratech.com.mx.",
+    "section5Title": "5. Data retention and security",
+    "section5Body": "We retain your data only for as long as necessary to fulfill the purpose for which it was collected, or until you request its deletion. We apply reasonable technical and organizational measures to protect your information from unauthorized access, loss, or misuse. We do not share or sell your data to third parties without your consent, except where legally required."
   }
 }
