@@ -46,7 +46,9 @@
     "sidebarBenefit2Title": "Une recommandation concrète",
     "sidebarBenefit2Text": "Ce n'est pas un formulaire générique. Il se termine par une prochaine étape utile pour votre activité.",
     "sidebarBenefit3Title": "Plus de contexte pour Lyra",
-    "sidebarBenefit3Text": "Nous arrivons mieux préparés à l'appel ou à la proposition technique si vous décidez de continuer."
+    "sidebarBenefit3Text": "Nous arrivons mieux préparés à l'appel ou à la proposition technique si vous décidez de continuer.",
+    "acceptTerms": "J'accepte les <link>Conditions Générales et la Politique de Confidentialité</link> de LyraTech.",
+    "errorTerms": "Vous devez accepter les Conditions Générales et la Politique de Confidentialité pour continuer."
   },
   "localeSwitcher": {
     "label": "Change language",
@@ -88,7 +90,8 @@
     "aboutUsLink": "/a-propos",
     "servicesLink": "/services",
     "portafolioLink": "/portfolio",
-    "contactLink": "/contact"
+    "contactLink": "/contact",
+    "legalLink": "/legal"
   },
   "heroHome": {
     "title": "Nous concevons des solutions qui comprennent votre entreprise",
@@ -334,7 +337,9 @@
     "serviceOption1": "Diagnostic",
     "serviceOption2": "Automatisations",
     "serviceOption3": "Projet à prix fixe",
-    "serviceOption4": "Équipe dédiée"
+    "serviceOption4": "Équipe dédiée",
+    "acceptTerms": "J'accepte les <link>Conditions Générales et la Politique de Confidentialité</link> de LyraTech.",
+    "errorTerms": "Vous devez accepter les Conditions Générales et la Politique de Confidentialité pour continuer."
   },
   "footer": {
     "description": "Nous créons des logiciels extraordinaires avec un design impeccable, une vitesse supérieure et une fonctionnalité parfaite. Votre succès numérique est notre mission.",
@@ -352,6 +357,35 @@
     "resources1": "Support",
     "resources2": "FAQ",
     "resources3": "Contact",
+    "resources4": "Mentions légales",
     "copyright": "© {year} LyraTech. Tous droits réservés."
+  },
+  "terms": {
+    "title": "Conditions Générales",
+    "lastUpdated": "Dernière mise à jour : juillet 2026",
+    "section1Title": "1. Acceptation des conditions",
+    "section1Body": "En accédant au site web de LyraTech et en l'utilisant, vous acceptez d'être lié par les présentes Conditions Générales. Si vous n'acceptez pas une partie de ces conditions, veuillez ne pas utiliser le site ni ses formulaires de contact ou de diagnostic.",
+    "section2Title": "2. Utilisation du site et des services",
+    "section2Body": "Le contenu de ce site est fourni à des fins d'information et commerciales. Vous vous engagez à utiliser le site de manière licite, sans tenter de compromettre sa sécurité, sans extraction automatisée de données (scraping) et sans interférer avec son fonctionnement normal. LyraTech se réserve le droit de restreindre l'accès à tout utilisateur qui enfreint ces conditions.",
+    "section3Title": "3. Formulaires de contact et de diagnostic",
+    "section3Body": "En remplissant l'un de nos formulaires (contact, diagnostic stratégique ou autres), vous confirmez que les informations fournies sont exactes et que vous êtes autorisé à les partager. L'utilisation que nous faisons de ces données est décrite en détail dans notre Politique de Confidentialité.",
+    "section4Title": "4. Propriété intellectuelle",
+    "section4Body": "Tout le contenu de ce site (textes, logos, images, design et code) est la propriété de LyraTech ou de ses concédants de licence et est protégé par les lois applicables en matière de propriété intellectuelle. Toute reproduction, totale ou partielle, sans autorisation écrite préalable est interdite.",
+    "section5Title": "5. Modifications de ces conditions",
+    "section5Body": "Nous pouvons mettre à jour ces Conditions Générales à tout moment pour refléter des changements juridiques, opérationnels ou du site. La version en vigueur sera toujours celle publiée sur cette page, avec sa date de dernière mise à jour correspondante."
+  },
+  "privacy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour : juillet 2026",
+    "section1Title": "1. Responsable du traitement",
+    "section1Body": "LyraTech est le responsable du traitement des données personnelles que vous nous fournissez via ce site web. Pour toute question concernant le traitement de vos données, vous pouvez nous contacter à ricardo.sierra@lyratech.com.mx.",
+    "section2Title": "2. Quelles données nous collectons",
+    "section2Body": "Nous ne collectons que les données que vous nous fournissez volontairement en remplissant nos formulaires de contact ou de diagnostic stratégique : le nom du prospect, l'adresse e-mail, l'entreprise et les réponses que vous partagez dans le formulaire. Nous ne collectons aucune donnée sensible ni information supplémentaire à votre insu.",
+    "section3Title": "3. Finalité et base légale du traitement",
+    "section3Body": "Nous utilisons ces données pour répondre à votre demande, examiner le formulaire que vous nous partagez et assurer un suivi commercial. La base légale de ce traitement est votre consentement, donné au moment de l'envoi du formulaire, conformément aux principes du Règlement Général sur la Protection des Données (RGPD) : licéité, minimisation des données et limitation des finalités.",
+    "section4Title": "4. Vos droits sur vos données",
+    "section4Body": "Conformément au RGPD et aux autres lois applicables en matière de protection des données, vous avez le droit : d'accéder à vos données, de les rectifier si elles sont inexactes, d'en demander la suppression, de vous opposer à leur traitement, de demander la portabilité de vos données et de retirer votre consentement à tout moment. Pour exercer l'un de ces droits, écrivez-nous à ricardo.sierra@lyratech.com.mx.",
+    "section5Title": "5. Conservation et sécurité des données",
+    "section5Body": "Nous conservons vos données uniquement pendant la durée nécessaire pour atteindre la finalité pour laquelle elles ont été collectées, ou jusqu'à ce que vous demandiez leur suppression. Nous appliquons des mesures techniques et organisationnelles raisonnables pour protéger vos informations contre tout accès non autorisé, perte ou usage abusif. Nous ne partageons ni ne vendons vos données à des tiers sans votre consentement, sauf obligation légale."
   }
 }

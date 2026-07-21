@@ -46,7 +46,9 @@
     "sidebarBenefit2Title": "Recomendación accionable",
     "sidebarBenefit2Text": "No es un formulario genérico: termina en un siguiente paso concreto para tu operación.",
     "sidebarBenefit3Title": "Más contexto para Lyra",
-    "sidebarBenefit3Text": "Llegamos mejor preparados a la llamada o propuesta técnica si decides continuar."
+    "sidebarBenefit3Text": "Llegamos mejor preparados a la llamada o propuesta técnica si decides continuar.",
+    "acceptTerms": "Acepto los <link>Términos y Condiciones y el Aviso de Privacidad</link> de LyraTech.",
+    "errorTerms": "Debes aceptar los Términos y Condiciones y el Aviso de Privacidad para continuar."
   },
   "localeSwitcher": {
     "label": "Change language",
@@ -88,7 +90,8 @@
     "aboutUsLink": "/nosotros",
     "servicesLink": "/servicios",
     "portafolioLink": "/portafolio",
-    "contactLink": "/contacto"
+    "contactLink": "/contacto",
+    "legalLink": "/legal"
   },
   "heroHome": {
     "title": "Construimos soluciones que entienden tu negocio",
@@ -334,7 +337,9 @@
     "serviceOption1": "Diagnóstico",
     "serviceOption2": "Automatizaciones",
     "serviceOption3": "Proyecto a precio fijo",
-    "serviceOption4": "Equipo dedicado"
+    "serviceOption4": "Equipo dedicado",
+    "acceptTerms": "Acepto los <link>Términos y Condiciones y el Aviso de Privacidad</link> de LyraTech.",
+    "errorTerms": "Debes aceptar los Términos y Condiciones y el Aviso de Privacidad para continuar."
   },
   "footer": {
     "description": "Creamos software extraordinario con diseño impecable, velocidad superior y funcionalidad perfecta. Tu éxito digital es nuestra misión.",
@@ -352,6 +357,35 @@
     "resources1": "Soporte",
     "resources2": "FAQ's",
     "resources3": "Contacto",
+    "resources4": "Legal",
     "copyright": "© {year} LyraTech. Todos los derechos reservados."
+  },
+  "terms": {
+    "title": "Términos y Condiciones",
+    "lastUpdated": "Última actualización: julio de 2026",
+    "section1Title": "1. Aceptación de los términos",
+    "section1Body": "Al acceder y utilizar el sitio web de LyraTech, aceptas quedar sujeto a los presentes Términos y Condiciones. Si no estás de acuerdo con alguna parte de estos términos, te pedimos no utilizar el sitio ni sus formularios de contacto o diagnóstico.",
+    "section2Title": "2. Uso del sitio y de los servicios",
+    "section2Body": "El contenido de este sitio tiene fines informativos y comerciales. Te comprometes a utilizar el sitio de forma lícita, sin intentar vulnerar su seguridad, extraer información de forma automatizada (scraping) ni interferir con su funcionamiento normal. LyraTech se reserva el derecho de restringir el acceso a cualquier usuario que incumpla estas condiciones.",
+    "section3Title": "3. Formularios de contacto y diagnóstico",
+    "section3Body": "Al completar cualquiera de nuestros formularios (contacto, diagnóstico estratégico u otros), declaras que la información proporcionada es verdadera y que cuentas con autorización para compartirla. El uso que damos a estos datos se describe con detalle en nuestro Aviso de Privacidad.",
+    "section4Title": "4. Propiedad intelectual",
+    "section4Body": "Todo el contenido de este sitio (textos, logotipos, imágenes, diseño y código) es propiedad de LyraTech o de sus licenciantes y está protegido por las leyes de propiedad intelectual aplicables. Queda prohibida su reproducción total o parcial sin autorización previa por escrito.",
+    "section5Title": "5. Modificaciones a estos términos",
+    "section5Body": "Podemos actualizar estos Términos y Condiciones en cualquier momento para reflejar cambios legales, operativos o del sitio. La versión vigente será siempre la publicada en esta página, con su fecha de última actualización correspondiente."
+  },
+  "privacy": {
+    "title": "Aviso de Privacidad",
+    "lastUpdated": "Última actualización: julio de 2026",
+    "section1Title": "1. Responsable del tratamiento de datos",
+    "section1Body": "LyraTech es responsable del tratamiento de los datos personales que nos proporcionas a través de este sitio web. Para cualquier duda relacionada con el tratamiento de tus datos, puedes contactarnos en ricardo.sierra@lyratech.com.mx.",
+    "section2Title": "2. Qué datos recopilamos",
+    "section2Body": "Únicamente recopilamos los datos que tú mismo nos proporcionas de forma voluntaria al llenar nuestros formularios de contacto o diagnóstico estratégico: nombre del prospecto, correo electrónico, empresa a la que perteneces y las respuestas que compartes en el formulario. No recopilamos datos sensibles ni información adicional sin tu conocimiento.",
+    "section3Title": "3. Finalidad y base legal del tratamiento",
+    "section3Body": "Utilizamos estos datos para responder a tu solicitud de contacto, evaluar tus respuestas del formulario que nos compartes y darte seguimiento comercial. La base legal para este tratamiento es tu consentimiento, otorgado al momento de enviar el formulario, en línea con los principios del Reglamento General de Protección de Datos (RGPD/GDPR): licitud, minimización de datos y limitación de la finalidad.",
+    "section4Title": "4. Tus derechos sobre tus datos",
+    "section4Body": "De acuerdo con el RGPD y otras leyes de protección de datos aplicables, tienes derecho a: acceder a tus datos, rectificarlos si son inexactos, solicitar su eliminación, oponerte a su tratamiento, solicitar la portabilidad de tus datos y retirar tu consentimiento en cualquier momento. Para ejercer cualquiera de estos derechos, escríbenos a ricardo.sierra@lyratech.com.mx.",
+    "section5Title": "5. Conservación y seguridad de los datos",
+    "section5Body": "Conservamos tus datos únicamente durante el tiempo necesario para cumplir con la finalidad para la que fueron recabados, o hasta que solicites su eliminación. Aplicamos medidas técnicas y organizativas razonables para proteger tu información contra accesos no autorizados, pérdida o uso indebido. No compartimos ni vendemos tus datos a terceros sin tu consentimiento, salvo obligación legal."
   }
 }
