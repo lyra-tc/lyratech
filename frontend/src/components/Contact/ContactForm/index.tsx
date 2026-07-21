@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Script from "next/script";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { MdEmail, MdPhone } from "react-icons/md";
 import { FaBuilding } from "react-icons/fa";
@@ -29,6 +30,7 @@ function fieldClass(hasError: boolean) {
 
 export default function ContactForm() {
     const t = useTranslations("contactForm");
+    const tNav = useTranslations("navbar");
     const [bookingOpen, setBookingOpen] = useState(false);
     const [serviceOpen, setServiceOpen] = useState(false);
     const serviceRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,8 @@ export default function ContactForm() {
         message: "",
     });
     const [errors, setErrors] = useState<Partial<Record<keyof FormState, boolean>>>({});
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [termsError, setTermsError] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState("");
@@ -119,6 +123,14 @@ export default function ContactForm() {
         if (Object.keys(newErrors).length > 0) return;
 
         setSubmitError("");
+
+        if (!acceptedTerms) {
+            setTermsError(true);
+            setSubmitError(t("errorTerms"));
+            return;
+        }
+        setTermsError(false);
+
         if (!turnstileToken) {
             setSubmitError(t("errorTurnstile"));
             return;
@@ -397,6 +409,41 @@ export default function ContactForm() {
                                 <div className="origin-center scale-[0.70] sm:origin-right sm:scale-[0.55]">
                                     <div className="w-[300px] max-w-full" ref={turnstileContainerRef} />
                                 </div>
+                            </div>
+
+                            {/* Accept terms */}
+                            <div className="mt-4 flex flex-col gap-1">
+                                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={acceptedTerms}
+                                        onChange={(e) => {
+                                            setAcceptedTerms(e.target.checked);
+                                            if (e.target.checked) setTermsError(false);
+                                        }}
+                                        className={`mt-0.5 h-4 w-4 flex-shrink-0 rounded border ${
+                                            termsError ? "border-red/60" : "border-gray-300"
+                                        } text-lyratech-purple focus:ring-lyratech-purple`}
+                                    />
+                                    <span className="text-xs text-gray-500 leading-relaxed">
+                                        {t.rich("acceptTerms", {
+                                            link: (chunks) => (
+                                                <Link
+                                                    href={tNav("legalLink")}
+                                                    target="_blank"
+                                                    className="text-lyratech-purple font-semibold underline hover:text-button-dark-purple"
+                                                >
+                                                    {chunks}
+                                                </Link>
+                                            ),
+                                        })}
+                                    </span>
+                                </label>
+                                {termsError && (
+                                    <span className="text-red/70 text-xs font-semibold pl-1 flex items-center gap-1">
+                                        <span>•</span> {t("errorTerms")}
+                                    </span>
+                                )}
                             </div>
 
                             {submitError && (

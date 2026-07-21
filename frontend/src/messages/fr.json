@@ -46,7 +46,9 @@
     "sidebarBenefit2Title": "Une recommandation concrète",
     "sidebarBenefit2Text": "Ce n'est pas un formulaire générique. Il se termine par une prochaine étape utile pour votre activité.",
     "sidebarBenefit3Title": "Plus de contexte pour Lyra",
-    "sidebarBenefit3Text": "Nous arrivons mieux préparés à l'appel ou à la proposition technique si vous décidez de continuer."
+    "sidebarBenefit3Text": "Nous arrivons mieux préparés à l'appel ou à la proposition technique si vous décidez de continuer.",
+    "acceptTerms": "J'accepte les <link>Conditions Générales et la Politique de Confidentialité</link> de LyraTech.",
+    "errorTerms": "Vous devez accepter les Conditions Générales et la Politique de Confidentialité pour continuer."
   },
   "localeSwitcher": {
     "label": "Change language",
@@ -88,7 +90,8 @@
     "aboutUsLink": "/a-propos",
     "servicesLink": "/services",
     "portafolioLink": "/portfolio",
-    "contactLink": "/contact"
+    "contactLink": "/contact",
+    "legalLink": "/legal"
   },
   "heroHome": {
     "title": "Nous concevons des solutions qui comprennent votre entreprise",
@@ -334,7 +337,9 @@
     "serviceOption1": "Diagnostic",
     "serviceOption2": "Automatisations",
     "serviceOption3": "Projet à prix fixe",
-    "serviceOption4": "Équipe dédiée"
+    "serviceOption4": "Équipe dédiée",
+    "acceptTerms": "J'accepte les <link>Conditions Générales et la Politique de Confidentialité</link> de LyraTech.",
+    "errorTerms": "Vous devez accepter les Conditions Générales et la Politique de Confidentialité pour continuer."
   },
   "footer": {
     "description": "Nous créons des logiciels extraordinaires avec un design impeccable, une vitesse supérieure et une fonctionnalité parfaite. Votre succès numérique est notre mission.",

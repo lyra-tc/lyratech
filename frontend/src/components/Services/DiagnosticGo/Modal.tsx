@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Script from "next/script";
 import { useLocale, useTranslations } from "next-intl";
 import { HiOutlineX, HiChevronLeft } from "react-icons/hi";
@@ -24,6 +25,7 @@ interface ContactFormState {
 
 export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
   const t = useTranslations("diagnosticGo");
+  const tNav = useTranslations("navbar");
   const locale = useLocale();
 
   const [questions, setQuestions] = useState<DiagnosticActiveQuestion[]>([]);
@@ -33,6 +35,8 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
   const [contact, setContact] = useState<ContactFormState>({ name: "", email: "", company: "", phone: "" });
   const [contactErrors, setContactErrors] = useState<Partial<Record<keyof ContactFormState, boolean>>>({});
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [result, setResult] = useState<DiagnosticSubmitResult | null>(null);
@@ -162,6 +166,12 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
       setSubmitError(t("requiredField"));
       return;
     }
+    if (!acceptedTerms) {
+      setTermsError(true);
+      setSubmitError(t("errorTerms"));
+      return;
+    }
+    setTermsError(false);
     if (!turnstileToken) {
       setSubmitError(t("errorTurnstile"));
       return;
@@ -203,6 +213,8 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
     setAnswers({});
     setSubmitError("");
     setTurnstileToken("");
+    setAcceptedTerms(false);
+    setTermsError(false);
     widgetIdRef.current = null;
   }
 
@@ -393,6 +405,37 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
                 )}
               </div>
             ) : null}
+
+            {isLastStep && !loadingQuestions && !loadError && (
+              <div className="mx-auto mt-4 w-full max-w-[620px]">
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => {
+                      setAcceptedTerms(e.target.checked);
+                      if (e.target.checked) setTermsError(false);
+                    }}
+                    className={`mt-0.5 h-4 w-4 flex-shrink-0 rounded border ${
+                      termsError ? "border-red/60" : "border-gray-300"
+                    } text-lyratech-purple focus:ring-lyratech-purple`}
+                  />
+                  <span className="text-xs text-gray-500 leading-relaxed">
+                    {t.rich("acceptTerms", {
+                      link: (chunks) => (
+                        <Link
+                          href={tNav("legalLink")}
+                          target="_blank"
+                          className="text-lyratech-purple font-semibold underline hover:text-button-dark-purple"
+                        >
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
+                  </span>
+                </label>
+              </div>
+            )}
 
             <div className={isLastStep ? "mt-2 flex min-h-[74px] justify-center" : "hidden"}>
               <div className="flex w-full justify-center">
