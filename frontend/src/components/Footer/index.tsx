@@ -40,6 +40,7 @@ function Footer() {
                 { label: t("resources1"), href: `${tNav("homeLink")}#contact` },
                 { label: t("resources2"), href: `${tNav("contactLink")}#faq` },
                 { label: t("resources3"), href: `${tNav("contactLink")}#contact-form` },
+                { label: t("resources4"), href: tNav("legalLink") },
             ],
         },
     ];
