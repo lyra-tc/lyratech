@@ -73,6 +73,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_DOCS_PATHS = {"/api/docs", "/api/redoc", "/api/openapi.json"}
+
+
+@app.middleware("http")
+async def security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Strict-Transport-Security"] = (
+        "max-age=63072000; includeSubDomains; preload"
+    )
+    if request.url.path not in _DOCS_PATHS:
+        response.headers["Content-Security-Policy"] = "default-src 'none'"
+    return response
+
 app.include_router(auth.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(leads.router, prefix="/api")
