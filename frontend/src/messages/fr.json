@@ -372,7 +372,9 @@
     "section4Title": "4. Propriété intellectuelle",
     "section4Body": "Tout le contenu de ce site (textes, logos, images, design et code) est la propriété de LyraTech ou de ses concédants de licence et est protégé par les lois applicables en matière de propriété intellectuelle. Toute reproduction, totale ou partielle, sans autorisation écrite préalable est interdite.",
     "section5Title": "5. Modifications de ces conditions",
-    "section5Body": "Nous pouvons mettre à jour ces Conditions Générales à tout moment pour refléter des changements juridiques, opérationnels ou du site. La version en vigueur sera toujours celle publiée sur cette page, avec sa date de dernière mise à jour correspondante."
+    "section5Body": "Nous pouvons mettre à jour ces Conditions Générales à tout moment pour refléter des changements juridiques, opérationnels ou du site. La version en vigueur sera toujours celle publiée sur cette page, avec sa date de dernière mise à jour correspondante.",
+    "section6Title": "6. Utilisation de l'intelligence artificielle dans Diagnostic Go",
+    "section6Body": "Diagnostic Go utilise des modèles d'intelligence artificielle (LLM) pour analyser les réponses que vous fournissez et générer votre diagnostic stratégique. Le détail du traitement de vos données avec cette technologie est décrit dans notre Politique de Confidentialité. Si vous n'êtes pas d'accord avec ce traitement, veuillez ne pas utiliser Diagnostic Go."
   },
   "privacy": {
     "title": "Politique de Confidentialité",
@@ -386,6 +388,8 @@
     "section4Title": "4. Vos droits sur vos données",
     "section4Body": "Conformément au RGPD et aux autres lois applicables en matière de protection des données, vous avez le droit : d'accéder à vos données, de les rectifier si elles sont inexactes, d'en demander la suppression, de vous opposer à leur traitement, de demander la portabilité de vos données et de retirer votre consentement à tout moment. Pour exercer l'un de ces droits, écrivez-nous à ricardo.sierra@lyratech.com.mx.",
     "section5Title": "5. Conservation et sécurité des données",
-    "section5Body": "Nous conservons vos données uniquement pendant la durée nécessaire pour atteindre la finalité pour laquelle elles ont été collectées, ou jusqu'à ce que vous demandiez leur suppression. Nous appliquons des mesures techniques et organisationnelles raisonnables pour protéger vos informations contre tout accès non autorisé, perte ou usage abusif. Nous ne partageons ni ne vendons vos données à des tiers sans votre consentement, sauf obligation légale."
+    "section5Body": "Nous conservons vos données uniquement pendant la durée nécessaire pour atteindre la finalité pour laquelle elles ont été collectées, ou jusqu'à ce que vous demandiez leur suppression. Nous appliquons des mesures techniques et organisationnelles raisonnables pour protéger vos informations contre tout accès non autorisé, perte ou usage abusif. Nous ne partageons ni ne vendons vos données à des tiers sans votre consentement, sauf obligation légale.",
+    "section6Title": "6. Utilisation de l'intelligence artificielle dans le diagnostic",
+    "section6Body": "Pour générer votre diagnostic stratégique, Diagnostic Go envoie les réponses que vous partagez à un modèle d'intelligence artificielle (LLM), qui les analyse et produit des recommandations automatisées. Ce traitement est nécessaire pour vous fournir le résultat du diagnostic et n'a lieu que lorsque vous choisissez d'utiliser cet outil. Si vous ne souhaitez pas que vos données soient traitées par intelligence artificielle, veuillez ne pas utiliser Diagnostic Go ; le reste de nos services et formulaires n'est pas concerné."
   }
 }

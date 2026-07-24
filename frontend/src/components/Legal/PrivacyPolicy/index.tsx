@@ -15,6 +15,7 @@ export default function PrivacyPolicy() {
         { titleKey: "section3Title", bodyKey: "section3Body" },
         { titleKey: "section4Title", bodyKey: "section4Body" },
         { titleKey: "section5Title", bodyKey: "section5Body" },
+        { titleKey: "section6Title", bodyKey: "section6Body" },
     ] as const;
 
     return (

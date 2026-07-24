@@ -372,7 +372,9 @@
     "section4Title": "4. Intellectual property",
     "section4Body": "All content on this site (text, logos, images, design, and code) is the property of LyraTech or its licensors and is protected under applicable intellectual property laws. Reproduction, in whole or in part, without prior written authorization is prohibited.",
     "section5Title": "5. Changes to these terms",
-    "section5Body": "We may update these Terms and Conditions at any time to reflect legal, operational, or site changes. The version in effect will always be the one published on this page, together with its corresponding last-updated date."
+    "section5Body": "We may update these Terms and Conditions at any time to reflect legal, operational, or site changes. The version in effect will always be the one published on this page, together with its corresponding last-updated date.",
+    "section6Title": "6. Use of artificial intelligence in Diagnostic Go",
+    "section6Body": "Diagnostic Go uses artificial intelligence (LLM) models to analyze the answers you provide and generate your strategic diagnostic. Details on how your data is processed with this technology are described in our Privacy Policy. If you do not agree with this processing, please do not use Diagnostic Go."
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -386,6 +388,8 @@
     "section4Title": "4. Your rights over your data",
     "section4Body": "Under the GDPR and other applicable data protection laws, you have the right to: access your data, rectify it if inaccurate, request its deletion, object to its processing, request data portability, and withdraw your consent at any time. To exercise any of these rights, write to us at ricardo.sierra@lyratech.com.mx.",
     "section5Title": "5. Data retention and security",
-    "section5Body": "We retain your data only for as long as necessary to fulfill the purpose for which it was collected, or until you request its deletion. We apply reasonable technical and organizational measures to protect your information from unauthorized access, loss, or misuse. We do not share or sell your data to third parties without your consent, except where legally required."
+    "section5Body": "We retain your data only for as long as necessary to fulfill the purpose for which it was collected, or until you request its deletion. We apply reasonable technical and organizational measures to protect your information from unauthorized access, loss, or misuse. We do not share or sell your data to third parties without your consent, except where legally required.",
+    "section6Title": "6. Use of artificial intelligence in the diagnostic",
+    "section6Body": "To generate your strategic diagnostic, Diagnostic Go sends the answers you share to an artificial intelligence (LLM) model, which analyzes them and produces automated recommendations. This processing is necessary to provide you with the diagnostic result and only takes place when you choose to use this tool. If you do not want your data processed using artificial intelligence, please do not use Diagnostic Go; our other services and forms are not affected."
   }
 }

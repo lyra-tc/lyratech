@@ -372,7 +372,9 @@
     "section4Title": "4. Geistiges Eigentum",
     "section4Body": "Sämtliche Inhalte dieser Website (Texte, Logos, Bilder, Design und Code) sind Eigentum von LyraTech oder seinen Lizenzgebern und durch die geltenden Gesetze zum geistigen Eigentum geschützt. Die vollständige oder teilweise Vervielfältigung ohne vorherige schriftliche Genehmigung ist untersagt.",
     "section5Title": "5. Änderungen dieser Bedingungen",
-    "section5Body": "Wir können diese Allgemeinen Geschäftsbedingungen jederzeit aktualisieren, um rechtliche, betriebliche oder website-bezogene Änderungen widerzuspiegeln. Maßgeblich ist stets die auf dieser Seite veröffentlichte Fassung mit dem entsprechenden Datum der letzten Aktualisierung."
+    "section5Body": "Wir können diese Allgemeinen Geschäftsbedingungen jederzeit aktualisieren, um rechtliche, betriebliche oder website-bezogene Änderungen widerzuspiegeln. Maßgeblich ist stets die auf dieser Seite veröffentlichte Fassung mit dem entsprechenden Datum der letzten Aktualisierung.",
+    "section6Title": "6. Einsatz künstlicher Intelligenz in Diagnostic Go",
+    "section6Body": "Diagnostic Go verwendet Modelle künstlicher Intelligenz (LLM), um die von Ihnen angegebenen Antworten zu analysieren und Ihre strategische Diagnose zu erstellen. Details zur Verarbeitung Ihrer Daten mit dieser Technologie finden Sie in unserer Datenschutzerklärung. Wenn Sie mit dieser Verarbeitung nicht einverstanden sind, nutzen Sie bitte Diagnostic Go nicht."
   },
   "privacy": {
     "title": "Datenschutzerklärung",
@@ -386,6 +388,8 @@
     "section4Title": "4. Ihre Rechte bezüglich Ihrer Daten",
     "section4Body": "Gemäß der DSGVO und anderen anwendbaren Datenschutzgesetzen haben Sie das Recht auf: Auskunft über Ihre Daten, Berichtigung bei Unrichtigkeit, Löschung, Widerspruch gegen die Verarbeitung, Datenübertragbarkeit und den jederzeitigen Widerruf Ihrer Einwilligung. Um eines dieser Rechte auszuüben, schreiben Sie uns an ricardo.sierra@lyratech.com.mx.",
     "section5Title": "5. Speicherdauer und Sicherheit der Daten",
-    "section5Body": "Wir speichern Ihre Daten nur so lange, wie es für den Zweck erforderlich ist, für den sie erhoben wurden, oder bis Sie deren Löschung beantragen. Wir wenden angemessene technische und organisatorische Maßnahmen an, um Ihre Daten vor unbefugtem Zugriff, Verlust oder Missbrauch zu schützen. Wir geben Ihre Daten ohne Ihre Einwilligung nicht an Dritte weiter und verkaufen sie nicht, außer bei gesetzlicher Verpflichtung."
+    "section5Body": "Wir speichern Ihre Daten nur so lange, wie es für den Zweck erforderlich ist, für den sie erhoben wurden, oder bis Sie deren Löschung beantragen. Wir wenden angemessene technische und organisatorische Maßnahmen an, um Ihre Daten vor unbefugtem Zugriff, Verlust oder Missbrauch zu schützen. Wir geben Ihre Daten ohne Ihre Einwilligung nicht an Dritte weiter und verkaufen sie nicht, außer bei gesetzlicher Verpflichtung.",
+    "section6Title": "6. Einsatz künstlicher Intelligenz bei der Diagnose",
+    "section6Body": "Um Ihre strategische Diagnose zu erstellen, sendet Diagnostic Go die von Ihnen geteilten Antworten an ein Modell künstlicher Intelligenz (LLM), das sie analysiert und automatisierte Empfehlungen erstellt. Diese Verarbeitung ist erforderlich, um Ihnen das Diagnoseergebnis bereitzustellen, und erfolgt nur, wenn Sie sich für die Nutzung dieses Tools entscheiden. Wenn Sie nicht möchten, dass Ihre Daten mittels künstlicher Intelligenz verarbeitet werden, nutzen Sie bitte Diagnostic Go nicht; unsere übrigen Dienste und Formulare sind davon nicht betroffen."
   }
 }

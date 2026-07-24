@@ -372,7 +372,9 @@
     "section4Title": "4. Propiedad intelectual",
     "section4Body": "Todo el contenido de este sitio (textos, logotipos, imágenes, diseño y código) es propiedad de LyraTech o de sus licenciantes y está protegido por las leyes de propiedad intelectual aplicables. Queda prohibida su reproducción total o parcial sin autorización previa por escrito.",
     "section5Title": "5. Modificaciones a estos términos",
-    "section5Body": "Podemos actualizar estos Términos y Condiciones en cualquier momento para reflejar cambios legales, operativos o del sitio. La versión vigente será siempre la publicada en esta página, con su fecha de última actualización correspondiente."
+    "section5Body": "Podemos actualizar estos Términos y Condiciones en cualquier momento para reflejar cambios legales, operativos o del sitio. La versión vigente será siempre la publicada en esta página, con su fecha de última actualización correspondiente.",
+    "section6Title": "6. Uso de inteligencia artificial en Diagnostic Go",
+    "section6Body": "Diagnostic Go utiliza modelos de inteligencia artificial (LLM) para analizar las respuestas que proporcionas y generar tu diagnóstico estratégico. El detalle de cómo se procesan tus datos con esta tecnología se describe en nuestro Aviso de Privacidad. Si no estás de acuerdo con este tratamiento, te pedimos no utilizar Diagnostic Go."
   },
   "privacy": {
     "title": "Aviso de Privacidad",
@@ -386,6 +388,8 @@
     "section4Title": "4. Tus derechos sobre tus datos",
     "section4Body": "De acuerdo con el RGPD y otras leyes de protección de datos aplicables, tienes derecho a: acceder a tus datos, rectificarlos si son inexactos, solicitar su eliminación, oponerte a su tratamiento, solicitar la portabilidad de tus datos y retirar tu consentimiento en cualquier momento. Para ejercer cualquiera de estos derechos, escríbenos a ricardo.sierra@lyratech.com.mx.",
     "section5Title": "5. Conservación y seguridad de los datos",
-    "section5Body": "Conservamos tus datos únicamente durante el tiempo necesario para cumplir con la finalidad para la que fueron recabados, o hasta que solicites su eliminación. Aplicamos medidas técnicas y organizativas razonables para proteger tu información contra accesos no autorizados, pérdida o uso indebido. No compartimos ni vendemos tus datos a terceros sin tu consentimiento, salvo obligación legal."
+    "section5Body": "Conservamos tus datos únicamente durante el tiempo necesario para cumplir con la finalidad para la que fueron recabados, o hasta que solicites su eliminación. Aplicamos medidas técnicas y organizativas razonables para proteger tu información contra accesos no autorizados, pérdida o uso indebido. No compartimos ni vendemos tus datos a terceros sin tu consentimiento, salvo obligación legal.",
+    "section6Title": "6. Uso de inteligencia artificial en el diagnóstico",
+    "section6Body": "Para generar tu diagnóstico estratégico, la herramienta Diagnostic Go envía las respuestas que compartes a un modelo de inteligencia artificial (LLM) que las analiza y produce recomendaciones automatizadas. Este procesamiento es necesario para ofrecerte el resultado del diagnóstico y se realiza únicamente cuando decides usar esta herramienta. Si no deseas que tus datos sean procesados mediante inteligencia artificial, te pedimos no utilizar Diagnostic Go; el resto de nuestros servicios y formularios no se ven afectados."
   }
 }
