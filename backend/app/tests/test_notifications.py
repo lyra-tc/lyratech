@@ -1,21 +1,21 @@
 def test_list_recipients_requires_auth(client):
     response = client.get("/api/notifications/recipients")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_create_recipient_requires_auth(client):
     response = client.post("/api/notifications/recipients", json={"email": "a@b.com"})
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_delete_recipient_requires_auth(client):
     response = client.delete("/api/notifications/recipients/1")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_send_test_recipient_requires_auth(client):
     response = client.post("/api/notifications/recipients/1/test")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_create_and_list_recipients(auth_client):

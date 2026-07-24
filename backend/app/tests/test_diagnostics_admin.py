@@ -62,19 +62,19 @@ VALID_SUBMIT_PAYLOAD = {
 
 
 def test_list_questions_requires_auth(client):
-    assert client.get("/api/diagnostics/questions").status_code == 403
+    assert client.get("/api/diagnostics/questions").status_code == 401
 
 
 def test_create_question_requires_auth(client):
-    assert client.post("/api/diagnostics/questions", json=QUESTION_PAYLOAD).status_code == 403
+    assert client.post("/api/diagnostics/questions", json=QUESTION_PAYLOAD).status_code == 401
 
 
 def test_update_question_requires_auth(client):
-    assert client.put("/api/diagnostics/questions/1", json={"is_active": False}).status_code == 403
+    assert client.put("/api/diagnostics/questions/1", json={"is_active": False}).status_code == 401
 
 
 def test_reorder_questions_requires_auth(client):
-    assert client.patch("/api/diagnostics/questions/reorder", json={"ordered_ids": []}).status_code == 403
+    assert client.patch("/api/diagnostics/questions/reorder", json={"ordered_ids": []}).status_code == 401
 
 
 def test_create_and_list_questions(auth_client):
@@ -125,15 +125,15 @@ def test_reorder_questions(auth_client):
 
 
 def test_list_submissions_requires_auth(client):
-    assert client.get("/api/diagnostics/submissions").status_code == 403
+    assert client.get("/api/diagnostics/submissions").status_code == 401
 
 
 def test_get_submission_requires_auth(client):
-    assert client.get("/api/diagnostics/submissions/1").status_code == 403
+    assert client.get("/api/diagnostics/submissions/1").status_code == 401
 
 
 def test_delete_submission_requires_auth(client):
-    assert client.delete("/api/diagnostics/submissions/1").status_code == 403
+    assert client.delete("/api/diagnostics/submissions/1").status_code == 401
 
 
 def test_get_submission_not_found(auth_client):

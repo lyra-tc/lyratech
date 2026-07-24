@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { ReactNode } from 'react';
 import { locales } from '@/config';
 import '../globals.css';
@@ -39,9 +39,9 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 }
 
-export default async function LocaleLayout({ children, params }: Props) {
+export default async function LocaleLayout({ children, params }: Readonly<Props>) {
     const { locale } = await params;
-    unstable_setRequestLocale(locale);
+    setRequestLocale(locale);
 
     return (
         <html className="h-full" lang={locale}>

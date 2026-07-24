@@ -45,12 +45,12 @@ def test_create_prospect_rate_limited(client, monkeypatch):
 
 def test_list_prospects_requires_auth(client):
     response = client.get("/api/prospects/")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_delete_prospect_requires_auth(client):
     response = client.delete("/api/prospects/1")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_create_prospect_dispatches_notification_to_configured_recipients(

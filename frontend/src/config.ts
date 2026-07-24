@@ -1,4 +1,4 @@
-import type {Pathnames} from "next-intl/navigation";
+import type {Pathnames} from "next-intl/routing";
 
 export const locales = ["es","en", "fr", "de"] as const;
 
