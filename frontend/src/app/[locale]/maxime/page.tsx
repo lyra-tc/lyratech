@@ -1,4 +1,5 @@
 import React from "react";
+import CardLayout from "@/components/DigitalBusinessCardV2/CardLayout";
 import Profile from "@/components/DigitalBusinessCardV2/Profile";
 import Contact from "@/components/DigitalBusinessCardV2/Contact";
 import MaximeImage from "@/assets/images/DigitalBusinessCard/Maxime.jpeg";
@@ -6,12 +7,7 @@ import ButtonLanguage from "@/components/ButtonLanguage";
 
 export default function Maxime() {
     return (
-        <div
-            className="min-h-screen"
-            style={{
-                background: "linear-gradient(160deg, #1a1c2e 0%, #2d2f52 40%, #1e2035 70%, #0d0f1a 100%)",
-            }}
-        >
+        <CardLayout>
             <Profile
                 imageSrc={MaximeImage}
                 name="Maxime Vilcocq"
@@ -23,6 +19,6 @@ export default function Maxime() {
                 email="maximevilcocq@live.com.mx"
                 qrEndpoint="maxime"
             />
-        </div>
+        </CardLayout>
     );
 }
