@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { IoClose } from "react-icons/io5";
@@ -10,15 +10,19 @@ interface MobileMenuProps {
     onClose: () => void;
 }
 
+export interface MobileMenuHandle {
+    requestClose: () => void;
+}
+
 function MenuItem({
     label,
     href,
     onNavigate,
-}: {
+}: Readonly<{
     label: string;
     href: string;
     onNavigate: (href: string) => void;
-}) {
+}>) {
     const [lineVisible, setLineVisible] = useState(false);
     const [lineOrigin, setLineOrigin] = useState<"left" | "right">("left");
     const [isAnimating, setIsAnimating] = useState(false);
@@ -70,7 +74,7 @@ function MenuItem({
     );
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
+const MobileMenu = forwardRef<MobileMenuHandle, MobileMenuProps>(({ onClose }, ref) => {
     const t = useTranslations("navbar");
     const router = useRouter();
     const [isClosing, setIsClosing] = useState(false);
@@ -91,6 +95,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
         // Menú sube
         setIsClosing(true);
     };
+
+    useImperativeHandle(ref, () => ({
+        requestClose: handleClose,
+    }));
 
     const handleNavigate = (href: string) => {
         setIsClosing(true);
@@ -136,6 +144,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
             )}
         </AnimatePresence>
     );
-};
+});
+
+MobileMenu.displayName = "MobileMenu";
 
 export default MobileMenu;
