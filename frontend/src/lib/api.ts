@@ -15,18 +15,19 @@ function getToken(): string | null {
 
 async function request<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit & { skipAuthRedirect?: boolean } = {}
 ): Promise<T> {
+  const { skipAuthRedirect, ...fetchOptions } = options;
   const token = getToken();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(options.headers as Record<string, string>),
+    ...(fetchOptions.headers as Record<string, string>),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  const res = await fetch(`${API_URL}${path}`, { ...fetchOptions, headers });
 
-  if (res.status === 401) {
+  if (res.status === 401 && !skipAuthRedirect) {
     localStorage.removeItem("lyratech_token");
     localStorage.removeItem("lyratech_user");
     window.location.href = "/dashboard/login";
@@ -99,6 +100,7 @@ export const auth = {
     request<{ access_token: string; token_type: string }>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
+      skipAuthRedirect: true,
     }),
   register: (email: string, full_name: string, password: string) =>
     request<UserInfo>("/api/auth/register", {
