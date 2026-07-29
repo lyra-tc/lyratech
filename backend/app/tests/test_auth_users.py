@@ -1,4 +1,6 @@
-from ..core.security import verify_password
+import time
+
+from ..core.security import get_password_hash, verify_password
 from ..models.user import User
 from .conftest import TestingSessionLocal, _build_test_app
 from fastapi.testclient import TestClient
@@ -82,6 +84,50 @@ def test_login_rate_limited_after_repeated_failures(client):
         json={"email": "target@lyratech.com.mx", "password": "wrong"},
     )
     assert response.status_code == 429
+
+
+def test_changing_password_invalidates_old_token(client):
+    client.post(
+        "/api/auth/register",
+        json={
+            "email": "sessions@lyratech.com.mx",
+            "full_name": "Session User",
+            "password": "secret123",
+        },
+    )
+    login_response = client.post(
+        "/api/auth/login",
+        json={"email": "sessions@lyratech.com.mx", "password": "secret123"},
+    )
+    old_token = login_response.json()["access_token"]
+
+    old_me_response = client.get(
+        "/api/auth/me", headers={"Authorization": f"Bearer {old_token}"}
+    )
+    assert old_me_response.status_code == 200
+
+    time.sleep(1.1)
+    change_response = client.put(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {old_token}"},
+        json={"current_password": "secret123", "new_password": "newsecret123"},
+    )
+    assert change_response.status_code == 204
+
+    stale_response = client.get(
+        "/api/auth/me", headers={"Authorization": f"Bearer {old_token}"}
+    )
+    assert stale_response.status_code == 401
+
+    new_login_response = client.post(
+        "/api/auth/login",
+        json={"email": "sessions@lyratech.com.mx", "password": "newsecret123"},
+    )
+    new_token = new_login_response.json()["access_token"]
+    fresh_response = client.get(
+        "/api/auth/me", headers={"Authorization": f"Bearer {new_token}"}
+    )
+    assert fresh_response.status_code == 200
 
 
 def test_second_registered_user_starts_pending_and_cannot_login(client):
@@ -275,3 +321,44 @@ def test_admin_can_reset_password_for_non_admin(auth_client):
         assert verify_password("brandnew123", refreshed.hashed_password)
     finally:
         db.close()
+
+
+def test_admin_reset_password_invalidates_target_users_old_token(client, auth_client):
+    db = TestingSessionLocal()
+    try:
+        user = User(
+            email="member2@lyratech.com.mx",
+            full_name="Member Two",
+            hashed_password=get_password_hash("oldpassword1"),
+            is_active=True,
+            is_admin=False,
+            is_superadmin=False,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        user_id = user.id
+    finally:
+        db.close()
+
+    login_response = client.post(
+        "/api/auth/login",
+        json={"email": "member2@lyratech.com.mx", "password": "oldpassword1"},
+    )
+    old_token = login_response.json()["access_token"]
+    assert (
+        client.get("/api/auth/me", headers={"Authorization": f"Bearer {old_token}"}).status_code
+        == 200
+    )
+
+    time.sleep(1.1)
+    reset_response = auth_client.put(
+        f"/api/users/{user_id}/reset-password",
+        json={"new_password": "brandnew456"},
+    )
+    assert reset_response.status_code == 204
+
+    stale_response = client.get(
+        "/api/auth/me", headers={"Authorization": f"Bearer {old_token}"}
+    )
+    assert stale_response.status_code == 401

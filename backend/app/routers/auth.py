@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -129,4 +130,6 @@ def change_password(
             detail=f"La contrasena debe tener al menos {MIN_PASSWORD_LENGTH} caracteres",
         )
     current_user.hashed_password = get_password_hash(body.new_password)
+    current_user.password_changed_at = datetime.now(timezone.utc)
     db.commit()
+    logger.warning("Password changed by %s (all previous sessions invalidated)", current_user.email)

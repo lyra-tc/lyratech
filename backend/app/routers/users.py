@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -116,6 +117,7 @@ def reset_user_password(
         )
     _ensure_not_superadmin(user)
     user.hashed_password = get_password_hash(body.new_password)
+    user.password_changed_at = datetime.now(timezone.utc)
     db.commit()
     logger.warning("Password reset for %s by %s", user.email, current_user.email)
 

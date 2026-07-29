@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import PyJWTError as JWTError
@@ -29,7 +31,8 @@ def get_current_user(
     try:
         payload = decode_token(credentials.credentials)
         email: str = payload.get("sub")
-        if not email:
+        issued_at = payload.get("iat")
+        if not email or issued_at is None:
             raise exc
     except JWTError:
         raise exc
@@ -37,6 +40,17 @@ def get_current_user(
     user = db.query(User).filter(User.email == email).first()
     if not user or not user.is_active:
         raise exc
+
+    if user.password_changed_at is not None:
+        password_changed_at = user.password_changed_at
+        if password_changed_at.tzinfo is None:
+            password_changed_at = password_changed_at.replace(tzinfo=timezone.utc)
+        # Truncate to whole seconds: JWT `iat` only has second-level
+        # precision, so a token issued in the same second as the password
+        # change must not be rejected as stale.
+        if issued_at < int(password_changed_at.timestamp()):
+            raise exc
+
     return user
 
 

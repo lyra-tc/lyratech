@@ -32,6 +32,14 @@ def ensure_user_management_schema() -> None:
                 )
             )
 
+    if "password_changed_at" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                )
+            )
+
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
 

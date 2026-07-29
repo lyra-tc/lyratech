@@ -45,6 +45,7 @@ Incluye:
 
 - HTTPS + HSTS en produccion; headers `X-Content-Type-Options`, `X-Frame-Options`, `Content-Security-Policy` (backend, `app/main.py`) y equivalentes en el frontend (`next.config.ts`).
 - Auth por JWT Bearer en header, sin cookies de sesion (CSRF clasico no aplica a esta arquitectura).
+- Cambiar la contrasena (por el propio usuario o por un admin) invalida cualquier token emitido antes de ese momento (`users.password_changed_at` + claim `iat` del JWT).
 - Contrasenas con `bcrypt`; minimo 6 caracteres al registrar y al cambiar contrasena.
 - Rate limiting por IP (`slowapi`): login `5/minuto`, registro `5/hora`, formulario de contacto y envio de diagnostico `5/hora` cada uno.
 - CORS restringido a los origenes del frontend (`BACKEND_CORS_ORIGINS`), no wildcard.
