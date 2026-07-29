@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import LocaleSwitcher from "@/components/ButtonLanguage/LocaleSwitcher";
-import { useLocale } from "use-intl";
+import { useLocale } from "next-intl";
 import { HiLanguage } from "react-icons/hi2";
 
 function ButtonLanguage() {

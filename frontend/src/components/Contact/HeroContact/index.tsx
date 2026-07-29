@@ -21,7 +21,7 @@ export default function HeroContact() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth" })}
                     className="flex items-center gap-2 sm:gap-3 bg-white border border-gray-200 rounded-full px-6 py-3 sm:px-10 sm:py-4 shadow-sm mb-8 sm:mb-10 cursor-pointer transition-all duration-300 hover:bg-lyratech-light-purple hover:border-lyratech-purple hover:shadow-md"
                 >
                     <HiOutlineChatAlt className="text-lyratech-purple text-2xl sm:text-3xl" />

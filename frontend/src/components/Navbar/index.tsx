@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaPhone } from "react-icons/fa6";
 import Logo from "@/assets/images/Navbar/White_Logo.png";
 import ClosedNotch from "@/assets/images/Navbar/ClosedNotch.png";
-import MobileMenu from "./MobileMenu";
+import MobileMenu, { MobileMenuHandle } from "./MobileMenu";
 import { useTranslations } from "next-intl";
 
 function Navbar() {
@@ -16,6 +16,8 @@ function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const notchRef = useRef<HTMLDivElement>(null);
+    const logoRef = useRef<HTMLImageElement>(null);
+    const mobileMenuRef = useRef<MobileMenuHandle>(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -28,10 +30,10 @@ function Navbar() {
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (
-                notchRef.current &&
-                !notchRef.current.contains(event.target as Node)
-            ) {
+            const target = event.target as Node;
+            const clickedNotch = notchRef.current?.contains(target);
+            const clickedLogo = logoRef.current?.contains(target);
+            if (!clickedNotch && !clickedLogo) {
                 setIsExpanded(false);
             }
         };
@@ -44,7 +46,11 @@ function Navbar() {
 
     const handleLogoClick = () => {
         if (isMobile) {
-            setIsMobileMenuOpen(true);
+            if (isMobileMenuOpen) {
+                mobileMenuRef.current?.requestClose();
+            } else {
+                setIsMobileMenuOpen(true);
+            }
         } else {
             setIsExpanded((prev) => !prev);
         }
@@ -67,6 +73,7 @@ function Navbar() {
 
                     {/* Logo — posición absoluta, nunca se mueve */}
                     <Image
+                        ref={logoRef}
                         alt="Lyra Tech Logo"
                         src={Logo}
                         width={20}
@@ -136,7 +143,19 @@ function Navbar() {
             {/* Notch visible solo en md+ */}
             <div
                 ref={notchRef}
+                role={!isMobile ? "button" : undefined}
+                tabIndex={!isMobile ? 0 : undefined}
                 onClick={!isMobile ? () => setIsExpanded((prev) => !prev) : undefined}
+                onKeyDown={
+                    !isMobile
+                        ? (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setIsExpanded((prev) => !prev);
+                              }
+                          }
+                        : undefined
+                }
                 className={`mx-auto cursor-pointer transition-all duration-500 ease-in-out
                     w-32 h-8 md:h-9
                     ${!isMobile && isExpanded ? "md:w-[700px] lg:w-[1000px]" : "md:w-44"}
@@ -152,7 +171,7 @@ function Navbar() {
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <MobileMenu onClose={() => setIsMobileMenuOpen(false)} />
+                <MobileMenu ref={mobileMenuRef} onClose={() => setIsMobileMenuOpen(false)} />
             )}
         </div>
     );

@@ -11,9 +11,9 @@ interface ProfileProps {
     position?: string;
 }
 
-function Profile({ imageSrc, name, position }: ProfileProps) {
+function Profile({ imageSrc, name, position }: Readonly<ProfileProps>) {
     return (
-        <div className="flex flex-col items-center justify-center pt-6 md:pt-12 lg:pt-16 pb-2 md:pb-6 px-6">
+        <div className="flex flex-col items-center justify-center pt-6 md:pt-0 pb-2 md:pb-0 px-6">
             {/* Logo Lyratech */}
             <motion.div
                 initial={{ opacity: 0, y: -12 }}

@@ -1,4 +1,4 @@
-import type {Pathnames} from "next-intl/navigation";
+import type {Pathnames} from "next-intl/routing";
 
 export const locales = ["es","en", "fr", "de"] as const;
 
@@ -45,4 +45,5 @@ export const pathnames: Pathnames<typeof locales> = {
     "/galo": "/galo",
     "/business-card": "/business-card",
     "/dev": "/dev",
+    "/legal": "/legal",
 };

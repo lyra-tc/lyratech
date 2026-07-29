@@ -26,7 +26,7 @@ function fadeUp(delay: number) {
 
 const glassBtn = "flex items-center justify-between w-full py-2.5 md:py-3 px-4 md:px-5 rounded-xl text-sm md:text-base font-montserrat-bold border border-white/10 transition-all duration-300 active:scale-95";
 
-function Contact({ phone, email, qrEndpoint }: ContactProps) {
+function Contact({ phone, email, qrEndpoint }: Readonly<ContactProps>) {
     const t = useTranslations("contactCard");
     const [showModal, setShowModal] = useState(false);
 
@@ -38,7 +38,7 @@ function Contact({ phone, email, qrEndpoint }: ContactProps) {
     const toggleModal = () => setShowModal((prev) => !prev);
 
     return (
-        <div className="flex justify-center items-center mt-1 md:mt-4 mb-4 md:mb-12 lg:mb-16 px-6">
+        <div className="flex justify-center items-center mt-1 md:mt-0 mb-4 md:mb-0 px-6">
             {/* Glass card */}
             <motion.div
                 initial={{ opacity: 0, y: 24 }}

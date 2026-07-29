@@ -1,13 +1,8 @@
 import createMiddleware from "next-intl/middleware";
-import { locales, pathnames, localePrefix } from "./config";
+import { routing } from "./routing";
 
-export default createMiddleware({
-    locales,
-    defaultLocale: "es",
-    localePrefix: localePrefix as "always" | "never" | "as-needed",
-    pathnames,
-})
+export default createMiddleware(routing);
+
 export const config = {
-    // Ajusta el patrón para que coincida con los idiomas soportados en tu app
-    matcher: ["/", "/((?!api|static|.*\\..*|_next).*)"],
+    matcher: ["/", "/((?!api|static|.*\\..*|_next|dashboard).*)"],
 };
