@@ -24,10 +24,6 @@ class ChangePasswordRequest(BaseModel):
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-def is_superadmin_identity(full_name: str) -> bool:
-    return full_name.strip().lower() == "ricardo sierra roa"
-
-
 @router.post("/login", response_model=Token)
 def login(body: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == body.email).first()
@@ -52,14 +48,13 @@ def register(body: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="El correo ya esta registrado")
 
     is_first_user = db.query(User.id).first() is None
-    is_superadmin = is_superadmin_identity(body.full_name)
     user = User(
         email=body.email,
         full_name=body.full_name,
         hashed_password=get_password_hash(body.password),
-        is_active=is_first_user or is_superadmin,
-        is_admin=is_first_user or is_superadmin,
-        is_superadmin=is_superadmin,
+        is_active=is_first_user,
+        is_admin=is_first_user,
+        is_superadmin=False,
     )
     db.add(user)
     db.commit()

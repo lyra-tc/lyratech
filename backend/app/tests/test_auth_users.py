@@ -21,7 +21,16 @@ def test_first_registered_user_becomes_active_admin(client):
     assert body["is_superadmin"] is False
 
 
-def test_ricardo_is_registered_as_superadmin(client):
+def test_registering_with_superadmin_name_grants_no_special_privileges(client):
+    client.post(
+        "/api/auth/register",
+        json={
+            "email": "first@lyratech.com.mx",
+            "full_name": "First Admin",
+            "password": "secret123",
+        },
+    )
+
     response = client.post(
         "/api/auth/register",
         json={
@@ -33,9 +42,9 @@ def test_ricardo_is_registered_as_superadmin(client):
 
     assert response.status_code == 201
     body = response.json()
-    assert body["is_active"] is True
-    assert body["is_admin"] is True
-    assert body["is_superadmin"] is True
+    assert body["is_active"] is False
+    assert body["is_admin"] is False
+    assert body["is_superadmin"] is False
 
 
 def test_second_registered_user_starts_pending_and_cannot_login(client):

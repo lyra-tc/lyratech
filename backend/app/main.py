@@ -32,18 +32,6 @@ def ensure_user_management_schema() -> None:
                 )
             )
 
-    with engine.begin() as connection:
-        connection.execute(
-            text(
-                """
-                UPDATE users
-                SET is_superadmin = TRUE, is_admin = TRUE, is_active = TRUE
-                WHERE LOWER(TRIM(full_name)) = 'ricardo sierra roa'
-                """
-            )
-        )
-
-
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
 
