@@ -9,6 +9,9 @@ USE `lyratech-dev`;
 
 -- --------------------------------------------------------
 -- Users
+-- is_superadmin is never granted by the API (register/login) or by any
+-- name/email match — it must be set manually in the database for the
+-- intended owner account. See README.md "Usuarios y permisos".
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     id            INT AUTO_INCREMENT PRIMARY KEY,

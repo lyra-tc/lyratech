@@ -9,8 +9,8 @@ Incluye:
 
 ## Stack
 
-- Frontend: Next.js 15, React 18, TypeScript, Tailwind CSS, `next-intl`, Framer Motion.
-- Backend: FastAPI, SQLAlchemy 2, Pydantic 2, PyMySQL, JWT, bcrypt.
+- Frontend: Next.js 15, React 18, TypeScript, Tailwind CSS, `next-intl` 4, Framer Motion.
+- Backend: FastAPI, SQLAlchemy 2, Pydantic 2, PyMySQL, PyJWT, bcrypt, slowapi (rate limiting).
 - Integraciones: Cloudflare Turnstile, OpenRouter, Resend.
 - Base de datos: MySQL 8.
 
@@ -25,21 +25,31 @@ Incluye:
 
 ### Dashboard
 
-- Login, registro y perfil.
-- Gestion de `Leads`.
-- Gestion de `Prospects`.
-- Gestion de `Notifications`.
-- Gestion de `Diagnosticos` enviados.
-- Gestion de `Preguntas` del diagnostico, incluyendo reorder.
-- Gestion de `Users` para admins.
+- Login, registro y perfil (cualquier usuario activo).
+- Gestion de `Leads` — solo admin.
+- Gestion de `Prospects` (ver/borrar) — solo admin. El alta viene del formulario publico.
+- Gestion de `Notifications` (destinatarios) — solo admin.
+- Gestion de `Diagnosticos` enviados (ver/borrar) — solo admin.
+- Gestion de `Preguntas` del diagnostico, incluyendo reorder — solo admin.
+- Gestion de `Users` — solo admin.
 
 ### Usuarios y permisos
 
-- El primer usuario registrado queda `activo + admin`.
-- Si el nombre del usuario es exactamente `Ricardo Sierra Roa`, tambien queda marcado como `superadmin`.
-- Los usuarios nuevos normales quedan pendientes de activacion por un admin.
-- Solo un `superadmin` puede quitar admin a otro admin normal.
-- La cuenta `superadmin` no se puede editar ni eliminar desde el dashboard.
+- El primer usuario registrado queda `activo + admin` automaticamente (bootstrap inicial).
+- Cualquier otro registro nuevo queda `pendiente` (`is_active = false`) hasta que un admin lo active desde `/dashboard/users`.
+- `is_superadmin` no se otorga por ningun flujo automatico ni por nombre — solo se asigna manualmente en la base de datos. Es una salvaguarda extra: la cuenta `superadmin` no puede ser editada, desactivada ni eliminada desde el dashboard (ni por otros admins).
+- Solo un `superadmin` puede quitar `admin` a otro admin normal.
+- Todos los endpoints de datos de negocio (`leads`, `prospects`, `notifications`, `diagnostics` admin) requieren `is_admin`; un usuario activo pero no-admin solo puede usar su propio perfil (`/auth/me`, cambio de contrasena).
+
+## Seguridad
+
+- HTTPS + HSTS en produccion; headers `X-Content-Type-Options`, `X-Frame-Options`, `Content-Security-Policy` (backend, `app/main.py`) y equivalentes en el frontend (`next.config.ts`).
+- Auth por JWT Bearer en header, sin cookies de sesion (CSRF clasico no aplica a esta arquitectura).
+- Contrasenas con `bcrypt`; minimo 6 caracteres al registrar y al cambiar contrasena.
+- Rate limiting por IP (`slowapi`): login `5/minuto`, registro `5/hora`, formulario de contacto y envio de diagnostico `5/hora` cada uno.
+- CORS restringido a los origenes del frontend (`BACKEND_CORS_ORIGINS`), no wildcard.
+- Logging de eventos de seguridad (login fallido/exitoso, registro, cambios de rol, borrado de cuentas, reset de contrasena por admin) via logger `security`.
+- Sin SQL crudo: todo el acceso a datos pasa por SQLAlchemy ORM parametrizado.
 
 ## Estructura del repo
 
@@ -82,9 +92,9 @@ lyratech/
 
 Notas:
 
-- `users.is_admin` inicia en `FALSE` por defecto.
-- `users.is_superadmin` inicia en `FALSE` por defecto.
-- El backend hace un ajuste de esquema al arrancar para agregar columnas nuevas en instalaciones existentes y marcar como `superadmin` a `Ricardo Sierra Roa`.
+- `users.is_admin` inicia en `FALSE` por defecto (excepto el primer usuario registrado, ver "Usuarios y permisos").
+- `users.is_superadmin` inicia en `FALSE` por defecto y solo se asigna manualmente en la base de datos, nunca por la API.
+- El backend hace un ajuste de esquema al arrancar (`ensure_user_management_schema` en `app/main.py`) para agregar columnas nuevas en instalaciones existentes que vengan de una version anterior de `init.sql`.
 
 ## API
 
@@ -93,53 +103,55 @@ Base local esperada:
 - Backend directo: `http://localhost:8000`
 - Docker dev: `http://localhost:8001`
 
+Niveles de acceso: **publico** (sin token), **auth** (cualquier usuario activo), **admin** (`is_admin`).
+
 ### Auth
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/auth/me`
-- `PUT /api/auth/me`
-- `PUT /api/auth/change-password`
+- `POST /api/auth/register` — publico, `5/hora` por IP
+- `POST /api/auth/login` — publico, `5/minuto` por IP
+- `GET /api/auth/me` — auth
+- `PUT /api/auth/me` — auth
+- `PUT /api/auth/change-password` — auth
 
 ### Users
 
-- `GET /api/users/`
-- `PATCH /api/users/{user_id}`
-- `PUT /api/users/{user_id}/reset-password`
-- `DELETE /api/users/{user_id}`
+- `GET /api/users/` — admin
+- `PATCH /api/users/{user_id}` — admin
+- `PUT /api/users/{user_id}/reset-password` — admin
+- `DELETE /api/users/{user_id}` — admin
 
 ### Leads
 
-- `GET /api/leads/`
-- `POST /api/leads/`
-- `GET /api/leads/{lead_id}`
-- `PUT /api/leads/{lead_id}`
-- `DELETE /api/leads/{lead_id}`
+- `GET /api/leads/` — admin
+- `POST /api/leads/` — admin
+- `GET /api/leads/{lead_id}` — admin
+- `PUT /api/leads/{lead_id}` — admin
+- `DELETE /api/leads/{lead_id}` — admin
 
 ### Prospects
 
-- `POST /api/prospects/`
-- `GET /api/prospects/`
-- `DELETE /api/prospects/{prospect_id}`
+- `POST /api/prospects/` — publico, `5/hora` por IP
+- `GET /api/prospects/` — admin
+- `DELETE /api/prospects/{prospect_id}` — admin
 
 ### Notifications
 
-- `GET /api/notifications/recipients`
-- `POST /api/notifications/recipients`
-- `DELETE /api/notifications/recipients/{recipient_id}`
-- `POST /api/notifications/recipients/{recipient_id}/test`
+- `GET /api/notifications/recipients` — admin
+- `POST /api/notifications/recipients` — admin
+- `DELETE /api/notifications/recipients/{recipient_id}` — admin
+- `POST /api/notifications/recipients/{recipient_id}/test` — admin
 
 ### Diagnostics
 
-- `GET /api/diagnostics/questions/active`
-- `POST /api/diagnostics/submit`
-- `GET /api/diagnostics/submissions`
-- `GET /api/diagnostics/submissions/{submission_id}`
-- `DELETE /api/diagnostics/submissions/{submission_id}`
-- `GET /api/diagnostics/questions`
-- `POST /api/diagnostics/questions`
-- `PUT /api/diagnostics/questions/{question_id}`
-- `PATCH /api/diagnostics/questions/reorder`
+- `GET /api/diagnostics/questions/active` — publico
+- `POST /api/diagnostics/submit` — publico, `5/hora` por IP
+- `GET /api/diagnostics/submissions` — admin
+- `GET /api/diagnostics/submissions/{submission_id}` — admin
+- `DELETE /api/diagnostics/submissions/{submission_id}` — admin
+- `GET /api/diagnostics/questions` — admin
+- `POST /api/diagnostics/questions` — admin
+- `PUT /api/diagnostics/questions/{question_id}` — admin
+- `PATCH /api/diagnostics/questions/reorder` — admin
 
 Swagger y Redoc:
 
@@ -187,6 +199,30 @@ Comando:
 cp .env.example .env
 docker compose -f docker-compose.dev.yml up --build
 ```
+
+## Docker Compose prod
+
+`docker-compose.yml` levanta el equivalente en produccion:
+
+- `lyratech-mysql`
+- `lyratech-mysql-backup`
+- `backend`
+- `frontend`
+
+Puertos principales (solo accesibles desde localhost/VPN en el servidor, nginx hace el reverse proxy hacia 80/443):
+
+- Frontend: `http://localhost:3001`
+- Backend: `http://localhost:8000`
+- MySQL: `localhost:${DATABASE_PORT}`
+
+## Despliegue (CI/CD)
+
+GitHub Actions (`.github/workflows/`) hace deploy automatico por SSH al VPS en cada push:
+
+- `deploy-dev.yml`: push a `develop` → rebuild + restart de `backend`/`frontend` en el entorno de dev (`dev.lyratech.com.mx`).
+- `deploy.yml`: push a `main` → rebuild + restart de `backend`/`frontend` en produccion (`lyratech.com.mx`).
+
+Ambos requieren los secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` configurados en el repo.
 
 ## Variables de entorno
 
