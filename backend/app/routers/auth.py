@@ -1,14 +1,20 @@
+import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..core.deps import get_current_user, get_db
+from ..core.limiter import limiter
 from ..core.security import create_access_token, get_password_hash, verify_password
 from ..models.user import User
 from ..schemas.auth import LoginRequest, Token
 from ..schemas.user import UserCreate, UserResponse
+
+logger = logging.getLogger("security")
+
+MIN_PASSWORD_LENGTH = 6
 
 
 class UpdateProfileRequest(BaseModel):
@@ -25,9 +31,15 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=Token)
-def login(body: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, body: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == body.email).first()
     if not user or not verify_password(body.password, user.hashed_password):
+        logger.warning(
+            "Failed login attempt for %s from %s",
+            body.email,
+            request.client.host if request.client else "unknown",
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Correo o contrasena incorrectos",
@@ -38,14 +50,26 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
             detail="Tu cuenta esta pendiente de activacion por un administrador",
         )
 
+    logger.info(
+        "Successful login for %s from %s",
+        user.email,
+        request.client.host if request.client else "unknown",
+    )
     token = create_access_token({"sub": user.email})
     return {"access_token": token, "token_type": "bearer"}
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)
-def register(body: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def register(request: Request, body: UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == body.email).first():
         raise HTTPException(status_code=400, detail="El correo ya esta registrado")
+
+    if len(body.password) < MIN_PASSWORD_LENGTH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"La contrasena debe tener al menos {MIN_PASSWORD_LENGTH} caracteres",
+        )
 
     is_first_user = db.query(User.id).first() is None
     user = User(
@@ -59,6 +83,13 @@ def register(body: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    logger.info(
+        "New user registered: %s (active=%s, admin=%s) from %s",
+        user.email,
+        user.is_active,
+        user.is_admin,
+        request.client.host if request.client else "unknown",
+    )
     return user
 
 
@@ -92,9 +123,10 @@ def change_password(
 ):
     if not verify_password(body.current_password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Contrasena actual incorrecta")
-    if len(body.new_password) < 6:
+    if len(body.new_password) < MIN_PASSWORD_LENGTH:
         raise HTTPException(
-            status_code=400, detail="La contrasena debe tener al menos 6 caracteres"
+            status_code=400,
+            detail=f"La contrasena debe tener al menos {MIN_PASSWORD_LENGTH} caracteres",
         )
     current_user.hashed_password = get_password_hash(body.new_password)
     db.commit()

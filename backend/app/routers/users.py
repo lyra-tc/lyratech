@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,6 +9,8 @@ from ..core.deps import get_current_admin, get_db
 from ..core.security import get_password_hash
 from ..models.user import User
 from ..schemas.user import UserResponse
+
+logger = logging.getLogger("security")
 
 
 class UserAdminUpdateRequest(BaseModel):
@@ -82,6 +85,13 @@ def update_user(
 
     db.commit()
     db.refresh(user)
+    logger.warning(
+        "User %s updated by %s: is_active=%s, is_admin=%s",
+        user.email,
+        current_user.email,
+        body.is_active,
+        body.is_admin,
+    )
     return user
 
 
@@ -89,7 +99,7 @@ def update_user(
 def reset_user_password(
     user_id: int,
     body: AdminResetPasswordRequest,
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ):
     if len(body.new_password) < 6:
@@ -107,12 +117,13 @@ def reset_user_password(
     _ensure_not_superadmin(user)
     user.hashed_password = get_password_hash(body.new_password)
     db.commit()
+    logger.warning("Password reset for %s by %s", user.email, current_user.email)
 
 
 @router.delete("/{user_id}", status_code=204)
 def delete_user(
     user_id: int,
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ):
     user = _get_target_user(user_id, db)
@@ -124,3 +135,4 @@ def delete_user(
     _ensure_not_superadmin(user)
     db.delete(user)
     db.commit()
+    logger.warning("User %s deleted by %s", user.email, current_user.email)

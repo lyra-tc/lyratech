@@ -1,7 +1,7 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+﻿from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List
-from ..core.deps import get_db, get_current_user
+from ..core.deps import get_db, get_current_admin
 from ..core.limiter import limiter
 from ..core.turnstile import verify_turnstile_token
 from ..core.email import send_prospect_notification_email
@@ -44,7 +44,7 @@ def list_prospects(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     return (
         db.query(Prospect)
@@ -59,7 +59,7 @@ def list_prospects(
 def delete_prospect(
     prospect_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     prospect = db.query(Prospect).filter(Prospect.id == prospect_id).first()
     if not prospect:

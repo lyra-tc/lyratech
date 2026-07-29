@@ -77,6 +77,14 @@ def test_reorder_questions_requires_auth(client):
     assert client.patch("/api/diagnostics/questions/reorder", json={"ordered_ids": []}).status_code == 401
 
 
+def test_list_questions_requires_admin(non_admin_client):
+    assert non_admin_client.get("/api/diagnostics/questions").status_code == 403
+
+
+def test_list_submissions_requires_admin(non_admin_client):
+    assert non_admin_client.get("/api/diagnostics/submissions").status_code == 403
+
+
 def test_create_and_list_questions(auth_client):
     create_res = auth_client.post("/api/diagnostics/questions", json=QUESTION_PAYLOAD)
     assert create_res.status_code == 201

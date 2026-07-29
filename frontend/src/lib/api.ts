@@ -2,9 +2,11 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export class ApiError extends Error {
   status: number;
-  constructor(message: string, status: number) {
+  retryAfterSeconds?: number;
+  constructor(message: string, status: number, retryAfterSeconds?: number) {
     super(message);
     this.status = status;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 }
 
@@ -36,7 +38,13 @@ async function request<T>(
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
-    throw new ApiError(err.detail || "Error en la solicitud", res.status);
+    const retryAfterHeader = res.headers.get("Retry-After");
+    const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : undefined;
+    throw new ApiError(
+      err.detail || "Error en la solicitud",
+      res.status,
+      Number.isFinite(retryAfterSeconds) ? retryAfterSeconds : undefined
+    );
   }
 
   if (res.status === 204) return undefined as T;

@@ -47,6 +47,43 @@ def test_registering_with_superadmin_name_grants_no_special_privileges(client):
     assert body["is_superadmin"] is False
 
 
+def test_register_rejects_short_password(client):
+    response = client.post(
+        "/api/auth/register",
+        json={
+            "email": "shortpw@lyratech.com.mx",
+            "full_name": "Short Pw",
+            "password": "abc",
+        },
+    )
+    assert response.status_code == 400
+    assert "al menos" in response.json()["detail"]
+
+
+def test_login_rate_limited_after_repeated_failures(client):
+    client.post(
+        "/api/auth/register",
+        json={
+            "email": "target@lyratech.com.mx",
+            "full_name": "Target User",
+            "password": "secret123",
+        },
+    )
+
+    for _ in range(5):
+        response = client.post(
+            "/api/auth/login",
+            json={"email": "target@lyratech.com.mx", "password": "wrong"},
+        )
+        assert response.status_code == 401
+
+    response = client.post(
+        "/api/auth/login",
+        json={"email": "target@lyratech.com.mx", "password": "wrong"},
+    )
+    assert response.status_code == 429
+
+
 def test_second_registered_user_starts_pending_and_cannot_login(client):
     client.post(
         "/api/auth/register",

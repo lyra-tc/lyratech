@@ -18,6 +18,11 @@ def test_send_test_recipient_requires_auth(client):
     assert response.status_code == 401
 
 
+def test_list_recipients_requires_admin(non_admin_client):
+    response = non_admin_client.get("/api/notifications/recipients")
+    assert response.status_code == 403
+
+
 def test_create_and_list_recipients(auth_client):
     create_res = auth_client.post(
         "/api/notifications/recipients", json={"email": "team@lyratech.com.mx"}

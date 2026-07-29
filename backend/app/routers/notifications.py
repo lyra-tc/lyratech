@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 import httpx
-from ..core.deps import get_db, get_current_user
+from ..core.deps import get_db, get_current_admin
 from ..core.email import send_test_notification_email
 from ..models.notification_recipient import NotificationRecipient
 from ..models.user import User
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 @router.get("/recipients", response_model=List[NotificationRecipientResponse])
 def list_recipients(
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     return (
         db.query(NotificationRecipient)
@@ -31,7 +31,7 @@ def list_recipients(
 def create_recipient(
     body: NotificationRecipientCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     existing = (
         db.query(NotificationRecipient)
@@ -39,7 +39,7 @@ def create_recipient(
         .first()
     )
     if existing:
-        raise HTTPException(status_code=409, detail="Este correo ya está en la lista")
+        raise HTTPException(status_code=409, detail="Este correo ya estÃ¡ en la lista")
 
     recipient = NotificationRecipient(email=body.email)
     db.add(recipient)
@@ -52,7 +52,7 @@ def create_recipient(
 def delete_recipient(
     recipient_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     recipient = (
         db.query(NotificationRecipient)
@@ -72,7 +72,7 @@ def delete_recipient(
 def send_test_recipient_email(
     recipient_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     recipient = (
         db.query(NotificationRecipient)

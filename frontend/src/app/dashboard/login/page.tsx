@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
-import { auth } from "@/lib/api";
+import { ApiError, auth } from "@/lib/api";
 import LogoColor from "@/assets/images/Logo/LogoColor.png";
 
 function LoginForm() {
@@ -16,6 +16,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lockedSecondsLeft, setLockedSecondsLeft] = useState(0);
   const registered = params.get("registered") === "1";
 
   useEffect(() => {
@@ -23,6 +24,21 @@ function LoginForm() {
       router.replace("/dashboard/leads");
     }
   }, [router]);
+
+  useEffect(() => {
+    if (lockedSecondsLeft <= 0) return;
+    const interval = setInterval(() => {
+      setLockedSecondsLeft((value) => Math.max(0, value - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lockedSecondsLeft]);
+
+  let buttonLabel = "Iniciar sesion";
+  if (lockedSecondsLeft > 0) {
+    buttonLabel = `Espera ${lockedSecondsLeft}s`;
+  } else if (loading) {
+    buttonLabel = "Iniciando sesion...";
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,7 +52,11 @@ function LoginForm() {
       localStorage.setItem("lyratech_user", JSON.stringify(user));
       router.push("/dashboard/leads");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesion");
+      if (err instanceof ApiError && err.status === 429) {
+        setLockedSecondsLeft(err.retryAfterSeconds ?? 60);
+      } else {
+        setError(err instanceof Error ? err.message : "Error al iniciar sesion");
+      }
     } finally {
       setLoading(false);
     }
@@ -96,21 +116,27 @@ function LoginForm() {
           </div>
         </div>
 
-        {error && (
+        {lockedSecondsLeft > 0 ? (
           <div className="rounded-lg border border-red/40 bg-red/20 px-4 py-3 text-sm font-montserrat text-red animate-fade-in">
-            {error}
+            Demasiados intentos. Intenta de nuevo en {lockedSecondsLeft}s.
           </div>
+        ) : (
+          error && (
+            <div className="rounded-lg border border-red/40 bg-red/20 px-4 py-3 text-sm font-montserrat text-red animate-fade-in">
+              {error}
+            </div>
+          )
         )}
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || lockedSecondsLeft > 0}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-lyratech-purple py-3 text-sm font-montserrat font-semibold text-white shadow-button transition-all duration-200 hover:scale-[1.02] hover:bg-button-light-purple active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading && (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-lyratech-purple" />
           )}
-          {loading ? "Iniciando sesion..." : "Iniciar sesion"}
+          {buttonLabel}
         </button>
       </form>
 

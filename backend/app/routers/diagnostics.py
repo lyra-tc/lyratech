@@ -1,10 +1,10 @@
-from typing import List, Optional
+﻿from typing import List, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from ..config import settings
-from ..core.deps import get_current_user, get_db
+from ..core.deps import get_current_admin, get_db
 from ..core.diagnostic_scoring import (
     compute_service_scores,
     determine_automation_approach,
@@ -214,7 +214,7 @@ def submit_diagnostic(
 def list_submissions(
     search: str = "",
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     query = db.query(DiagnosticSubmission)
     if search:
@@ -231,13 +231,13 @@ def list_submissions(
 def get_submission(
     submission_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     submission = (
         db.query(DiagnosticSubmission).filter(DiagnosticSubmission.id == submission_id).first()
     )
     if not submission:
-        raise HTTPException(status_code=404, detail="Diagnóstico no encontrado")
+        raise HTTPException(status_code=404, detail="DiagnÃ³stico no encontrado")
     return submission
 
 
@@ -245,13 +245,13 @@ def get_submission(
 def delete_submission(
     submission_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     submission = (
         db.query(DiagnosticSubmission).filter(DiagnosticSubmission.id == submission_id).first()
     )
     if not submission:
-        raise HTTPException(status_code=404, detail="Diagnóstico no encontrado")
+        raise HTTPException(status_code=404, detail="DiagnÃ³stico no encontrado")
     db.delete(submission)
     db.commit()
 
@@ -259,7 +259,7 @@ def delete_submission(
 @router.get("/questions", response_model=List[DiagnosticQuestionResponse])
 def list_questions(
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     return db.query(DiagnosticQuestion).order_by(DiagnosticQuestion.sort_order).all()
 
@@ -268,7 +268,7 @@ def list_questions(
 def create_question(
     body: DiagnosticQuestionCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     existing = db.query(DiagnosticQuestion).filter(DiagnosticQuestion.key == body.key).first()
     if existing:
@@ -293,7 +293,7 @@ def update_question(
     question_id: int,
     body: DiagnosticQuestionUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     question = db.query(DiagnosticQuestion).filter(DiagnosticQuestion.id == question_id).first()
     if not question:
@@ -314,7 +314,7 @@ def update_question(
 def reorder_questions(
     body: DiagnosticQuestionReorder,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     questions = {
         q.id: q

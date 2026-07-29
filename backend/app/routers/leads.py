@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from ..core.deps import get_db, get_current_user
+from ..core.deps import get_db, get_current_admin
 from ..models.lead import Lead
 from ..models.user import User
 from ..schemas.lead import LeadCreate, LeadUpdate, LeadResponse
@@ -14,7 +14,7 @@ def list_leads(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     return db.query(Lead).order_by(Lead.created_at.desc()).offset(skip).limit(limit).all()
 
@@ -23,7 +23,7 @@ def list_leads(
 def create_lead(
     body: LeadCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     lead = Lead(**body.model_dump())
     db.add(lead)
@@ -36,7 +36,7 @@ def create_lead(
 def get_lead(
     lead_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if not lead:
@@ -49,7 +49,7 @@ def update_lead(
     lead_id: int,
     body: LeadUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if not lead:
@@ -67,7 +67,7 @@ def update_lead(
 def delete_lead(
     lead_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(get_current_admin),
 ):
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if not lead:

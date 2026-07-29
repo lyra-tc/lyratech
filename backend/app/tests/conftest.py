@@ -12,7 +12,7 @@ from ..database import Base
 from ..core.deps import get_db, get_current_user
 from ..core.limiter import limiter
 from ..models.user import User
-from ..routers import auth, diagnostics, notifications, prospects, users
+from ..routers import auth, diagnostics, leads, notifications, prospects, users
 
 engine = create_engine(
     "sqlite:///:memory:",
@@ -40,6 +40,7 @@ def _build_test_app() -> FastAPI:
     app.include_router(prospects.router, prefix="/api")
     app.include_router(notifications.router, prefix="/api")
     app.include_router(diagnostics.router, prefix="/api")
+    app.include_router(leads.router, prefix="/api")
     app.dependency_overrides[get_db] = _override_get_db
     return app
 
@@ -66,6 +67,20 @@ def auth_client():
         full_name="Admin",
         is_active=True,
         is_admin=True,
+        is_superadmin=False,
+    )
+    return TestClient(app)
+
+
+@pytest.fixture
+def non_admin_client():
+    app = _build_test_app()
+    app.dependency_overrides[get_current_user] = lambda: User(
+        id=2,
+        email="member@lyratech.com.mx",
+        full_name="Member",
+        is_active=True,
+        is_admin=False,
         is_superadmin=False,
     )
     return TestClient(app)
