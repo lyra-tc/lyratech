@@ -124,9 +124,9 @@ function Portafolio() {
         <div id="portfolio" className="font-montserrat mb-32 md:mb-40 lg:mb-52">
             {/* Title + Description */}
             <div className="text-center px-10 md:px-16 lg:px-20 xl:px-28">
-                <h1 className="uppercase font-extrabold text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
+                <h2 className="uppercase font-extrabold text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
                     {t("title")}
-                </h1>
+                </h2>
                 <p className="mt-5 md:text-lg md:mt-8 lg:text-xl">
                     {t("description")}
                 </p>

@@ -71,7 +71,7 @@ export default function LocaleSwitcher({ closeModalAction, currentLocale }: Read
                         >
                             <Image
                                 src={lang.flag}
-                                alt={`${lang.label} Flag`}
+                                alt={t("flagAlt", { label: lang.label })}
                                 width={20}
                                 height={14}
                                 className="mr-2"

@@ -125,6 +125,8 @@ export default function PortfolioGrid() {
     return (
         <section id="portfolio" className="px-6 py-12 md:py-16">
             <div className="max-w-6xl mx-auto">
+                <h2 className="sr-only">{tGrid("sectionTitle")}</h2>
+
                 {/* Filter tabs */}
                 <div className="flex flex-wrap gap-3 mb-10 justify-center">
                     {filters.map((f) => (

@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
     return (
         <section id="privacidad" className="py-20 px-6 bg-gray-50 scroll-mt-24">
             <div className="max-w-3xl mx-auto">
-                <motion.h1
+                <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
                     className="font-montserrat-bold text-3xl md:text-5xl text-black mb-4"
                 >
                     {t("title")}
-                </motion.h1>
+                </motion.h2>
 
                 <p className="font-montserrat text-gray-400 text-sm mb-12">
                     {t("lastUpdated")}
