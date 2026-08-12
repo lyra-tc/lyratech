@@ -360,6 +360,11 @@
     "resources4": "Rechtliches",
     "copyright": "© {year} LyraTech. Alle Rechte vorbehalten."
   },
+  "notFound": {
+    "badge": "Seite nicht gefunden",
+    "description": "Entschuldigung, wir konnten die gesuchte Seite nicht finden. Der Link ist möglicherweise fehlerhaft oder die Seite wurde verschoben.",
+    "button": "Zurück zur Startseite"
+  },
   "terms": {
     "title": "Allgemeine Geschäftsbedingungen",
     "lastUpdated": "Zuletzt aktualisiert: Juli 2026",

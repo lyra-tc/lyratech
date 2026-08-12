@@ -66,6 +66,33 @@ const nextConfig: NextConfig = {
     },
     reactStrictMode: true,
 
+    async redirects() {
+        return [
+            // The placeholder "coming soon" landing page is gone now that the
+            // real site is live — send any old links/bookmarks/search results home.
+            {
+                source: "/coming-soon",
+                destination: "/",
+                permanent: true,
+            },
+            {
+                source: "/proximamente",
+                destination: "/",
+                permanent: true,
+            },
+            {
+                source: "/demnaechst",
+                destination: "/",
+                permanent: true,
+            },
+            {
+                source: "/bientot-disponible",
+                destination: "/",
+                permanent: true,
+            },
+        ];
+    },
+
     async rewrites() {
         return [
             // ==================

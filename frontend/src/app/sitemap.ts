@@ -11,7 +11,6 @@ const publicRouteKeys = [
     "/services",
     "/portfolio",
     "/contact",
-    "/coming-soon",
     "/legal",
 ] as const;
 

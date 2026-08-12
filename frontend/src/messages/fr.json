@@ -360,6 +360,11 @@
     "resources4": "Mentions légales",
     "copyright": "© {year} LyraTech. Tous droits réservés."
   },
+  "notFound": {
+    "badge": "Page introuvable",
+    "description": "Désolé, nous n'avons pas trouvé la page que vous cherchez. Le lien est peut-être rompu ou la page a été déplacée.",
+    "button": "Retour à l'accueil"
+  },
   "terms": {
     "title": "Conditions Générales",
     "lastUpdated": "Dernière mise à jour : juillet 2026",
