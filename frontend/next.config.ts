@@ -4,6 +4,12 @@ import withNextIntl from "next-intl/plugin";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const isDev = process.env.NODE_ENV === "development";
 
+// Dev/staging deploys reuse this same config, so we can't rely on NODE_ENV
+// (it's "production" there too) to tell them apart from the real site.
+const productionSiteUrl = "https://lyratech.com.mx";
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || productionSiteUrl).replace(/\/$/, "");
+const isProductionSite = siteUrl === productionSiteUrl;
+
 // Same hosts next/image is allowed to optimize — reused below so the CSP can't drift from it.
 const imageRemoteHosts = ["flagcdn.com", "upload.wikimedia.org"];
 
@@ -43,6 +49,9 @@ const nextConfig: NextConfig = {
                     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
                     { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
                     { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+                    ...(isProductionSite
+                        ? []
+                        : [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]),
                 ],
             },
         ];
