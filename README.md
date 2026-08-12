@@ -236,6 +236,7 @@ Las mas importantes:
 - `NEXT_PUBLIC_API_URL`
 - `NEXT_PUBLIC_BOOKING_URL`
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+- `NEXT_PUBLIC_SITE_URL` (dominio absoluto usado por `sitemap.xml`/`robots.txt`; por defecto `https://lyratech.com.mx` en produccion y `https://dev.lyratech.com.mx` en dev)
 
 ### Backend
 
