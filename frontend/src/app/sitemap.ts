@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { pathnames } from "@/config";
-
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://lyratech.com.mx").replace(/\/$/, "");
+import { siteUrl } from "@/lib/site";
 
 // Only the marketing pages meant for organic search. Personal business-card
 // profiles, /dev, and the admin dashboard are intentionally left out.

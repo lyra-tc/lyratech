@@ -55,6 +55,7 @@
     "locale": "{locale, select, es {🇪🇸 Español} en {🇬🇧 English} de {🇩🇪 Deutsch} fr {🇫🇷 Français} other {Unknown}}"
   },
   "buttonLanguage": {
+    "flagAlt": "{label} flag",
     "Spanish": "Spanish",
     "English": "English",
     "German": "German",
@@ -105,6 +106,8 @@
     "titlePurple": "ideas",
     "titleBlack2": "into digital realities",
     "description": "At LyraTech we don't just write code, we create experiences that connect, inspire and generate real value. We are a multidisciplinary team passionate about solving complex problems with elegant and scalable solutions.",
+    "photoTeamAlt": "The Lyratech team at work",
+    "photoWorkspaceAlt": "The Lyratech workspace",
     "feat1Title": "Passion",
     "feat1Desc": "We love what we do and it shows in every line of code",
     "feat2Title": "Precision",
@@ -122,6 +125,7 @@
   },
   "teamSection": {
     "title": "Our team",
+    "photoAlt": "Photo of {name}",
     "desc1": "Visionary strategist who turns ideas into high-impact digital products.",
     "desc2": "Orchestrates processes and teams so every project ships on time with excellence.",
     "desc3": "Architect of solid, scalable, and cutting-edge technological solutions.",
@@ -194,6 +198,7 @@
     "verMas": "Read more"
   },
   "portfolioGrid": {
+    "sectionTitle": "All Projects",
     "filterAll": "All",
     "filterWeb": "Web",
     "filterMobile": "Mobile",
@@ -396,5 +401,31 @@
     "section5Body": "We retain your data only for as long as necessary to fulfill the purpose for which it was collected, or until you request its deletion. We apply reasonable technical and organizational measures to protect your information from unauthorized access, loss, or misuse. We do not share or sell your data to third parties for commercial purposes; we do use external providers that process data on our behalf to deliver the service: OpenRouter (to generate the diagnostic's AI analysis) and Resend (to send emails), each under their own data protection policies. These transfers are necessary to provide the service you requested.",
     "section6Title": "6. Use of artificial intelligence in the diagnostic",
     "section6Body": "To generate your strategic diagnostic, Diagnostic Go sends the answers you share to an artificial intelligence (LLM) model, which analyzes them and produces automated recommendations. This processing is necessary to provide you with the diagnostic result and only takes place when you choose to use this tool. If you do not want your data processed using artificial intelligence, please do not use Diagnostic Go; our other services and forms are not affected."
+  },
+  "metadata": {
+    "home": {
+      "title": "Custom Software Development",
+      "description": "At LyraTech we build custom software: AI-powered automation, fixed-price projects, and dedicated teams. We turn your idea into a real digital product."
+    },
+    "aboutUs": {
+      "title": "About Us",
+      "description": "Meet the team behind LyraTech: brilliant minds turning ideas into extraordinary digital solutions, from Querétaro, Mexico."
+    },
+    "services": {
+      "title": "Software Development Services",
+      "description": "Process automation, fixed-price projects, and dedicated teams. Technology that transforms your business, from idea to launch."
+    },
+    "portfolio": {
+      "title": "Our Project Portfolio",
+      "description": "Explore the projects we've built: fintech apps, event platforms, corporate websites, and more successful digital solutions."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Have a project in mind? Reach out and let's talk about turning your idea into a real digital solution. We reply within 24 hours."
+    },
+    "legal": {
+      "title": "Terms & Privacy Policy",
+      "description": "Read LyraTech's Terms and Conditions and Privacy Policy for using our website and services."
+    }
   }
 }

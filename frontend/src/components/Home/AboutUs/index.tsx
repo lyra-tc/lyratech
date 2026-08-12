@@ -51,7 +51,7 @@ export default function ScrollStack() {
                                 </div>
                             </div>
                             <div className="mt-14 md:mt-6 lg:w-1/2">
-                                <Image alt="About Us" src={card.img} />
+                                <Image alt={card.title} src={card.img} />
                             </div>
                         </div>
                     </motion.div>

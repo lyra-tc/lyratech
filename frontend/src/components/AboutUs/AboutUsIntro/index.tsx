@@ -17,10 +17,10 @@ const features = [
 ] as const;
 
 const images = [Office1, Office2];
-const alts   = ["Lyratech team", "Lyratech workspace"];
 
 export default function AboutUsIntro() {
     const t = useTranslations("aboutUsIntro");
+    const alts = [t("photoTeamAlt"), t("photoWorkspaceAlt")];
     const [front, setFront] = useState(0);
 
     return (
