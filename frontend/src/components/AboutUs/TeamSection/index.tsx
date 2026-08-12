@@ -92,7 +92,7 @@ export default function TeamSection() {
                         <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center mb-5 overflow-hidden ring-4 ring-lyratech-light-purple">
                             <Image
                                 src={member.image}
-                                alt={member.name}
+                                alt={t("photoAlt", { name: member.name })}
                                 width={128}
                                 height={128}
                                 className="w-full h-full object-cover rounded-full"

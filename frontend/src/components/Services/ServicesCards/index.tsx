@@ -118,9 +118,9 @@ export default function ServicesCards() {
                                         }}
                                     >
                                         <div className="flex items-center justify-between mb-6">
-                                            <h3 className="font-montserrat-bold text-white text-lg leading-tight pr-4">
+                                            <p className="font-montserrat-bold text-white text-lg leading-tight pr-4">
                                                 {service.title}
-                                            </h3>
+                                            </p>
                                             <button
                                                 onClick={() => setFlipped(null)}
                                                 className="text-gray-400 hover:text-white transition-colors flex-shrink-0"

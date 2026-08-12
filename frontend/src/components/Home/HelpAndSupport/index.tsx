@@ -43,9 +43,9 @@ function HelpAndSupport() {
         <div id="contact" className="text-black font-montserrat mb-14 md:mb-32">
             {/*Title*/}
             <div className="flex flex-col text-center mx-6 py-8 gap-y-6 rounded-[30px] shadow-contact md:mx-16 md:py-12 lg:mx-20 lg:gap-y-10 xl:mx-28 xl:py-16 xl:gap-y-14">
-                <h1 className="font-bold text-2xl md:text-3xl lg:text-4xl xl:text-5xl uppercase">
+                <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl xl:text-5xl uppercase">
                     {t("title")}
-                </h1>
+                </h2>
                 <p className="px-4 md:px-14 md:text-lg lg:px-20 lg:text-xl xl:px-64">
                     {t("subtitle")}
                 </p>

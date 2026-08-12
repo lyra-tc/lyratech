@@ -1,10 +1,11 @@
 import clsx from 'clsx';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { ReactNode } from 'react';
 import { locales } from '@/config';
 import '../globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import type { Metadata } from 'next';
+import { siteUrl } from '@/lib/site';
 import deMessages from '@/messages/de.json';
 import enMessages from '@/messages/en.json';
 import esMessages from '@/messages/es.json';
@@ -28,10 +29,17 @@ export function generateStaticParams() {
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "metadata.home" });
+
     return {
-        title: "Lyra Technologies",
-        description: "Lyra Tech website",
+        metadataBase: new URL(siteUrl),
+        title: {
+            template: "%s | LyraTech",
+            default: `${t("title")} | LyraTech`,
+        },
+        description: t("description"),
         icons: [
             { rel: "icon", url: "/favicon-light.ico", media: "(prefers-color-scheme: light)" },
             { rel: "icon", url: "/favicon-dark.ico", media: "(prefers-color-scheme: dark)" },

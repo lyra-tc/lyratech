@@ -162,7 +162,7 @@ function Navbar() {
                 `}
             >
                 <Image
-                    alt="Lyra Tech Notch"
+                    alt=""
                     src={ClosedNotch}
                     className="w-full h-full"
                     priority

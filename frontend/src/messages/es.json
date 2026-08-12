@@ -55,6 +55,7 @@
     "locale": "{locale, select, es {🇪🇸 Español} en {🇬🇧 English} de {🇩🇪 Deutsch} fr {🇫🇷 Français} other {Unknown}}"
   },
   "buttonLanguage": {
+    "flagAlt": "Bandera de {label}",
     "Spanish": "Español",
     "English": "Inglés",
     "German": "Alemán",
@@ -105,6 +106,8 @@
     "titlePurple": "ideas",
     "titleBlack2": "en realidades digitales",
     "description": "En LyraTech no solo escribimos código, creamos experiencias que conectan, inspiran y generan valor real. Somos un equipo multidisciplinario apasionado por resolver problemas complejos con soluciones elegantes y escalables.",
+    "photoTeamAlt": "Equipo de Lyratech trabajando",
+    "photoWorkspaceAlt": "Espacio de trabajo de Lyratech",
     "feat1Title": "Pasión",
     "feat1Desc": "Amamos lo que hacemos y se nota en cada línea de código",
     "feat2Title": "Precisión",
@@ -122,6 +125,7 @@
   },
   "teamSection": {
     "title": "Nuestro equipo",
+    "photoAlt": "Foto de {name}",
     "desc1": "Estratega visionario que convierte ideas en productos digitales de alto impacto.",
     "desc2": "Orquesta procesos y equipos para que cada proyecto llegue a tiempo y con excelencia.",
     "desc3": "Arquitecto de soluciones tecnológicas sólidas, escalables y a la vanguardia.",
@@ -194,6 +198,7 @@
     "verMas": "Leer más"
   },
   "portfolioGrid": {
+    "sectionTitle": "Todos los proyectos",
     "filterAll": "Todos",
     "filterWeb": "Web",
     "filterMobile": "Móvil",
@@ -360,6 +365,11 @@
     "resources4": "Legal",
     "copyright": "© {year} LyraTech. Todos los derechos reservados."
   },
+  "notFound": {
+    "badge": "Página no encontrada",
+    "description": "Lo sentimos, no pudimos encontrar la página que buscas. Puede que el enlace esté roto o que la página haya sido movida.",
+    "button": "Volver al inicio"
+  },
   "terms": {
     "title": "Términos y Condiciones",
     "lastUpdated": "Última actualización: julio de 2026",
@@ -391,5 +401,31 @@
     "section5Body": "Conservamos tus datos únicamente durante el tiempo necesario para cumplir con la finalidad para la que fueron recabados, o hasta que solicites su eliminación. Aplicamos medidas técnicas y organizativas razonables para proteger tu información contra accesos no autorizados, pérdida o uso indebido. No compartimos ni vendemos tus datos a terceros con fines comerciales; sí utilizamos proveedores externos que procesan datos por nuestra cuenta para poder ofrecerte el servicio: OpenRouter (para generar el análisis de inteligencia artificial del diagnóstico) y Resend (para el envío de correos electrónicos), cada uno bajo su propia política de protección de datos. Estas transferencias son necesarias para prestarte el servicio que solicitas.",
     "section6Title": "6. Uso de inteligencia artificial en el diagnóstico",
     "section6Body": "Para generar tu diagnóstico estratégico, la herramienta Diagnostic Go envía las respuestas que compartes a un modelo de inteligencia artificial (LLM) que las analiza y produce recomendaciones automatizadas. Este procesamiento es necesario para ofrecerte el resultado del diagnóstico y se realiza únicamente cuando decides usar esta herramienta. Si no deseas que tus datos sean procesados mediante inteligencia artificial, te pedimos no utilizar Diagnostic Go; el resto de nuestros servicios y formularios no se ven afectados."
+  },
+  "metadata": {
+    "home": {
+      "title": "Desarrollo de Software a la Medida",
+      "description": "En LyraTech creamos software a la medida: automatizaciones con IA, proyectos a precio fijo y equipos dedicados. Convertimos tu idea en una solución digital real."
+    },
+    "aboutUs": {
+      "title": "Sobre Nosotros",
+      "description": "Conoce al equipo detrás de LyraTech: mentes brillantes que transforman ideas en soluciones digitales extraordinarias, desde Querétaro, México."
+    },
+    "services": {
+      "title": "Servicios de Desarrollo de Software",
+      "description": "Automatización de procesos, proyectos a precio fijo y equipos dedicados. Tecnología que transforma tu negocio, desde la idea hasta el lanzamiento."
+    },
+    "portfolio": {
+      "title": "Portafolio de Proyectos",
+      "description": "Descubre los proyectos que hemos desarrollado: apps financieras, plataformas de eventos, sitios corporativos y más soluciones digitales exitosas."
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "description": "¿Tienes un proyecto en mente? Escríbenos y hablemos de cómo convertir tu idea en una solución digital real. Respondemos en menos de 24 horas."
+    },
+    "legal": {
+      "title": "Términos y Aviso de Privacidad",
+      "description": "Consulta los Términos y Condiciones y el Aviso de Privacidad de LyraTech para el uso de nuestro sitio web y servicios."
+    }
   }
 }
