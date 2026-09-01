@@ -11,6 +11,7 @@ from ..core.diagnostic_scoring import (
     recommend_services,
 )
 from ..core.email import send_diagnostic_notification_email, send_diagnostic_result_email
+from ..core.idempotency import claim_turnstile_token
 from ..core.limiter import limiter
 from ..core.openrouter import OpenRouterError, build_fallback_result, generate_diagnostic
 from ..core.turnstile import verify_turnstile_token
@@ -123,6 +124,9 @@ def submit_diagnostic(
             status_code=400,
             detail="No se pudo verificar que eres humano, intenta de nuevo",
         )
+
+    if not claim_turnstile_token(db, body.turnstile_token):
+        raise HTTPException(status_code=409, detail="Esta solicitud ya fue procesada")
 
     active_questions = (
         db.query(DiagnosticQuestion)

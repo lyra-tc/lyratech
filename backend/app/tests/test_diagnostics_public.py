@@ -91,11 +91,51 @@ def test_submit_diagnostic_rate_limited(client, monkeypatch):
     monkeypatch.setattr(
         "app.routers.diagnostics.verify_turnstile_token", lambda token, remote_ip=None: True
     )
-    for _ in range(5):
-        assert client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD).status_code == 201
+    monkeypatch.setattr(
+        "app.routers.diagnostics._dispatch_diagnostic_emails", lambda *a, **k: None
+    )
+    for i in range(5):
+        payload = {**VALID_SUBMIT_PAYLOAD, "turnstile_token": f"test-token-{i}"}
+        assert client.post("/api/diagnostics/submit", json=payload).status_code == 201
 
-    response = client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD)
+    payload = {**VALID_SUBMIT_PAYLOAD, "turnstile_token": "test-token-5"}
+    response = client.post("/api/diagnostics/submit", json=payload)
     assert response.status_code == 429
+
+
+def test_submit_diagnostic_duplicate_token_rejected(client, monkeypatch):
+    _seed()
+    monkeypatch.setattr(
+        "app.routers.diagnostics.verify_turnstile_token", lambda token, remote_ip=None: True
+    )
+    call_count = {"n": 0}
+
+    def fake_generate(**kwargs):
+        call_count["n"] += 1
+        return {
+            "headline": "LLM headline",
+            "summary": "LLM summary",
+            "why_it_fits": "LLM why",
+            "key_opportunities": ["A"],
+            "suggested_next_steps": ["B"],
+            "confidence_note": "note",
+            "email_subject": "subj",
+            "email_preview": "preview",
+            "open_answer_en": "",
+        }
+
+    monkeypatch.setattr("app.routers.diagnostics.generate_diagnostic", fake_generate)
+    monkeypatch.setattr(
+        "app.routers.diagnostics._dispatch_diagnostic_emails", lambda *a, **k: None
+    )
+
+    first = client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD)
+    assert first.status_code == 201
+
+    second = client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD)
+    assert second.status_code == 409
+
+    assert call_count["n"] == 1
 
 
 def test_submit_diagnostic_uses_llm_result_when_available(client, monkeypatch):
