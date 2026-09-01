@@ -44,6 +44,7 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
   const [turnstileReady, setTurnstileReady] = useState(false);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const submitLockRef = useRef(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -177,6 +178,8 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
       return;
     }
 
+    if (submitLockRef.current) return;
+    submitLockRef.current = true;
     setSubmitting(true);
     setSubmitError("");
     try {
@@ -195,6 +198,8 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
         setSubmitError(t("errorRateLimited"));
       } else if (err instanceof ApiError && err.status === 400) {
         setSubmitError(t("errorTurnstile"));
+      } else if (err instanceof ApiError && err.status === 409) {
+        setSubmitError(t("errorDuplicate"));
       } else {
         setSubmitError(t("errorGeneric"));
       }
@@ -203,6 +208,7 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
       }
       setTurnstileToken("");
     } finally {
+      submitLockRef.current = false;
       setSubmitting(false);
     }
   }
