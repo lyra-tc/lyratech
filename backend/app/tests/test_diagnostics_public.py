@@ -13,13 +13,13 @@ def _seed():
 
 VALID_ANSWERS = {
     "main_goal": ["reduce_manual_work"],
-    "current_situation": ["have_process_not_working"],
-    "main_pain": ["repetitive_manual_tasks"],
-    "needs_context_or_rules": ["fixed_rules"],
-    "what_first": ["connect_existing_systems"],
-    "urgency": ["asap"],
-    "tech_team_status": ["technical_team_needs_tools"],
-    "project_definition": ["just_exploring"],
+    "project_stage": ["existing_system_to_improve"],
+    "expected_outcome": ["save_time_reduce_errors"],
+    "automation_shape": ["fixed_rules"],
+    "collaboration_model": ["prefer_recommendation"],
+    "tech_capacity": ["team_needs_better_tools"],
+    "urgency": ["within_1_month"],
+    "open_challenge": ["Perdemos horas capturando datos manualmente cada semana"],
 }
 
 VALID_SUBMIT_PAYLOAD = {
@@ -33,20 +33,20 @@ VALID_SUBMIT_PAYLOAD = {
 }
 
 
-def test_list_active_questions_returns_nine_seeded_questions(client):
+def test_list_active_questions_returns_eight_seeded_questions(client):
     _seed()
     response = client.get("/api/diagnostics/questions/active", params={"locale": "es"})
     assert response.status_code == 200
     body = response.json()
-    assert len(body) == 9
+    assert len(body) == 8
     assert body[0]["key"] == "main_goal"
-    assert body[0]["label"] == "¿Qué quieres lograr principalmente?"
+    assert body[0]["label"] == "¿Qué te gustaría resolver principalmente?"
 
 
 def test_list_active_questions_respects_locale(client):
     _seed()
     response = client.get("/api/diagnostics/questions/active", params={"locale": "en"})
-    assert response.json()[0]["label"] == "What do you mainly want to achieve?"
+    assert response.json()[0]["label"] == "What would you mainly like to solve?"
 
 
 def test_submit_diagnostic_success_with_llm_fallback(client, monkeypatch):
@@ -61,7 +61,7 @@ def test_submit_diagnostic_success_with_llm_fallback(client, monkeypatch):
     body = response.json()
     assert body["recommended_service"] == "process_automation"
     assert body["secondary_service"] is None
-    assert body["service_scores"]["process_automation"] == 12
+    assert body["service_scores"]["process_automation"] == 10
     assert "submission_id" in body
 
 
@@ -91,11 +91,51 @@ def test_submit_diagnostic_rate_limited(client, monkeypatch):
     monkeypatch.setattr(
         "app.routers.diagnostics.verify_turnstile_token", lambda token, remote_ip=None: True
     )
-    for _ in range(5):
-        assert client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD).status_code == 201
+    monkeypatch.setattr(
+        "app.routers.diagnostics._dispatch_diagnostic_emails", lambda *a, **k: None
+    )
+    for i in range(5):
+        payload = {**VALID_SUBMIT_PAYLOAD, "turnstile_token": f"test-token-{i}"}
+        assert client.post("/api/diagnostics/submit", json=payload).status_code == 201
 
-    response = client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD)
+    payload = {**VALID_SUBMIT_PAYLOAD, "turnstile_token": "test-token-5"}
+    response = client.post("/api/diagnostics/submit", json=payload)
     assert response.status_code == 429
+
+
+def test_submit_diagnostic_duplicate_token_rejected(client, monkeypatch):
+    _seed()
+    monkeypatch.setattr(
+        "app.routers.diagnostics.verify_turnstile_token", lambda token, remote_ip=None: True
+    )
+    call_count = {"n": 0}
+
+    def fake_generate(**kwargs):
+        call_count["n"] += 1
+        return {
+            "headline": "LLM headline",
+            "summary": "LLM summary",
+            "why_it_fits": "LLM why",
+            "key_opportunities": ["A"],
+            "suggested_next_steps": ["B"],
+            "confidence_note": "note",
+            "email_subject": "subj",
+            "email_preview": "preview",
+            "open_answer_en": "",
+        }
+
+    monkeypatch.setattr("app.routers.diagnostics.generate_diagnostic", fake_generate)
+    monkeypatch.setattr(
+        "app.routers.diagnostics._dispatch_diagnostic_emails", lambda *a, **k: None
+    )
+
+    first = client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD)
+    assert first.status_code == 201
+
+    second = client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD)
+    assert second.status_code == 409
+
+    assert call_count["n"] == 1
 
 
 def test_submit_diagnostic_uses_llm_result_when_available(client, monkeypatch):

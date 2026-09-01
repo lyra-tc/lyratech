@@ -52,6 +52,7 @@ export default function ContactForm() {
     const [turnstileReady, setTurnstileReady] = useState(false);
     const turnstileContainerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<string | null>(null);
+    const submitLockRef = useRef(false);
 
     const SERVICES = [
         { value: "diagnostico", label: t("serviceOption1") },
@@ -136,6 +137,8 @@ export default function ContactForm() {
             return;
         }
 
+        if (submitLockRef.current) return;
+        submitLockRef.current = true;
         setSubmitting(true);
         try {
             await submitProspect({
@@ -153,6 +156,8 @@ export default function ContactForm() {
                 setSubmitError(t("errorRateLimited"));
             } else if (err instanceof ApiError && err.status === 400) {
                 setSubmitError(t("errorTurnstile"));
+            } else if (err instanceof ApiError && err.status === 409) {
+                setSubmitError(t("errorDuplicate"));
             } else {
                 setSubmitError(t("errorGeneric"));
             }
@@ -161,6 +166,7 @@ export default function ContactForm() {
             }
             setTurnstileToken("");
         } finally {
+            submitLockRef.current = false;
             setSubmitting(false);
         }
     };

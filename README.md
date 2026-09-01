@@ -48,6 +48,7 @@ Incluye:
 - Cambiar la contrasena (por el propio usuario o por un admin) invalida cualquier token emitido antes de ese momento (`users.password_changed_at` + claim `iat` del JWT).
 - Contrasenas con `bcrypt`; minimo 6 caracteres al registrar y al cambiar contrasena.
 - Rate limiting por IP (`slowapi`): login `5/minuto`, registro `5/hora`, formulario de contacto y envio de diagnostico `5/hora` cada uno.
+- Proteccion anti-duplicado en `prospects` y `diagnostics/submit`: cada token de Turnstile solo puede reclamarse una vez (tabla `used_turnstile_tokens`, ver `app/core/idempotency.py`), evitando doble registro/doble llamada a OpenRouter por doble-click o reintento de red. El frontend tambien bloquea el segundo click antes de disparar la peticion.
 - CORS restringido a los origenes del frontend (`BACKEND_CORS_ORIGINS`), no wildcard.
 - Logging de eventos de seguridad (login fallido/exitoso, registro, cambios de rol, borrado de cuentas, reset de contrasena por admin) via logger `security`.
 - Sin SQL crudo: todo el acceso a datos pasa por SQLAlchemy ORM parametrizado.
@@ -90,12 +91,15 @@ lyratech/
 - `notification_recipients`
 - `diagnostic_questions`
 - `diagnostic_submissions`
+- `used_turnstile_tokens`
 
 Notas:
 
 - `users.is_admin` inicia en `FALSE` por defecto (excepto el primer usuario registrado, ver "Usuarios y permisos").
 - `users.is_superadmin` inicia en `FALSE` por defecto y solo se asigna manualmente en la base de datos, nunca por la API.
 - El backend hace un ajuste de esquema al arrancar (`ensure_user_management_schema` en `app/main.py`) para agregar columnas nuevas en instalaciones existentes que vengan de una version anterior de `init.sql`.
+- `init.sql` solo corre una vez, cuando el volumen de MySQL esta vacio (primer arranque del contenedor). En una base de datos ya existente, las tablas nuevas (como `used_turnstile_tokens`) las crea automaticamente SQLAlchemy (`Base.metadata.create_all` en `app/main.py`) la siguiente vez que arranca el backend — no hace falta migrar nada a mano.
+- `used_turnstile_tokens` se limpia sola: al arrancar, el backend borra las filas de mas de 30 dias (`cleanup_old_turnstile_tokens`).
 
 ## API
 

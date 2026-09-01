@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -44,6 +44,7 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
   const [turnstileReady, setTurnstileReady] = useState(false);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const submitLockRef = useRef(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -79,9 +80,18 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
     };
   }, [locale, t]);
 
-  const totalSteps = 1 + questions.length;
+  const visibleQuestions = useMemo(
+    () =>
+      questions.filter(
+        (q) =>
+          q.key !== "automation_shape" ||
+          (answers.main_goal ?? []).includes("reduce_manual_work")
+      ),
+    [questions, answers.main_goal]
+  );
+  const totalSteps = 1 + visibleQuestions.length;
   const isContactStep = stepIndex === 0;
-  const currentQuestion = isContactStep ? null : questions[stepIndex - 1];
+  const currentQuestion = isContactStep ? null : visibleQuestions[stepIndex - 1];
   const isLastStep = stepIndex === totalSteps - 1;
   const stepsRemaining = Math.max(totalSteps - (stepIndex + 1), 0);
   const approxMinutesLeft = Math.max(1, stepsRemaining || 1);
@@ -147,13 +157,18 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
     setStepIndex((i) => Math.max(0, i - 1));
   }
 
+  function isCurrentQuestionRequired(): boolean {
+    if (!currentQuestion) return false;
+    return currentQuestion.is_required || currentQuestion.key === "automation_shape";
+  }
+
   function handleNext() {
     if (isContactStep) {
       if (!validateContact()) return;
       setStepIndex(1);
       return;
     }
-    if (currentQuestion?.is_required && !answers[currentQuestion.key]?.length) {
+    if (isCurrentQuestionRequired() && !answers[currentQuestion!.key]?.length) {
       setSubmitError(t("requiredField"));
       return;
     }
@@ -162,7 +177,7 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
   }
 
   async function handleSubmit() {
-    if (currentQuestion?.is_required && !answers[currentQuestion.key]?.length) {
+    if (isCurrentQuestionRequired() && !answers[currentQuestion!.key]?.length) {
       setSubmitError(t("requiredField"));
       return;
     }
@@ -177,16 +192,23 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
       return;
     }
 
+    if (submitLockRef.current) return;
+    submitLockRef.current = true;
     setSubmitting(true);
     setSubmitError("");
     try {
+      const visibleAnswers = Object.fromEntries(
+        Object.entries(answers).filter(([key]) =>
+          visibleQuestions.some((q) => q.key === key)
+        )
+      );
       const submitResult = await submitDiagnostic({
         name: contact.name,
         email: contact.email,
         phone: contact.phone,
         company: contact.company,
         locale,
-        answers,
+        answers: visibleAnswers,
         turnstile_token: turnstileToken,
       });
       setResult(submitResult);
@@ -195,6 +217,8 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
         setSubmitError(t("errorRateLimited"));
       } else if (err instanceof ApiError && err.status === 400) {
         setSubmitError(t("errorTurnstile"));
+      } else if (err instanceof ApiError && err.status === 409) {
+        setSubmitError(t("errorDuplicate"));
       } else {
         setSubmitError(t("errorGeneric"));
       }
@@ -203,6 +227,7 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
       }
       setTurnstileToken("");
     } finally {
+      submitLockRef.current = false;
       setSubmitting(false);
     }
   }

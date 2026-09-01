@@ -13,17 +13,17 @@ def _session():
     return sessionmaker(bind=engine)()
 
 
-def test_seed_inserts_nine_questions_when_empty():
+def test_seed_inserts_eight_questions_when_empty():
     db = _session()
     seed_diagnostic_questions(db)
-    assert db.query(DiagnosticQuestion).count() == 9
+    assert db.query(DiagnosticQuestion).count() == 8
 
 
 def test_seed_is_idempotent():
     db = _session()
     seed_diagnostic_questions(db)
     seed_diagnostic_questions(db)
-    assert db.query(DiagnosticQuestion).count() == 9
+    assert db.query(DiagnosticQuestion).count() == 8
 
 
 def test_seed_skips_when_questions_already_exist():
@@ -56,7 +56,7 @@ def test_seed_recovers_from_integrity_error_when_another_worker_seeds_first(monk
             )
         )
     db.commit()
-    assert db.query(DiagnosticQuestion).count() == 9
+    assert db.query(DiagnosticQuestion).count() == 8
 
     # Force our own emptiness check to report "table is empty" even though
     # rows already exist, reproducing the race window where the check ran
@@ -74,4 +74,4 @@ def test_seed_recovers_from_integrity_error_when_another_worker_seeds_first(monk
     # values means another worker already seeded the data, which is fine.
     seed_diagnostic_questions(db)
 
-    assert db.query(DiagnosticQuestion).count() == 9
+    assert db.query(DiagnosticQuestion).count() == 8

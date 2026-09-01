@@ -9,7 +9,7 @@ from app.core.diagnostic_scoring import (
 def test_compute_service_scores_sums_matching_option_weights():
     answers = {
         "main_goal": ["reduce_manual_work"],
-        "current_situation": ["have_process_not_working"],
+        "project_stage": ["existing_system_to_improve"],
     }
     scores = compute_service_scores(answers, DEFAULT_QUESTIONS_SEED)
     assert scores == {
@@ -23,7 +23,7 @@ def test_compute_service_scores_ignores_open_text_and_unknown_values():
     answers = {
         "main_goal": ["reduce_manual_work"],
         "open_challenge": ["free text, not scored"],
-        "main_pain": ["not_a_real_option"],
+        "expected_outcome": ["not_a_real_option"],
     }
     scores = compute_service_scores(answers, DEFAULT_QUESTIONS_SEED)
     assert scores["process_automation"] == 3
@@ -58,15 +58,20 @@ def test_recommend_services_all_zero_has_no_secondary():
 
 
 def test_determine_automation_approach_ai_signal():
-    answers = {"needs_context_or_rules": ["context_or_language"]}
+    answers = {"automation_shape": ["context_or_language"]}
+    assert determine_automation_approach(answers) == "ai"
+
+
+def test_determine_automation_approach_mixed_signal_is_ai():
+    answers = {"automation_shape": ["mixed_rules_and_context"]}
     assert determine_automation_approach(answers) == "ai"
 
 
 def test_determine_automation_approach_traditional_signal():
-    answers = {"needs_context_or_rules": ["fixed_rules"]}
+    answers = {"automation_shape": ["fixed_rules"]}
     assert determine_automation_approach(answers) == "traditional"
 
 
-def test_determine_automation_approach_not_applicable_or_missing():
-    assert determine_automation_approach({"needs_context_or_rules": ["not_applicable"]}) is None
+def test_determine_automation_approach_not_sure_or_missing():
+    assert determine_automation_approach({"automation_shape": ["not_sure_shape"]}) is None
     assert determine_automation_approach({}) is None
