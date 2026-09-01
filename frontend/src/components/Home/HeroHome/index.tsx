@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 //import Logo from "@/assets/images/Home/Hero/CrystalLogo.png";
 import Logo from "@/assets/images/Home/Hero/SolidLogo.png";
 //import Logo from "@/assets/images/Home/Hero/Logo.png";
@@ -12,8 +13,13 @@ import DiagnosticGoModal from "@/components/Services/DiagnosticGo/Modal";
 
 function HeroHome() {
     const t = useTranslations("heroHome");
+    const searchParams = useSearchParams();
     const [showBooking, setShowBooking] = useState(false);
     const [showDiagnostic, setShowDiagnostic] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.has("diagnostic")) setShowDiagnostic(true);
+    }, [searchParams]);
 
     return (
         <div id="home" className="text-black flex flex-col items-center justify-center md:flex-row md:mt-16 xl:mt-2 mb-16 md:mb-16">
