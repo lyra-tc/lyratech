@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { buildAlternates } from "@/lib/metadata";
@@ -37,7 +37,9 @@ export default function Home() {
             <Navbar />
             <ButtonLanguage />
             <DiagnosticGoFloatingButton />
-            <Hero />
+            <Suspense fallback={null}>
+                <Hero />
+            </Suspense>
             <AboutUs />
             <Services />
             <Portafolio />
