@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Navbar from "@/components/Navbar/index";
 import Hero from "@/components/Home/HeroHome";
 import AboutUs from "@/components/Home/AboutUs";
@@ -13,7 +13,9 @@ export default function Home() {
         <div className="">
             <Navbar />
             <ButtonLanguage />
-            <Hero />
+            <Suspense fallback={null}>
+                <Hero />
+            </Suspense>
             <AboutUs />
             <Services />
             <Portafolio />
