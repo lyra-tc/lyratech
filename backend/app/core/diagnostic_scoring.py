@@ -64,8 +64,8 @@ def recommend_services(scores: Dict[str, int]) -> Tuple[str, Optional[str]]:
 
 def determine_automation_approach(answers: Dict[str, List[str]]) -> Optional[str]:
     """Only meaningful when the primary recommendation is process_automation."""
-    values = answers.get("needs_context_or_rules", [])
-    if "context_or_language" in values:
+    values = answers.get("automation_shape", [])
+    if "context_or_language" in values or "mixed_rules_and_context" in values:
         return "ai"
     if "fixed_rules" in values:
         return "traditional"

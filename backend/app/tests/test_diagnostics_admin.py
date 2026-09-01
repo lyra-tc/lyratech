@@ -41,13 +41,13 @@ QUESTION_PAYLOAD = {
 
 VALID_ANSWERS = {
     "main_goal": ["reduce_manual_work"],
-    "current_situation": ["have_process_not_working"],
-    "main_pain": ["repetitive_manual_tasks"],
-    "needs_context_or_rules": ["fixed_rules"],
-    "what_first": ["connect_existing_systems"],
-    "urgency": ["asap"],
-    "tech_team_status": ["technical_team_needs_tools"],
-    "project_definition": ["just_exploring"],
+    "project_stage": ["existing_system_to_improve"],
+    "expected_outcome": ["save_time_reduce_errors"],
+    "automation_shape": ["fixed_rules"],
+    "collaboration_model": ["prefer_recommendation"],
+    "tech_capacity": ["team_needs_better_tools"],
+    "urgency": ["within_1_month"],
+    "open_challenge": ["Perdemos horas capturando datos manualmente cada semana"],
 }
 
 VALID_SUBMIT_PAYLOAD = {

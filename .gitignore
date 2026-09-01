@@ -26,4 +26,4 @@ __pycache__/
 .DS_Store
 
 # --- Superpowers brainstorming companion ---
-.superpowers/
+docs

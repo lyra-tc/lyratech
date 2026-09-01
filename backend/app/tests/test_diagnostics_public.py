@@ -13,13 +13,13 @@ def _seed():
 
 VALID_ANSWERS = {
     "main_goal": ["reduce_manual_work"],
-    "current_situation": ["have_process_not_working"],
-    "main_pain": ["repetitive_manual_tasks"],
-    "needs_context_or_rules": ["fixed_rules"],
-    "what_first": ["connect_existing_systems"],
-    "urgency": ["asap"],
-    "tech_team_status": ["technical_team_needs_tools"],
-    "project_definition": ["just_exploring"],
+    "project_stage": ["existing_system_to_improve"],
+    "expected_outcome": ["save_time_reduce_errors"],
+    "automation_shape": ["fixed_rules"],
+    "collaboration_model": ["prefer_recommendation"],
+    "tech_capacity": ["team_needs_better_tools"],
+    "urgency": ["within_1_month"],
+    "open_challenge": ["Perdemos horas capturando datos manualmente cada semana"],
 }
 
 VALID_SUBMIT_PAYLOAD = {
@@ -33,20 +33,20 @@ VALID_SUBMIT_PAYLOAD = {
 }
 
 
-def test_list_active_questions_returns_nine_seeded_questions(client):
+def test_list_active_questions_returns_eight_seeded_questions(client):
     _seed()
     response = client.get("/api/diagnostics/questions/active", params={"locale": "es"})
     assert response.status_code == 200
     body = response.json()
-    assert len(body) == 9
+    assert len(body) == 8
     assert body[0]["key"] == "main_goal"
-    assert body[0]["label"] == "¿Qué quieres lograr principalmente?"
+    assert body[0]["label"] == "¿Qué te gustaría resolver principalmente?"
 
 
 def test_list_active_questions_respects_locale(client):
     _seed()
     response = client.get("/api/diagnostics/questions/active", params={"locale": "en"})
-    assert response.json()[0]["label"] == "What do you mainly want to achieve?"
+    assert response.json()[0]["label"] == "What would you mainly like to solve?"
 
 
 def test_submit_diagnostic_success_with_llm_fallback(client, monkeypatch):
@@ -61,7 +61,7 @@ def test_submit_diagnostic_success_with_llm_fallback(client, monkeypatch):
     body = response.json()
     assert body["recommended_service"] == "process_automation"
     assert body["secondary_service"] is None
-    assert body["service_scores"]["process_automation"] == 12
+    assert body["service_scores"]["process_automation"] == 10
     assert "submission_id" in body
 
 
