@@ -2,6 +2,7 @@
 from sqlalchemy.orm import Session
 from typing import List
 from ..core.deps import get_db, get_current_admin
+from ..core.idempotency import claim_turnstile_token
 from ..core.limiter import limiter
 from ..core.turnstile import verify_turnstile_token
 from ..core.email import send_prospect_notification_email
@@ -27,6 +28,9 @@ def create_prospect(
             status_code=400,
             detail="No se pudo verificar que eres humano, intenta de nuevo",
         )
+
+    if not claim_turnstile_token(db, body.turnstile_token):
+        raise HTTPException(status_code=409, detail="Esta solicitud ya fue procesada")
 
     prospect = Prospect(**body.model_dump(exclude={"turnstile_token"}))
     db.add(prospect)

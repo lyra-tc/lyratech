@@ -114,3 +114,15 @@ CREATE TABLE IF NOT EXISTS diagnostic_submissions (
     INDEX ix_diagnostic_submissions_id (id),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+-- Used Turnstile tokens: idempotency guard so a duplicate submit
+-- (double-click, network retry, replayed request) with the same
+-- Turnstile token on /prospects or /diagnostics/submit is rejected
+-- instead of processed twice. Rows older than 30 days are cleaned up by
+-- the backend at startup (see app/core/idempotency.py).
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS used_turnstile_tokens (
+    token_hash  CHAR(64) NOT NULL PRIMARY KEY,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

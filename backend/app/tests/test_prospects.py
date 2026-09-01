@@ -36,11 +36,25 @@ def test_create_prospect_rate_limited(client, monkeypatch):
         "app.routers.prospects.verify_turnstile_token",
         lambda token, remote_ip=None: True,
     )
-    for _ in range(5):
-        assert client.post("/api/prospects/", json=VALID_PAYLOAD).status_code == 201
+    for i in range(5):
+        payload = {**VALID_PAYLOAD, "turnstile_token": f"test-token-{i}"}
+        assert client.post("/api/prospects/", json=payload).status_code == 201
 
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
+    payload = {**VALID_PAYLOAD, "turnstile_token": "test-token-5"}
+    response = client.post("/api/prospects/", json=payload)
     assert response.status_code == 429
+
+
+def test_create_prospect_duplicate_token_rejected(client, monkeypatch):
+    monkeypatch.setattr(
+        "app.routers.prospects.verify_turnstile_token",
+        lambda token, remote_ip=None: True,
+    )
+    first = client.post("/api/prospects/", json=VALID_PAYLOAD)
+    assert first.status_code == 201
+
+    second = client.post("/api/prospects/", json=VALID_PAYLOAD)
+    assert second.status_code == 409
 
 
 def test_list_prospects_requires_auth(client):

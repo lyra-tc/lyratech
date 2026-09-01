@@ -7,6 +7,7 @@ from sqlalchemy import inspect, text
 
 from .config import settings
 from .core.diagnostic_seed import seed_diagnostic_questions
+from .core.idempotency import cleanup_old_turnstile_tokens
 from .core.limiter import limiter
 from .database import Base, SessionLocal, engine
 from .routers import auth, diagnostics, leads, notifications, prospects, users
@@ -46,6 +47,7 @@ ensure_user_management_schema()
 _seed_db = SessionLocal()
 try:
     seed_diagnostic_questions(_seed_db)
+    cleanup_old_turnstile_tokens(_seed_db)
 finally:
     _seed_db.close()
 
