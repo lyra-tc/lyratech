@@ -165,7 +165,7 @@ export default function LeadsPage() {
                   <span className="font-montserrat text-dark-blue/60 text-sm">{lead.source || "—"}</span>
                 </td>
                 <td className="px-4 py-3.5">
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1">
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(lead); }}
                       className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors"
