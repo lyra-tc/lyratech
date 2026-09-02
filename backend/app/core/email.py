@@ -4,7 +4,7 @@ import logging
 import httpx
 
 from ..config import settings
-from ..models.prospect import Prospect
+from ..models.lead import Lead
 from ..models.diagnostic_submission import DiagnosticSubmission
 from .diagnostic_catalog import SERVICE_CATALOG
 
@@ -78,14 +78,14 @@ def _build_email_shell(
     )
 
 
-def build_prospect_notification_html(prospect: Prospect) -> str:
+def build_lead_notification_html(lead: Lead) -> str:
     rows = [
-        ("Nombre", prospect.name),
-        ("Correo", prospect.email),
-        ("Telefono", prospect.phone or "-"),
-        ("Empresa", prospect.company or "-"),
-        ("Servicio", prospect.service or "-"),
-        ("Mensaje", prospect.message or "-"),
+        ("Nombre", lead.name),
+        ("Correo", lead.email),
+        ("Telefono", lead.phone or "-"),
+        ("Empresa", lead.company or "-"),
+        ("Servicio", lead.service or "-"),
+        ("Mensaje", lead.message or "-"),
     ]
     rows_html = "".join(
         f'<div style="padding:16px 0;border-bottom:1px solid {EMAIL_LINE};">'
@@ -101,7 +101,7 @@ def build_prospect_notification_html(prospect: Prospect) -> str:
         f'<div style="margin-bottom:22px;padding:18px 20px;border-radius:20px;'
         f'background:{EMAIL_PANEL};border:1px solid {EMAIL_LINE};">'
         f'<div style="color:{EMAIL_INK};font-size:14px;line-height:1.7;">'
-        "Se registro un nuevo prospecto desde el formulario de contacto. Aqui tienes los datos capturados para dar seguimiento."
+        "Se registro un nuevo lead desde el formulario de contacto. Aqui tienes los datos capturados para dar seguimiento."
         "</div>"
         "</div>"
         f"{rows_html}"
@@ -110,13 +110,13 @@ def build_prospect_notification_html(prospect: Prospect) -> str:
     if settings.FRONTEND_URL:
         cta_html = (
             '<div style="margin-top:24px;">'
-            f'{_build_email_button("Ver en el dashboard", f"{settings.FRONTEND_URL}/dashboard/prospects")}'
+            f'{_build_email_button("Ver en el dashboard", f"{settings.FRONTEND_URL}/dashboard/leads")}'
             "</div>"
         )
 
     return _build_email_shell(
         eyebrow="Nuevo contacto",
-        title="Nuevo prospecto recibido",
+        title="Nuevo lead recibido",
         intro="Un nuevo lead llego a la plataforma y ya esta listo para seguimiento.",
         content_html=content_html,
         cta_html=cta_html,
@@ -173,18 +173,16 @@ def send_test_notification_email(recipient_email: str) -> None:
     _send_email(payload)
 
 
-def send_prospect_notification_email(
-    prospect: Prospect, recipient_emails: list[str]
-) -> None:
+def send_lead_notification_email(lead: Lead, recipient_emails: list[str]) -> None:
     if not recipient_emails:
         logger.info(
-            "No notification recipients configured; skipping email for prospect %s",
-            prospect.id,
+            "No notification recipients configured; skipping email for lead %s",
+            lead.id,
         )
         return
     if not settings.RESEND_API_KEY:
         logger.warning(
-            "RESEND_API_KEY not configured; skipping email for prospect %s", prospect.id
+            "RESEND_API_KEY not configured; skipping email for lead %s", lead.id
         )
         return
 
@@ -197,14 +195,14 @@ def send_prospect_notification_email(
         payload = {
             "from": f"{settings.NOTIFICATION_FROM_NAME} <{settings.NOTIFICATION_FROM_EMAIL}>",
             "to": recipient_emails,
-            "reply_to": prospect.email,
-            "subject": f"Nuevo prospecto: {prospect.name}",
-            "html": build_prospect_notification_html(prospect),
+            "reply_to": lead.email,
+            "subject": f"Nuevo lead: {lead.name}",
+            "html": build_lead_notification_html(lead),
         }
         _send_email(payload)
     except Exception:
         logger.exception(
-            "Failed to send prospect notification email for prospect %s", prospect.id
+            "Failed to send lead notification email for lead %s", lead.id
         )
 
 
@@ -332,7 +330,7 @@ def send_diagnostic_notification_email(
     submission: DiagnosticSubmission, recipient_emails: list[str]
 ) -> None:
     """Fire-and-forget internal notification — mirrors
-    `send_prospect_notification_email` exactly, reusing the same
+    `send_lead_notification_email` exactly, reusing the same
     dashboard-configured recipient list."""
     if not recipient_emails:
         logger.info(

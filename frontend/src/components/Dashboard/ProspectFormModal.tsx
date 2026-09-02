@@ -2,44 +2,45 @@
 
 import React, { useRef, useState } from "react";
 import { HiOutlineX, HiOutlineCheck } from "react-icons/hi";
-import { leadsApi } from "@/lib/api";
-import type { Lead, LeadCreate, LeadStatus } from "@/lib/api";
-import { STATUS_LABELS, SOURCES } from "@/lib/leadConstants";
+import { prospectsApi } from "@/lib/api";
+import type { Prospect, ProspectCreate, ProspectStatus } from "@/lib/api";
+import { STATUS_LABELS, SOURCES } from "@/lib/prospectConstants";
 import Dropdown from "@/components/shared/Dropdown";
 import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
 import { deepEqual } from "@/lib/deepEqual";
 
-const STATUS_OPTIONS = (Object.keys(STATUS_LABELS) as LeadStatus[]).map((s) => ({
+const STATUS_OPTIONS = (Object.keys(STATUS_LABELS) as ProspectStatus[]).map((s) => ({
   value: s,
   label: STATUS_LABELS[s],
 }));
 
 const SOURCE_OPTIONS = SOURCES.map((s) => ({ value: s, label: s }));
 
-interface LeadFormModalProps {
-  editing: Lead | null;
-  initialForm: LeadCreate;
+interface ProspectFormModalProps {
+  editing: Prospect | null;
+  initialForm: ProspectCreate;
   onClose: () => void;
-  onSaved: (lead: Lead) => void;
+  onSaved: (prospect: Prospect) => void;
 }
 
-function toFormValues(lead: Lead): LeadCreate {
+function toFormValues(prospect: Prospect): ProspectCreate {
   return {
-    name: lead.name,
-    email: lead.email || "",
-    phone: lead.phone || "",
-    company: lead.company || "",
-    status: lead.status,
-    source: lead.source || "",
-    notes: lead.notes || "",
+    name: prospect.name,
+    email: prospect.email || "",
+    phone: prospect.phone || "",
+    company: prospect.company || "",
+    service: prospect.service || "",
+    status: prospect.status,
+    source: prospect.source || "",
+    notes: prospect.notes || "",
   };
 }
 
-export default function LeadFormModal({ editing, initialForm, onClose, onSaved }: LeadFormModalProps) {
-  const initialFormRef = useRef<LeadCreate>(editing ? toFormValues(editing) : initialForm);
-  const [form, setForm] = useState<LeadCreate>(initialFormRef.current);
+export default function ProspectFormModal({ editing, initialForm, onClose, onSaved }: ProspectFormModalProps) {
+  const initialFormRef = useRef<ProspectCreate>(editing ? toFormValues(editing) : initialForm);
+  const [form, setForm] = useState<ProspectCreate>(initialFormRef.current);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -71,8 +72,8 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
     setFormError("");
     try {
       const saved = editing
-        ? await leadsApi.update(editing.id, form)
-        : await leadsApi.create(form);
+        ? await prospectsApi.update(editing.id, form)
+        : await prospectsApi.create(form);
       onSaved(saved);
       onClose();
     } catch (err: unknown) {
@@ -94,7 +95,7 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-scale-in">
         <div className="flex items-center justify-between p-6 border-b border-black/5">
           <h2 className="font-montserrat-bold text-dark-blue text-lg">
-            {editing ? "Editar lead" : "Nuevo lead"}
+            {editing ? "Editar prospecto" : "Nuevo prospecto"}
           </h2>
           <button onClick={requestClose} className="p-1.5 rounded-lg hover:bg-beige text-dark-blue/50 hover:text-dark-blue transition-colors">
             <HiOutlineX size={18} />
@@ -157,12 +158,23 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
             />
           </div>
 
+          <div>
+            <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Servicio</label>
+            <input
+              type="text"
+              value={form.service ?? ""}
+              onChange={(e) => setForm({ ...form, service: e.target.value })}
+              className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
+              placeholder="Ej. automatizaciones, precio-fijo"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Estado</label>
               <Dropdown
                 value={form.status ?? "new"}
-                onChange={(v) => setForm({ ...form, status: v as LeadStatus })}
+                onChange={(v) => setForm({ ...form, status: v as ProspectStatus })}
                 options={STATUS_OPTIONS}
               />
             </div>
@@ -187,7 +199,7 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
               rows={3}
               className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all resize-none"
-              placeholder="Notas adicionales sobre el lead..."
+              placeholder="Notas adicionales sobre el prospecto..."
             />
           </div>
 
@@ -209,7 +221,7 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
               className="flex-1 flex items-center justify-center gap-2 bg-lyratech-purple hover:bg-button-light-purple disabled:opacity-50 text-white font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm shadow-button hover:scale-[1.02]"
             >
               <HiOutlineCheck size={16} />
-              {saving ? "Guardando..." : editing ? "Guardar cambios" : "Crear lead"}
+              {saving ? "Guardando..." : editing ? "Guardar cambios" : "Crear prospecto"}
             </button>
           </div>
         </div>

@@ -61,18 +61,25 @@ export interface UserInfo {
 export interface Lead {
   id: number;
   name: string;
-  email?: string;
+  email: string;
   phone?: string;
   company?: string;
-  status: LeadStatus;
-  source?: string;
-  notes?: string;
-  assigned_to?: number;
+  service?: string;
+  message?: string;
   created_at: string;
-  updated_at: string;
 }
 
-export type LeadStatus =
+export interface LeadSubmit {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  service?: string;
+  message?: string;
+  turnstile_token: string;
+}
+
+export type ProspectStatus =
   | "new"
   | "contacted"
   | "qualified"
@@ -80,12 +87,28 @@ export type LeadStatus =
   | "closed"
   | "lost";
 
-export interface LeadCreate {
+export interface Prospect {
+  id: number;
   name: string;
   email?: string;
   phone?: string;
   company?: string;
-  status?: LeadStatus;
+  service?: string;
+  status: ProspectStatus;
+  source?: string;
+  notes?: string;
+  assigned_to?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProspectCreate {
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  service?: string;
+  status?: ProspectStatus;
   source?: string;
   notes?: string;
 }
@@ -138,45 +161,11 @@ export const usersApi = {
 
 export const leadsApi = {
   list: () => request<Lead[]>("/api/leads/"),
-  create: (data: LeadCreate) =>
-    request<Lead>("/api/leads/", { method: "POST", body: JSON.stringify(data) }),
-  update: (id: number, data: Partial<LeadCreate> & { status?: LeadStatus }) =>
-    request<Lead>(`/api/leads/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
-  remove: (id: number) =>
-    request<void>(`/api/leads/${id}`, { method: "DELETE" }),
+  remove: (id: number) => request<void>(`/api/leads/${id}`, { method: "DELETE" }),
 };
 
-export interface Prospect {
-  id: number;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  service?: string;
-  message?: string;
-  created_at: string;
-}
-
-export interface ProspectSubmit {
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  service?: string;
-  message?: string;
-  turnstile_token: string;
-}
-
-export const prospectsApi = {
-  list: () => request<Prospect[]>("/api/prospects/"),
-  remove: (id: number) => request<void>(`/api/prospects/${id}`, { method: "DELETE" }),
-};
-
-export async function submitProspect(data: ProspectSubmit): Promise<Prospect> {
-  const res = await fetch(`${API_URL}/api/prospects/`, {
+export async function submitLead(data: LeadSubmit): Promise<Lead> {
+  const res = await fetch(`${API_URL}/api/leads/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -187,6 +176,16 @@ export async function submitProspect(data: ProspectSubmit): Promise<Prospect> {
   }
   return res.json();
 }
+
+export const prospectsApi = {
+  list: () => request<Prospect[]>("/api/prospects/"),
+  create: (data: ProspectCreate) =>
+    request<Prospect>("/api/prospects/", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: Partial<ProspectCreate>) =>
+    request<Prospect>(`/api/prospects/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  remove: (id: number) =>
+    request<void>(`/api/prospects/${id}`, { method: "DELETE" }),
+};
 
 export interface NotificationRecipient {
   id: number;

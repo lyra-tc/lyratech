@@ -1,46 +1,12 @@
-﻿from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from ..core.deps import get_db, get_current_admin
-from ..core.idempotency import claim_turnstile_token
-from ..core.limiter import limiter
-from ..core.turnstile import verify_turnstile_token
-from ..core.email import send_prospect_notification_email
 from ..models.prospect import Prospect
-from ..models.notification_recipient import NotificationRecipient
 from ..models.user import User
-from ..schemas.prospect import ProspectCreate, ProspectResponse
+from ..schemas.prospect import ProspectCreate, ProspectUpdate, ProspectResponse
 
 router = APIRouter(prefix="/prospects", tags=["prospects"])
-
-
-@router.post("/", response_model=ProspectResponse, status_code=201)
-@limiter.limit("5/hour")
-def create_prospect(
-    request: Request,
-    body: ProspectCreate,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db),
-):
-    remote_ip = request.client.host if request.client else None
-    if not verify_turnstile_token(body.turnstile_token, remote_ip):
-        raise HTTPException(
-            status_code=400,
-            detail="No se pudo verificar que eres humano, intenta de nuevo",
-        )
-
-    if not claim_turnstile_token(db, body.turnstile_token):
-        raise HTTPException(status_code=409, detail="Esta solicitud ya fue procesada")
-
-    prospect = Prospect(**body.model_dump(exclude={"turnstile_token"}))
-    db.add(prospect)
-    db.commit()
-    db.refresh(prospect)
-
-    recipient_emails = [r.email for r in db.query(NotificationRecipient).all()]
-    background_tasks.add_task(send_prospect_notification_email, prospect, recipient_emails)
-
-    return prospect
 
 
 @router.get("/", response_model=List[ProspectResponse])
@@ -57,6 +23,50 @@ def list_prospects(
         .limit(limit)
         .all()
     )
+
+
+@router.post("/", response_model=ProspectResponse, status_code=201)
+def create_prospect(
+    body: ProspectCreate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    prospect = Prospect(**body.model_dump())
+    db.add(prospect)
+    db.commit()
+    db.refresh(prospect)
+    return prospect
+
+
+@router.get("/{prospect_id}", response_model=ProspectResponse)
+def get_prospect(
+    prospect_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    prospect = db.query(Prospect).filter(Prospect.id == prospect_id).first()
+    if not prospect:
+        raise HTTPException(status_code=404, detail="Prospecto no encontrado")
+    return prospect
+
+
+@router.put("/{prospect_id}", response_model=ProspectResponse)
+def update_prospect(
+    prospect_id: int,
+    body: ProspectUpdate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    prospect = db.query(Prospect).filter(Prospect.id == prospect_id).first()
+    if not prospect:
+        raise HTTPException(status_code=404, detail="Prospecto no encontrado")
+
+    for field, value in body.model_dump(exclude_unset=True).items():
+        setattr(prospect, field, value)
+
+    db.commit()
+    db.refresh(prospect)
+    return prospect
 
 
 @router.delete("/{prospect_id}", status_code=204)

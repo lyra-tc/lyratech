@@ -41,8 +41,43 @@ def ensure_user_management_schema() -> None:
                 )
             )
 
+
+def ensure_leads_prospects_swap() -> None:
+    if engine.dialect.name != "mysql":
+        return  # the chained RENAME TABLE form below is MySQL-only
+
+    inspector = inspect(engine)
+    table_names = set(inspector.get_table_names())
+    if "leads" not in table_names or "prospects" not in table_names:
+        return
+
+    lead_columns = {c["name"] for c in inspector.get_columns("leads")}
+    if "message" not in lead_columns:
+        # Roles are still the old way round -- swap the two tables atomically.
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "RENAME TABLE leads TO _leads_prospects_swap_tmp, "
+                    "prospects TO leads, "
+                    "_leads_prospects_swap_tmp TO prospects"
+                )
+            )
+
+    # Independent of the swap above and safe to run on every boot: the pipeline
+    # table needs a `service` column the old `leads` table never had. Kept
+    # separate so a crash between the RENAME and here self-heals next boot.
+    # Fresh inspector: the cached metadata above is stale after the RENAME.
+    prospect_columns = {c["name"] for c in inspect(engine).get_columns("prospects")}
+    if "service" not in prospect_columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE prospects ADD COLUMN service VARCHAR(100)")
+            )
+
+
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
+ensure_leads_prospects_swap()
 
 _seed_db = SessionLocal()
 try:

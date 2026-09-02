@@ -1,116 +1,73 @@
-VALID_PAYLOAD = {
-    "name": "Ada Lovelace",
-    "email": "ada@example.com",
-    "phone": "+52 555 000 0000",
-    "company": "Acme",
-    "service": "automatizaciones",
-    "message": "Quiero saber más",
-    "turnstile_token": "test-token",
-}
-
-
-def test_create_prospect_success(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
-    )
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 201
-    body = response.json()
-    assert body["name"] == "Ada Lovelace"
-    assert body["email"] == "ada@example.com"
-    assert "turnstile_token" not in body
-
-
-def test_create_prospect_turnstile_failure(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: False,
-    )
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 400
-
-
-def test_create_prospect_rate_limited(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
-    )
-    for i in range(5):
-        payload = {**VALID_PAYLOAD, "turnstile_token": f"test-token-{i}"}
-        assert client.post("/api/prospects/", json=payload).status_code == 201
-
-    payload = {**VALID_PAYLOAD, "turnstile_token": "test-token-5"}
-    response = client.post("/api/prospects/", json=payload)
-    assert response.status_code == 429
-
-
-def test_create_prospect_duplicate_token_rejected(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
-    )
-    first = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert first.status_code == 201
-
-    second = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert second.status_code == 409
+from .conftest import TestingSessionLocal
+from ..models.prospect import Prospect
 
 
 def test_list_prospects_requires_auth(client):
-    response = client.get("/api/prospects/")
-    assert response.status_code == 401
+    assert client.get("/api/prospects/").status_code == 401
 
 
-def test_delete_prospect_requires_auth(client):
-    response = client.delete("/api/prospects/1")
-    assert response.status_code == 401
+def test_list_prospects_requires_admin(non_admin_client):
+    assert non_admin_client.get("/api/prospects/").status_code == 403
 
 
-def test_create_prospect_dispatches_notification_to_configured_recipients(
-    client, auth_client, monkeypatch
-):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
+def test_admin_can_create_and_read_prospect(auth_client):
+    created = auth_client.post(
+        "/api/prospects/",
+        json={
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "service": "precio-fijo",
+            "source": "Web",
+        },
     )
+    assert created.status_code == 201
+    body = created.json()
+    assert body["service"] == "precio-fijo"
+    assert body["status"] == "new"
+    prospect_id = body["id"]
+
+    fetched = auth_client.get(f"/api/prospects/{prospect_id}")
+    assert fetched.status_code == 200
+    assert fetched.json()["name"] == "Ada Lovelace"
+
+
+def test_get_missing_prospect_returns_404(auth_client):
+    assert auth_client.get("/api/prospects/99999").status_code == 404
+
+
+def test_admin_can_update_prospect(auth_client):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "Grace", "source": "Web"}
+    )
+    prospect_id = created.json()["id"]
+
+    updated = auth_client.put(
+        f"/api/prospects/{prospect_id}",
+        json={"status": "qualified", "service": "equipo-dedicado"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["status"] == "qualified"
+    assert updated.json()["service"] == "equipo-dedicado"
+
+
+def test_admin_can_delete_prospect(auth_client):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "Temp", "source": "Web"}
+    )
+    prospect_id = created.json()["id"]
+    assert auth_client.delete(f"/api/prospects/{prospect_id}").status_code == 204
+    assert auth_client.delete(f"/api/prospects/{prospect_id}").status_code == 404
+
+
+def test_prospect_row_persists_service(auth_client):
     auth_client.post(
-        "/api/notifications/recipients", json={"email": "team@lyratech.com.mx"}
+        "/api/prospects/",
+        json={"name": "Persisted", "service": "diagnostico", "source": "Web"},
     )
-
-    captured = {}
-
-    def fake_send(prospect, recipient_emails):
-        captured["prospect_name"] = prospect.name
-        captured["recipient_emails"] = recipient_emails
-
-    monkeypatch.setattr(
-        "app.routers.prospects.send_prospect_notification_email", fake_send
-    )
-
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 201
-    assert captured["prospect_name"] == "Ada Lovelace"
-    assert captured["recipient_emails"] == ["team@lyratech.com.mx"]
-
-
-def test_create_prospect_dispatches_with_empty_list_when_no_recipients_configured(
-    client, monkeypatch
-):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
-    )
-
-    captured = {}
-
-    def fake_send(prospect, recipient_emails):
-        captured["recipient_emails"] = recipient_emails
-
-    monkeypatch.setattr(
-        "app.routers.prospects.send_prospect_notification_email", fake_send
-    )
-
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 201
-    assert captured["recipient_emails"] == []
+    db = TestingSessionLocal()
+    try:
+        row = db.query(Prospect).filter(Prospect.name == "Persisted").first()
+        assert row is not None
+        assert row.service == "diagnostico"
+    finally:
+        db.close()
