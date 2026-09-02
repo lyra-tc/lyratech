@@ -115,7 +115,8 @@ export const auth = {
       method: "POST",
       body: JSON.stringify({ email, full_name, password }),
     }),
-  me: () => request<UserInfo>("/api/auth/me"),
+  me: (options?: { skipAuthRedirect?: boolean }) =>
+    request<UserInfo>("/api/auth/me", options),
   updateProfile: (data: { full_name?: string; email?: string }) =>
     request<UserInfo>("/api/auth/me", {
       method: "PUT",

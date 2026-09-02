@@ -58,7 +58,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
   function handleLogout() {
     localStorage.removeItem("lyratech_token");
     localStorage.removeItem("lyratech_user");
-    router.push("/dashboard/login");
+    router.replace("/dashboard/login");
   }
 
   const initials = user?.full_name
