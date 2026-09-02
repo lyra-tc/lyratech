@@ -4,6 +4,7 @@ import React from "react";
 import { HiOutlineX } from "react-icons/hi";
 import type { Lead } from "@/lib/api";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/leadConstants";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 
 interface LeadViewModalProps {
   lead: Lead;
@@ -21,6 +22,8 @@ function formatDate(value: string) {
 }
 
 export default function LeadViewModal({ lead, onClose }: LeadViewModalProps) {
+  useEscapeKey(onClose);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button

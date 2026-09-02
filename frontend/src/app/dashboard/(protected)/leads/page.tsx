@@ -9,6 +9,7 @@ import {
 } from "react-icons/hi";
 import LeadFormModal from "@/components/Dashboard/LeadFormModal";
 import LeadViewModal from "@/components/Dashboard/LeadViewModal";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Dropdown from "@/components/shared/Dropdown";
 import { leadsApi } from "@/lib/api";
@@ -40,6 +41,8 @@ export default function LeadsPage() {
   const [editing, setEditing] = useState<Lead | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [viewing, setViewing] = useState<Lead | null>(null);
+
+  useEscapeKey(() => setDeleteId(null), deleteId !== null);
 
   const loadData = useCallback(async () => {
     try {

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { HiOutlineSearch, HiOutlineTrash, HiOutlineSwitchHorizontal } from "react-icons/hi";
 import LeadFormModal from "@/components/Dashboard/LeadFormModal";
 import LoadingDots from "@/components/shared/LoadingDots";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { prospectsApi } from "@/lib/api";
 import type { Prospect, LeadCreate } from "@/lib/api";
 
@@ -14,6 +15,8 @@ export default function ProspectsPage() {
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [converting, setConverting] = useState<Prospect | null>(null);
+
+  useEscapeKey(() => setDeleteId(null), deleteId !== null);
 
   const loadData = useCallback(async () => {
     try {

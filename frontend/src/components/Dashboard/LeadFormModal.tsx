@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { HiOutlineX, HiOutlineCheck } from "react-icons/hi";
 import { leadsApi } from "@/lib/api";
 import type { Lead, LeadCreate, LeadStatus } from "@/lib/api";
 import { STATUS_LABELS, SOURCES } from "@/lib/leadConstants";
 import Dropdown from "@/components/shared/Dropdown";
+import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { deepEqual } from "@/lib/deepEqual";
 
 const STATUS_OPTIONS = (Object.keys(STATUS_LABELS) as LeadStatus[]).map((s) => ({
   value: s,
@@ -34,10 +38,18 @@ function toFormValues(lead: Lead): LeadCreate {
 }
 
 export default function LeadFormModal({ editing, initialForm, onClose, onSaved }: LeadFormModalProps) {
-  const [form, setForm] = useState<LeadCreate>(editing ? toFormValues(editing) : initialForm);
+  const initialFormRef = useRef<LeadCreate>(editing ? toFormValues(editing) : initialForm);
+  const [form, setForm] = useState<LeadCreate>(initialFormRef.current);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const isDirty = !deepEqual(form, initialFormRef.current);
+  const { requestClose, confirmOpen, confirmDiscard, cancelDiscard } = useUnsavedChangesGuard({
+    isDirty,
+    onClose,
+  });
+  useEscapeKey(requestClose, !confirmOpen && !saving);
 
   function validateForm(): boolean {
     const errors: Record<string, string> = {};
@@ -71,11 +83,12 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
   }
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Cerrar"
-        onClick={onClose}
+        onClick={requestClose}
         className="fixed inset-0 bg-dark-blue/60 backdrop-blur-sm cursor-default"
       />
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-scale-in">
@@ -83,7 +96,7 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
           <h2 className="font-montserrat-bold text-dark-blue text-lg">
             {editing ? "Editar lead" : "Nuevo lead"}
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-beige text-dark-blue/50 hover:text-dark-blue transition-colors">
+          <button onClick={requestClose} className="p-1.5 rounded-lg hover:bg-beige text-dark-blue/50 hover:text-dark-blue transition-colors">
             <HiOutlineX size={18} />
           </button>
         </div>
@@ -185,7 +198,7 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
           )}
           <div className="flex gap-3 pt-2">
             <button
-              onClick={onClose}
+              onClick={requestClose}
               className="flex-1 border border-black/15 text-dark-blue/70 hover:text-dark-blue font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm hover:bg-beige"
             >
               Cancelar
@@ -202,5 +215,11 @@ export default function LeadFormModal({ editing, initialForm, onClose, onSaved }
         </div>
       </div>
     </div>
+    <DiscardChangesDialog
+      open={confirmOpen}
+      onConfirm={confirmDiscard}
+      onCancel={cancelDiscard}
+    />
+    </>
   );
 }

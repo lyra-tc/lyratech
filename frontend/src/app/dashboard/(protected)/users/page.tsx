@@ -10,6 +10,9 @@ import {
   HiOutlineX,
 } from "react-icons/hi";
 import LoadingDots from "@/components/shared/LoadingDots";
+import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
 import { auth, usersApi } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
@@ -33,6 +36,25 @@ export default function UsersPage() {
   const [passwordModal, setPasswordModal] = useState<PasswordModalState | null>(null);
   const [deleteModal, setDeleteModal] = useState<DeleteModalState | null>(null);
   const [newPassword, setNewPassword] = useState("");
+
+  const closePasswordModal = useCallback(() => {
+    setPasswordModal(null);
+    setNewPassword("");
+  }, []);
+
+  const passwordSaving = passwordModal !== null && passwordModal.userId === actionLoadingId;
+  const {
+    requestClose: requestClosePassword,
+    confirmOpen: passwordConfirmOpen,
+    confirmDiscard: passwordConfirmDiscard,
+    cancelDiscard: passwordCancelDiscard,
+  } = useUnsavedChangesGuard({ isDirty: newPassword.trim() !== "", onClose: closePasswordModal });
+
+  useEscapeKey(
+    requestClosePassword,
+    passwordModal !== null && !passwordConfirmOpen && !passwordSaving
+  );
+  useEscapeKey(() => setDeleteModal(null), deleteModal !== null && !passwordConfirmOpen);
 
   const loadUsers = useCallback(async () => {
     const list = await usersApi.list();
@@ -273,10 +295,7 @@ export default function UsersPage() {
           <button
             type="button"
             aria-label="Cerrar modal"
-            onClick={() => {
-              setPasswordModal(null);
-              setNewPassword("");
-            }}
+            onClick={requestClosePassword}
             className="fixed inset-0 bg-dark-blue/60 backdrop-blur-sm"
           />
           <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl">
@@ -288,10 +307,7 @@ export default function UsersPage() {
                 </p>
               </div>
               <button
-                onClick={() => {
-                  setPasswordModal(null);
-                  setNewPassword("");
-                }}
+                onClick={requestClosePassword}
                 className="rounded-lg p-1.5 text-dark-blue/50 transition-colors hover:bg-beige hover:text-dark-blue"
               >
                 <HiOutlineX size={18} />
@@ -312,10 +328,7 @@ export default function UsersPage() {
               </div>
               <div className="flex gap-3">
                 <button
-                  onClick={() => {
-                    setPasswordModal(null);
-                    setNewPassword("");
-                  }}
+                  onClick={requestClosePassword}
                   className="flex-1 rounded-xl border border-black/15 py-2.5 text-sm font-montserrat font-semibold text-dark-blue/70 transition-all hover:bg-beige"
                 >
                   Cancelar
@@ -332,6 +345,12 @@ export default function UsersPage() {
           </div>
         </div>
       )}
+
+      <DiscardChangesDialog
+        open={passwordConfirmOpen}
+        onConfirm={passwordConfirmDiscard}
+        onCancel={passwordCancelDiscard}
+      />
 
       {deleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

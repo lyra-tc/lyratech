@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { HiOutlineSearch, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
 import LoadingDots from "@/components/shared/LoadingDots";
 import DiagnosticSubmissionDetail from "@/components/Dashboard/DiagnosticSubmissionDetail";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { diagnosticsApi } from "@/lib/api";
 import type { DiagnosticSubmissionListItem } from "@/lib/api";
 
@@ -26,6 +27,8 @@ export default function DiagnosticsPage() {
   const [loading, setLoading] = useState(true);
   const [viewingId, setViewingId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+
+  useEscapeKey(() => setDeleteId(null), deleteId !== null);
 
   const loadData = useCallback(async () => {
     setLoading(true);

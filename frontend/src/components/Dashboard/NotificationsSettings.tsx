@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { HiOutlineCheck, HiOutlineMail, HiOutlineTrash } from "react-icons/hi";
 import { notificationsApi } from "@/lib/api";
 import LoadingDots from "@/components/shared/LoadingDots";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 import type { NotificationRecipient } from "@/lib/api";
 
 export default function NotificationsSettings() {
@@ -15,6 +16,8 @@ export default function NotificationsSettings() {
   const [deleteRecipientId, setDeleteRecipientId] = useState<number | null>(null);
   const [removingRecipientId, setRemovingRecipientId] = useState<number | null>(null);
   const [testingRecipientId, setTestingRecipientId] = useState<number | null>(null);
+
+  useEscapeKey(() => setDeleteRecipientId(null), deleteRecipientId !== null);
 
   const inputClass =
     "w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all bg-white";

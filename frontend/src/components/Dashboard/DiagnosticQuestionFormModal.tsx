@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { HiOutlineX, HiOutlineCheck, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
 import { diagnosticsApi } from "@/lib/api";
+import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { deepEqual } from "@/lib/deepEqual";
 import type {
   DiagnosticQuestion,
   DiagnosticQuestionConfig,
@@ -82,6 +86,18 @@ function toFormValues(question: DiagnosticQuestion | null): FormState {
   };
 }
 
+// Drop the client-only `_clientId` so a form can be structurally compared to
+// its initial snapshot for the unsaved-changes guard.
+function normalizeForm(form: FormState) {
+  return {
+    ...form,
+    config_json: {
+      ...form.config_json,
+      options: toApiOptions(form.config_json.options),
+    },
+  };
+}
+
 function toApiOptions(options: OptionWithClientId[]): DiagnosticQuestionOption[] {
   return options.map((option) => ({
     value: option.value,
@@ -105,10 +121,18 @@ export default function DiagnosticQuestionFormModal({
   onClose,
   onSaved,
 }: DiagnosticQuestionFormModalProps) {
-  const [form, setForm] = useState<FormState>(toFormValues(editing));
+  const initialFormRef = useRef<FormState>(toFormValues(editing));
+  const [form, setForm] = useState<FormState>(initialFormRef.current);
   const [activeLocale, setActiveLocale] = useState<"es" | "en" | "fr" | "de">("es");
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+
+  const isDirty = !deepEqual(normalizeForm(form), normalizeForm(initialFormRef.current));
+  const { requestClose, confirmOpen, confirmDiscard, cancelDiscard } = useUnsavedChangesGuard({
+    isDirty,
+    onClose,
+  });
+  useEscapeKey(requestClose, !confirmOpen && !saving);
 
   function updateLabel(locale: string, value: string) {
     setForm((prev) => ({
@@ -177,11 +201,12 @@ export default function DiagnosticQuestionFormModal({
   }
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Cerrar"
-        onClick={onClose}
+        onClick={requestClose}
         className="fixed inset-0 bg-dark-blue/60 backdrop-blur-sm cursor-default"
       />
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in">
@@ -189,7 +214,7 @@ export default function DiagnosticQuestionFormModal({
           <h2 className="font-montserrat-bold text-dark-blue text-lg">
             {editing ? "Editar pregunta" : "Nueva pregunta"}
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-beige text-dark-blue/50 hover:text-dark-blue transition-colors">
+          <button onClick={requestClose} className="p-1.5 rounded-lg hover:bg-beige text-dark-blue/50 hover:text-dark-blue transition-colors">
             <HiOutlineX size={18} />
           </button>
         </div>
@@ -334,7 +359,7 @@ export default function DiagnosticQuestionFormModal({
 
           <div className="flex gap-3 pt-2">
             <button
-              onClick={onClose}
+              onClick={requestClose}
               className="flex-1 border border-black/15 text-dark-blue/70 hover:text-dark-blue font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm hover:bg-beige"
             >
               Cancelar
@@ -351,5 +376,11 @@ export default function DiagnosticQuestionFormModal({
         </div>
       </div>
     </div>
+    <DiscardChangesDialog
+      open={confirmOpen}
+      onConfirm={confirmDiscard}
+      onCancel={cancelDiscard}
+    />
+    </>
   );
 }
