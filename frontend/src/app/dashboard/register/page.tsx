@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,12 +16,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem("lyratech_token")) {
-      router.replace("/dashboard/leads");
-    }
-  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -250,6 +250,19 @@ Manual verification checklist, documented in the plan:
 3. All active dashboard sessions end once (expected, accepted). The orphaned
    `localStorage.lyratech_token` on clients is inert and can be ignored.
 
+## Implementation notes (deviations from the draft above)
+
+- **Middleware does NOT redirect a cookie-bearing request away from `/dashboard/login`.**
+  An expired cookie still physically exists in the browser; if the middleware
+  bounced it to `/dashboard/leads`, the protected layout's `auth.me()` would 401
+  and bounce it back — an infinite loop. Middleware only redirects *missing*-cookie
+  requests to login. "Already logged in → skip the form" is instead handled by the
+  login page calling `auth.me()` on mount and `router.replace`-ing to
+  `/dashboard/leads` only on success.
+- **The protected layout calls `auth.logout()` in its `auth.me()` catch** before
+  redirecting, so a stale cookie is cleared and the middleware stops seeing the
+  browser as "has a session" on the next navigation.
+
 ## Risks
 
 - **Next middleware reading a non-`NEXT_PUBLIC_` runtime env:** avoided by passing

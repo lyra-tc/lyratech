@@ -2,10 +2,11 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from ..core.cookies import clear_session_cookie, set_session_cookie
 from ..core.deps import get_current_user, get_db
 from ..core.limiter import limiter
 from ..core.security import create_access_token, get_password_hash, verify_password
@@ -33,7 +34,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=Token)
 @limiter.limit("5/minute")
-def login(request: Request, body: LoginRequest, db: Session = Depends(get_db)):
+def login(
+    request: Request,
+    response: Response,
+    body: LoginRequest,
+    db: Session = Depends(get_db),
+):
     user = db.query(User).filter(User.email == body.email).first()
     if not user or not verify_password(body.password, user.hashed_password):
         logger.warning(
@@ -57,7 +63,13 @@ def login(request: Request, body: LoginRequest, db: Session = Depends(get_db)):
         request.client.host if request.client else "unknown",
     )
     token = create_access_token({"sub": user.email})
+    set_session_cookie(response, token)
     return {"access_token": token, "token_type": "bearer"}
+
+
+@router.post("/logout", status_code=204)
+def logout(response: Response):
+    clear_session_cookie(response)
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)

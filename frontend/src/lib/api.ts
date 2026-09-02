@@ -10,28 +10,25 @@ export class ApiError extends Error {
   }
 }
 
-function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("lyratech_token");
-}
-
 async function request<T>(
   path: string,
   options: RequestInit & { skipAuthRedirect?: boolean } = {}
 ): Promise<T> {
   const { skipAuthRedirect, ...fetchOptions } = options;
-  const token = getToken();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(fetchOptions.headers as Record<string, string>),
   };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_URL}${path}`, { ...fetchOptions, headers });
+  // Auth travels in an httpOnly session cookie, so every request must send
+  // credentials (the frontend and API share the lyratech.com.mx parent domain).
+  const res = await fetch(`${API_URL}${path}`, {
+    ...fetchOptions,
+    headers,
+    credentials: "include",
+  });
 
   if (res.status === 401 && !skipAuthRedirect) {
-    localStorage.removeItem("lyratech_token");
-    localStorage.removeItem("lyratech_user");
     window.location.href = "/dashboard/login";
     throw new Error("No autorizado");
   }
@@ -59,16 +56,6 @@ export interface UserInfo {
   is_admin: boolean;
   is_superadmin: boolean;
   created_at: string;
-}
-
-export function getCachedUser(): UserInfo | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem("lyratech_user");
-    return raw ? (JSON.parse(raw) as UserInfo) : null;
-  } catch {
-    return null;
-  }
 }
 
 export interface Lead {
@@ -117,6 +104,8 @@ export const auth = {
     }),
   me: (options?: { skipAuthRedirect?: boolean }) =>
     request<UserInfo>("/api/auth/me", options),
+  logout: () =>
+    request<void>("/api/auth/logout", { method: "POST", skipAuthRedirect: true }),
   updateProfile: (data: { full_name?: string; email?: string }) =>
     request<UserInfo>("/api/auth/me", {
       method: "PUT",

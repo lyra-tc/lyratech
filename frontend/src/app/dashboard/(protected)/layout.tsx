@@ -23,25 +23,22 @@ export default function ProtectedDashboardLayout({ children }: { children: React
   const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    if (!localStorage.getItem("lyratech_token")) {
-      setStatus("unauthenticated");
-      router.replace("/dashboard/login");
-      return;
-    }
-
+    // The middleware already blocked this route unless a session cookie is
+    // present, so here we only need to confirm the cookie is still valid.
     let cancelled = false;
     auth
       .me({ skipAuthRedirect: true })
       .then((me) => {
         if (cancelled) return;
         setUser(me);
-        localStorage.setItem("lyratech_user", JSON.stringify(me));
         setStatus("authenticated");
       })
-      .catch(() => {
+      .catch(async () => {
         if (cancelled) return;
-        localStorage.removeItem("lyratech_token");
-        localStorage.removeItem("lyratech_user");
+        // Clear the stale cookie so the middleware stops treating the browser
+        // as "has a session" on the next navigation.
+        await auth.logout().catch(() => {});
+        if (cancelled) return;
         setStatus("unauthenticated");
         router.replace("/dashboard/login");
       });
@@ -53,7 +50,7 @@ export default function ProtectedDashboardLayout({ children }: { children: React
 
   // Never render the dashboard (nor its child pages / API calls) until we have
   // confirmed a valid session. Prevents the "dashboard flash then bounce to
-  // login" seen with expired tokens or users who never signed in.
+  // login" seen with an expired session cookie.
   if (status !== "authenticated" || !user) {
     return <FullScreenLoader />;
   }

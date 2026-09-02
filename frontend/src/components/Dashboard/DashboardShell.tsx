@@ -18,6 +18,7 @@ import {
   HiOutlineUsers,
 } from "react-icons/hi";
 import Logo from "@/assets/images/Navbar/White_Logo.png";
+import { auth } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
@@ -55,9 +56,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
     setMobileMoreOpen(false);
   }, [pathname]);
 
-  function handleLogout() {
-    localStorage.removeItem("lyratech_token");
-    localStorage.removeItem("lyratech_user");
+  async function handleLogout() {
+    try {
+      await auth.logout();
+    } catch {
+      /* clear the cookie best-effort; redirect regardless */
+    }
     router.replace("/dashboard/login");
   }
 
