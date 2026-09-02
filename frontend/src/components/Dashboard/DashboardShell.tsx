@@ -22,8 +22,8 @@ import { auth } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
-  { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineInboxIn },
   { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineUsers },
+  { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineInboxIn },
   { label: "Diagnosticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
   { label: "Preguntas", mobileLabel: "Preg.", href: "/dashboard/diagnostics/questions", icon: HiOutlineClipboardList },
   { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail },

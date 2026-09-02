@@ -25,7 +25,7 @@ function LoginForm() {
     auth
       .me({ skipAuthRedirect: true })
       .then(() => {
-        if (!cancelled) router.replace("/dashboard/leads");
+        if (!cancelled) router.replace("/dashboard/prospects");
       })
       .catch(() => {
         /* no valid session — stay on the login form */
@@ -57,7 +57,7 @@ function LoginForm() {
 
     try {
       await auth.login(email, password);
-      router.push("/dashboard/leads");
+      router.push("/dashboard/prospects");
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 429) {
         setLockedSecondsLeft(err.retryAfterSeconds ?? 60);

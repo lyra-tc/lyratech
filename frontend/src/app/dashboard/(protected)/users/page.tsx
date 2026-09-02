@@ -69,7 +69,7 @@ export default function UsersPage() {
       try {
         const me = await auth.me();
         if (!me.is_admin) {
-          router.replace("/dashboard/leads");
+          router.replace("/dashboard/prospects");
           return;
         }
 
