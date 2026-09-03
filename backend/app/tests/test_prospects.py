@@ -94,3 +94,84 @@ def test_prospect_rejects_removed_status_value(auth_client):
 def test_prospect_default_status_is_meeting_to_schedule(auth_client):
     created = auth_client.post("/api/prospects/", json={"name": "D", "source": "Web"})
     assert created.json()["status"] == "meeting_to_schedule"
+
+
+def test_booking_flow_sets_meeting_scheduled(auth_client):
+    created = auth_client.post("/api/prospects/", json={"name": "B", "source": "Web"})
+    prospect_id = created.json()["id"]
+
+    updated = auth_client.put(
+        f"/api/prospects/{prospect_id}", json={"status": "meeting_scheduled"}
+    )
+    assert updated.status_code == 200
+    assert updated.json()["status"] == "meeting_scheduled"
+
+
+def test_create_prospect_rejects_meeting_scheduled(auth_client):
+    created = auth_client.post(
+        "/api/prospects/",
+        json={"name": "X", "source": "Web", "status": "meeting_scheduled"},
+    )
+    assert created.status_code == 422
+    assert (
+        created.json()["detail"]
+        == "No se puede crear un prospecto directamente en Reunión agendada"
+    )
+
+
+def test_meeting_scheduled_can_move_to_lost(auth_client):
+    pid = auth_client.post(
+        "/api/prospects/", json={"name": "M", "source": "Web"}
+    ).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
+
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"status": "lost"})
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "lost"
+
+
+@pytest.mark.parametrize("target", ["meeting_to_schedule", "call_later"])
+def test_meeting_scheduled_locked_from_reverting(auth_client, target):
+    pid = auth_client.post(
+        "/api/prospects/", json={"name": "L", "source": "Web"}
+    ).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
+
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"status": target})
+    assert resp.status_code == 409
+    assert (
+        resp.json()["detail"]
+        == "Un prospecto en Reunión agendada solo puede pasar a Perdido"
+    )
+
+
+def test_meeting_scheduled_can_be_re_saved_unchanged(auth_client):
+    pid = auth_client.post("/api/prospects/", json={"name": "R", "source": "Web"}).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
+
+    resp = auth_client.put(
+        f"/api/prospects/{pid}", json={"status": "meeting_scheduled", "notes": "x"}
+    )
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "meeting_scheduled"
+    assert resp.json()["notes"] == "x"
+
+
+def test_meeting_scheduled_field_edit_without_status(auth_client):
+    pid = auth_client.post("/api/prospects/", json={"name": "F", "source": "Web"}).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
+
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"notes": "edited"})
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "meeting_scheduled"
+    assert resp.json()["notes"] == "edited"
+
+
+@pytest.mark.parametrize("start", ["call_later", "lost"])
+def test_meeting_scheduled_not_assignable_from_other_statuses(auth_client, start):
+    pid = auth_client.post(
+        "/api/prospects/", json={"name": "N", "source": "Web", "status": start}
+    ).json()["id"]
+
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
+    assert resp.status_code == 409

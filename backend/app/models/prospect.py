@@ -7,6 +7,7 @@ from ..database import Base
 class ProspectStatus(str, enum.Enum):
     meeting_to_schedule = "meeting_to_schedule"
     call_later = "call_later"
+    meeting_scheduled = "meeting_scheduled"
     lost = "lost"
 
 

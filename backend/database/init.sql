@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS prospects (
     phone       VARCHAR(50),
     company     VARCHAR(255),
     service     VARCHAR(100),
-    status      ENUM('meeting_to_schedule','call_later','lost') NOT NULL DEFAULT 'meeting_to_schedule',
+    status      ENUM('meeting_to_schedule','call_later','meeting_scheduled','lost') NOT NULL DEFAULT 'meeting_to_schedule',
     source      VARCHAR(100),
     notes       TEXT,
     assigned_to INT,

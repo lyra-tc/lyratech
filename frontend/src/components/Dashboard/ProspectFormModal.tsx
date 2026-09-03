@@ -11,11 +11,6 @@ import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
 import { deepEqual } from "@/lib/deepEqual";
 
-const STATUS_OPTIONS = (Object.keys(STATUS_LABELS) as ProspectStatus[]).map((s) => ({
-  value: s,
-  label: STATUS_LABELS[s],
-}));
-
 const SOURCE_OPTIONS = SOURCES.map((s) => ({ value: s, label: s }));
 
 interface ProspectFormModalProps {
@@ -51,6 +46,14 @@ export default function ProspectFormModal({ editing, initialForm, onClose, onSav
     onClose,
   });
   useEscapeKey(requestClose, !confirmOpen && !saving);
+
+  // "Reunión agendada" is reachable only through the booking flow (never a
+  // manual pick). Once a prospect is there, the only allowed move is "Perdido".
+  const statusOptions = (
+    editing?.status === "meeting_scheduled"
+      ? (["meeting_scheduled", "lost"] as ProspectStatus[])
+      : (["meeting_to_schedule", "call_later", "lost"] as ProspectStatus[])
+  ).map((s) => ({ value: s, label: STATUS_LABELS[s] }));
 
   function validateForm(): boolean {
     const errors: Record<string, string> = {};
@@ -175,7 +178,7 @@ export default function ProspectFormModal({ editing, initialForm, onClose, onSav
               <Dropdown
                 value={form.status ?? "meeting_to_schedule"}
                 onChange={(v) => setForm({ ...form, status: v as ProspectStatus })}
-                options={STATUS_OPTIONS}
+                options={statusOptions}
               />
             </div>
             <div>

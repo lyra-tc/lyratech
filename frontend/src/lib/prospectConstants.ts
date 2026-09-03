@@ -3,12 +3,14 @@ import type { ProspectStatus } from "@/lib/api";
 export const STATUS_LABELS: Record<ProspectStatus, string> = {
   meeting_to_schedule: "Agendar reunión",
   call_later: "Llamar más tarde",
+  meeting_scheduled: "Reunión agendada",
   lost: "Perdido",
 };
 
 export const STATUS_COLORS: Record<ProspectStatus, string> = {
   meeting_to_schedule: "bg-blue/20 text-blue border-blue/30",
   call_later: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30",
+  meeting_scheduled: "bg-lyratech-purple/20 text-lyratech-purple border-lyratech-purple/30",
   lost: "bg-red/20 text-red border-red/30",
 };
 

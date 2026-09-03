@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from ..core.deps import get_db, get_current_admin
-from ..models.prospect import Prospect
+from ..models.prospect import Prospect, ProspectStatus
 from ..models.user import User
 from ..schemas.prospect import ProspectCreate, ProspectUpdate, ProspectResponse
 
@@ -31,6 +31,11 @@ def create_prospect(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
+    if body.status == ProspectStatus.meeting_scheduled:
+        raise HTTPException(
+            status_code=422,
+            detail="No se puede crear un prospecto directamente en Reunión agendada",
+        )
     prospect = Prospect(**body.model_dump())
     db.add(prospect)
     db.commit()
@@ -61,7 +66,27 @@ def update_prospect(
     if not prospect:
         raise HTTPException(status_code=404, detail="Prospecto no encontrado")
 
-    for field, value in body.model_dump(exclude_unset=True).items():
+    data = body.model_dump(exclude_unset=True)
+    new_status = data.get("status")
+    if (
+        prospect.status == ProspectStatus.meeting_scheduled
+        and new_status in (ProspectStatus.meeting_to_schedule, ProspectStatus.call_later)
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail="Un prospecto en Reunión agendada solo puede pasar a Perdido",
+        )
+    if (
+        new_status == ProspectStatus.meeting_scheduled
+        and prospect.status
+        not in (ProspectStatus.meeting_to_schedule, ProspectStatus.meeting_scheduled)
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail="Reunión agendada solo se puede asignar desde Agendar reunión",
+        )
+
+    for field, value in data.items():
         setattr(prospect, field, value)
 
     db.commit()

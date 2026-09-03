@@ -6,9 +6,11 @@ import {
   HiOutlineSearch,
   HiOutlinePencil,
   HiOutlineTrash,
+  HiOutlineCalendar,
 } from "react-icons/hi";
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
 import ProspectViewModal from "@/components/Dashboard/ProspectViewModal";
+import BookingModal from "@/components/shared/BookingModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Dropdown from "@/components/shared/Dropdown";
@@ -42,8 +44,13 @@ export default function ProspectsPage() {
   const [editing, setEditing] = useState<Prospect | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [viewing, setViewing] = useState<Prospect | null>(null);
+  const [bookingProspect, setBookingProspect] = useState<Prospect | null>(null);
+  const [confirmBooked, setConfirmBooked] = useState<Prospect | null>(null);
+  const [bookingError, setBookingError] = useState("");
+  const [markingBooked, setMarkingBooked] = useState(false);
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
+  useEscapeKey(() => closeConfirmBooked(), confirmBooked !== null && !markingBooked);
 
   const loadData = useCallback(async () => {
     try {
@@ -102,10 +109,39 @@ export default function ProspectsPage() {
     }
   }
 
+  function closeConfirmBooked() {
+    setConfirmBooked(null);
+    setBookingError("");
+  }
+
+  function handleBookingClose() {
+    const prospect = bookingProspect;
+    setBookingProspect(null);
+    if (prospect) {
+      setBookingError("");
+      setConfirmBooked(prospect);
+    }
+  }
+
+  async function confirmMeetingScheduled(prospect: Prospect) {
+    setMarkingBooked(true);
+    setBookingError("");
+    try {
+      const saved = await prospectsApi.update(prospect.id, { status: "meeting_scheduled" });
+      handleSaved(saved);
+      closeConfirmBooked();
+    } catch (err: unknown) {
+      setBookingError(err instanceof Error ? err.message : "Error al actualizar el estado");
+    } finally {
+      setMarkingBooked(false);
+    }
+  }
+
   const stats = {
     total: prospects.length,
     toSchedule: prospects.filter((p) => p.status === "meeting_to_schedule").length,
     callLater: prospects.filter((p) => p.status === "call_later").length,
+    scheduled: prospects.filter((p) => p.status === "meeting_scheduled").length,
     lost: prospects.filter((p) => p.status === "lost").length,
   };
 
@@ -164,9 +200,20 @@ export default function ProspectsPage() {
                   <span className="font-montserrat text-dark-blue/60 text-sm">{prospect.service || "—"}</span>
                 </td>
                 <td className="px-4 py-3.5">
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-montserrat font-semibold border ${STATUS_COLORS[prospect.status]}`}>
-                    {STATUS_LABELS[prospect.status]}
-                  </span>
+                  {prospect.status === "meeting_to_schedule" ? (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setBookingProspect(prospect); }}
+                      title="Agendar reunión"
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-montserrat font-semibold border transition-all hover:brightness-95 hover:scale-[1.03] ${STATUS_COLORS[prospect.status]}`}
+                    >
+                      <HiOutlineCalendar size={13} />
+                      {STATUS_LABELS[prospect.status]}
+                    </button>
+                  ) : (
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-montserrat font-semibold border ${STATUS_COLORS[prospect.status]}`}>
+                      {STATUS_LABELS[prospect.status]}
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3.5">
                   <span className="font-montserrat text-dark-blue/60 text-sm">{prospect.source || "—"}</span>
@@ -219,11 +266,12 @@ export default function ProspectsPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
           {[
             { label: "Total", value: stats.total, color: "bg-dark-blue" },
             { label: "Agendar reunión", value: stats.toSchedule, color: "bg-blue" },
             { label: "Llamar más tarde", value: stats.callLater, color: "bg-yellow-500" },
+            { label: "Reunión agendada", value: stats.scheduled, color: "bg-lyratech-purple" },
             { label: "Perdidos", value: stats.lost, color: "bg-red" },
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-white rounded-xl p-4 shadow-sm border border-black/5">
@@ -265,6 +313,53 @@ export default function ProspectsPage() {
 
       {/* View Modal */}
       {viewing && <ProspectViewModal prospect={viewing} onClose={() => setViewing(null)} />}
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={bookingProspect !== null}
+        onClose={handleBookingClose}
+        title={bookingProspect ? `Agendar reunión con ${bookingProspect.name}` : "Agendar reunión"}
+      />
+
+      {/* Confirm meeting scheduled */}
+      {confirmBooked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={() => !markingBooked && closeConfirmBooked()}
+            className="fixed inset-0 bg-dark-blue/60 backdrop-blur-sm cursor-default"
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-scale-in">
+            <h3 className="font-montserrat-bold text-dark-blue text-lg mb-2">¿Ya agendaste la reunión?</h3>
+            <p className="font-montserrat text-dark-blue/60 text-sm mb-6">
+              Marca a <span className="font-semibold text-dark-blue">{confirmBooked.name}</span> como{" "}
+              <span className="font-semibold">Reunión agendada</span> si completaste el agendado en el calendario.
+            </p>
+            {bookingError && (
+              <div className="bg-red/10 border border-red/30 text-red rounded-lg px-3 py-2 text-xs font-montserrat mb-4">
+                {bookingError}
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={closeConfirmBooked}
+                disabled={markingBooked}
+                className="flex-1 border border-black/15 text-dark-blue/70 font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm hover:bg-beige disabled:opacity-50"
+              >
+                Todavía no
+              </button>
+              <button
+                onClick={() => confirmMeetingScheduled(confirmBooked)}
+                disabled={markingBooked}
+                className="flex-1 bg-lyratech-purple hover:bg-button-light-purple text-white font-montserrat font-semibold py-2.5 rounded-xl transition-all text-sm disabled:opacity-50"
+              >
+                {markingBooked ? "Guardando..." : "Sí, marcar como agendada"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create / Edit Modal */}
       {showModal && (
