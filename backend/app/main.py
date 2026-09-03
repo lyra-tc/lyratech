@@ -137,9 +137,11 @@ def ensure_prospect_status_schema() -> None:
     cols = {c["name"]: c for c in inspector.get_columns("prospects")}
     status_enums = set(getattr(cols.get("status", {}).get("type", None), "enums", []) or [])
 
-    if status_enums - {"meeting_to_schedule", "call_later", "lost"}:
-        # Any value outside the 3 targets -> widen to a superset, remap
-        # everything non-lost to meeting_to_schedule, then narrow.
+    if status_enums != {"meeting_to_schedule", "call_later", "lost"}:
+        # ENUM doesn't exactly match the 3 targets (legacy values present, or a
+        # target value like call_later missing after an earlier 2-state pass) ->
+        # widen to a superset, remap everything non-lost to meeting_to_schedule,
+        # then narrow.
         with engine.begin() as connection:
             connection.execute(text(
                 "ALTER TABLE prospects MODIFY COLUMN status "
