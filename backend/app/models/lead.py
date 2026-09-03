@@ -11,6 +11,8 @@ class Lead(Base):
     email = Column(String(255))
     phone = Column(String(50))
     company = Column(String(255))
+    industry = Column(String(120))
+    address = Column(String(255))
     service = Column(String(100))
     message = Column(Text)
     created_at = Column(DateTime, server_default=func.now())

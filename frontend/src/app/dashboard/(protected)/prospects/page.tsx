@@ -28,6 +28,7 @@ const EMPTY_FORM: ProspectCreate = {
   email: "",
   phone: "",
   company: "",
+  industry: "",
   service: "",
   status: "meeting_to_schedule",
   source: "",
@@ -190,7 +191,10 @@ export default function ProspectsPage() {
                   </p>
                 </td>
                 <td className="px-4 py-3.5">
-                  <span className="font-montserrat text-dark-blue/70 text-sm">{prospect.company || "—"}</span>
+                  <p className="font-montserrat text-dark-blue/70 text-sm">{prospect.company || "—"}</p>
+                  {prospect.industry && (
+                    <p className="font-montserrat text-dark-blue/40 text-xs mt-0.5">{prospect.industry}</p>
+                  )}
                 </td>
                 <td className="px-4 py-3.5">
                   <p className="font-montserrat text-dark-blue/70 text-sm">{prospect.email || "—"}</p>

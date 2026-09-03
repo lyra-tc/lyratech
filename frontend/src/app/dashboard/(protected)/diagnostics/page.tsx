@@ -179,6 +179,7 @@ export default function DiagnosticsPage() {
           email: submission.email,
           phone,
           company: submission.company || "",
+          industry: "",
           service: serviceLabel,
           status: "meeting_to_schedule",
           source: "Diagnóstico GO",

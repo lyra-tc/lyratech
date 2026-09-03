@@ -67,6 +67,8 @@ export interface Lead {
   email?: string;
   phone?: string;
   company?: string;
+  industry?: string;
+  address?: string;
   service?: string;
   message?: string;
   created_at: string;
@@ -77,6 +79,8 @@ export interface LeadManualCreate {
   email?: string;
   phone?: string;
   company?: string;
+  industry?: string;
+  address?: string;
   service?: string;
   message?: string;
 }
@@ -99,6 +103,7 @@ export interface Prospect {
   email?: string;
   phone?: string;
   company?: string;
+  industry?: string;
   service?: string;
   status: ProspectStatus;
   source?: string;
@@ -113,6 +118,7 @@ export interface ProspectCreate {
   email?: string;
   phone?: string;
   company?: string;
+  industry?: string;
   service?: string;
   status?: ProspectStatus;
   source?: string;

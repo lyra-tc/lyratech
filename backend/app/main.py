@@ -175,6 +175,26 @@ def ensure_prospect_status_schema() -> None:
             ))
 
 
+def ensure_industry_address_schema() -> None:
+    if engine.dialect.name != "mysql":
+        return  # SQLite/pytest builds the columns from the models
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+    if "leads" in tables:
+        cols = {c["name"] for c in inspector.get_columns("leads")}
+        if "industry" not in cols:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE leads ADD COLUMN industry VARCHAR(120)"))
+        if "address" not in cols:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE leads ADD COLUMN address VARCHAR(255)"))
+    if "prospects" in tables:
+        cols = {c["name"] for c in inspect(engine).get_columns("prospects")}
+        if "industry" not in cols:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE prospects ADD COLUMN industry VARCHAR(120)"))
+
+
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
 ensure_leads_prospects_swap()
@@ -182,6 +202,7 @@ ensure_leads_email_nullable_schema()
 ensure_diagnostic_conversion_schema()
 ensure_email_delivery_tracking_schema()
 ensure_prospect_status_schema()
+ensure_industry_address_schema()
 
 _seed_db = SessionLocal()
 try:

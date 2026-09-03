@@ -19,6 +19,7 @@ class Prospect(Base):
     email = Column(String(255))
     phone = Column(String(50))
     company = Column(String(255))
+    industry = Column(String(120))
     service = Column(String(100))
     status = Column(Enum(ProspectStatus), nullable=False, default=ProspectStatus.meeting_to_schedule)
     source = Column(String(100))

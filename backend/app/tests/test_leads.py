@@ -212,3 +212,41 @@ def test_update_lead_accepts_empty_email_string(auth_client):
 def test_update_lead_rejects_blank_name(auth_client):
     lead_id = auth_client.post("/api/leads/manual", json={"name": "K", "phone": "5"}).json()["id"]
     assert auth_client.put(f"/api/leads/{lead_id}", json={"name": "  "}).status_code == 422
+
+
+def test_manual_lead_persists_industry_and_address(auth_client):
+    resp = auth_client.post(
+        "/api/leads/manual",
+        json={
+            "name": "Giro Co",
+            "phone": "555",
+            "industry": "Manufactura",
+            "address": "Av. Siempre Viva 742",
+        },
+    )
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["industry"] == "Manufactura"
+    assert body["address"] == "Av. Siempre Viva 742"
+
+    listed = auth_client.get("/api/leads/").json()
+    row = next(x for x in listed if x["id"] == body["id"])
+    assert row["industry"] == "Manufactura"
+    assert row["address"] == "Av. Siempre Viva 742"
+
+
+def test_update_lead_industry_address(auth_client):
+    lead_id = auth_client.post(
+        "/api/leads/manual", json={"name": "L", "phone": "5"}
+    ).json()["id"]
+    resp = auth_client.put(
+        f"/api/leads/{lead_id}", json={"industry": "Retail", "address": "Calle 1"}
+    )
+    assert resp.status_code == 200
+    assert resp.json()["industry"] == "Retail"
+    assert resp.json()["address"] == "Calle 1"
+
+    listed = auth_client.get("/api/leads/").json()
+    row = next(x for x in listed if x["id"] == lead_id)
+    assert row["industry"] == "Retail"
+    assert row["address"] == "Calle 1"

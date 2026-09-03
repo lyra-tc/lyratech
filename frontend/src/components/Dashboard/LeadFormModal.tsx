@@ -16,6 +16,8 @@ const EMPTY_FORM: LeadManualCreate = {
   email: "",
   phone: "",
   company: "",
+  industry: "",
+  address: "",
   service: "",
   message: "",
 };
@@ -32,6 +34,8 @@ function toFormValues(lead: Lead): LeadManualCreate {
     email: lead.email || "",
     phone: lead.phone || "",
     company: lead.company || "",
+    industry: lead.industry || "",
+    address: lead.address || "",
     service: lead.service || "",
     message: lead.message || "",
   };
@@ -153,6 +157,28 @@ export default function LeadFormModal({ editing, onClose, onSaved }: LeadFormMod
                 onChange={(e) => setForm({ ...form, company: e.target.value })}
                 className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
                 placeholder="Nombre de la empresa"
+              />
+            </div>
+
+            <div>
+              <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Giro de empresa</label>
+              <input
+                type="text"
+                value={form.industry ?? ""}
+                onChange={(e) => setForm({ ...form, industry: e.target.value })}
+                className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
+                placeholder="Ej. manufactura, retail, salud"
+              />
+            </div>
+
+            <div>
+              <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Dirección</label>
+              <textarea
+                value={form.address ?? ""}
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                rows={2}
+                className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all resize-none"
+                placeholder="Dirección de la empresa"
               />
             </div>
 

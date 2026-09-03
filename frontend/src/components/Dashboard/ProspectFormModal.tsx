@@ -27,6 +27,7 @@ function toFormValues(prospect: Prospect): ProspectCreate {
     email: prospect.email || "",
     phone: prospect.phone || "",
     company: prospect.company || "",
+    industry: prospect.industry || "",
     service: prospect.service || "",
     status: prospect.status,
     source: prospect.source || "",
@@ -165,6 +166,17 @@ export default function ProspectFormModal({ editing, initialForm, onClose, onSav
               onChange={(e) => setForm({ ...form, company: e.target.value })}
               className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
               placeholder="Nombre de la empresa"
+            />
+          </div>
+
+          <div>
+            <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Giro de empresa</label>
+            <input
+              type="text"
+              value={form.industry ?? ""}
+              onChange={(e) => setForm({ ...form, industry: e.target.value })}
+              className="w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
+              placeholder="Ej. manufactura, retail, salud"
             />
           </div>
 

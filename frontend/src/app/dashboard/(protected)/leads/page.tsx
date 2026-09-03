@@ -67,15 +67,20 @@ export default function LeadsPage() {
   }
 
   function convertInitialForm(lead: Lead): ProspectCreate {
+    const notesParts = [
+      lead.message?.trim() || "",
+      lead.address?.trim() ? `Dirección: ${lead.address.trim()}` : "",
+    ].filter(Boolean);
     return {
       name: lead.name,
-      email: lead.email,
+      email: lead.email || "",
       phone: lead.phone || "",
       company: lead.company || "",
+      industry: lead.industry || "",
       service: lead.service || "",
       status: "meeting_to_schedule",
       source: "Web",
-      notes: lead.message || "",
+      notes: notesParts.join("\n\n"),
     };
   }
 
@@ -153,7 +158,10 @@ export default function LeadsPage() {
                         <p className="font-montserrat font-semibold text-dark-blue text-sm">{lead.name}</p>
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className="font-montserrat text-dark-blue/70 text-sm">{lead.company || "—"}</span>
+                        <p className="font-montserrat text-dark-blue/70 text-sm">{lead.company || "—"}</p>
+                        {lead.industry && (
+                          <p className="font-montserrat text-dark-blue/40 text-xs mt-0.5">{lead.industry}</p>
+                        )}
                       </td>
                       <td className="px-4 py-3.5">
                         <p className="font-montserrat text-dark-blue/70 text-sm">{lead.email || "—"}</p>

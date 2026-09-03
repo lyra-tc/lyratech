@@ -26,6 +26,8 @@ class LeadManualCreate(BaseModel):
     company: Optional[str] = None
     service: Optional[str] = None
     message: Optional[str] = None
+    industry: Optional[str] = None
+    address: Optional[str] = None
 
     _email_blank = field_validator("email", mode="before")(_blank_to_none)
 
@@ -37,6 +39,8 @@ class LeadUpdate(BaseModel):
     company: Optional[str] = None
     service: Optional[str] = None
     message: Optional[str] = None
+    industry: Optional[str] = None
+    address: Optional[str] = None
 
     _email_blank = field_validator("email", mode="before")(_blank_to_none)
 
@@ -49,6 +53,8 @@ class LeadResponse(BaseModel):
     company: Optional[str] = None
     service: Optional[str] = None
     message: Optional[str] = None
+    industry: Optional[str] = None
+    address: Optional[str] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

@@ -66,6 +66,9 @@ export default function ProspectViewModal({ prospect, onClose }: ProspectViewMod
           <div>
             <p className="font-montserrat text-dark-blue/50 text-xs mb-1">Empresa</p>
             <p className="font-montserrat text-dark-blue text-sm">{prospect.company || "—"}</p>
+            {prospect.industry && (
+              <p className="font-montserrat text-dark-blue/40 text-xs mt-1">Giro: {prospect.industry}</p>
+            )}
           </div>
 
           <div>

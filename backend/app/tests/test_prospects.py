@@ -175,3 +175,15 @@ def test_meeting_scheduled_not_assignable_from_other_statuses(auth_client, start
 
     resp = auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
     assert resp.status_code == 409
+
+
+def test_prospect_persists_industry(auth_client):
+    created = auth_client.post(
+        "/api/prospects/",
+        json={"name": "Ind Co", "source": "Web", "industry": "Salud"},
+    )
+    assert created.status_code == 201
+    assert created.json()["industry"] == "Salud"
+
+    fetched = auth_client.get(f"/api/prospects/{created.json()['id']}")
+    assert fetched.json()["industry"] == "Salud"

@@ -9,6 +9,7 @@ class ProspectCreate(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     service: Optional[str] = None
     status: ProspectStatus = ProspectStatus.meeting_to_schedule
     source: Optional[str] = None
@@ -21,6 +22,7 @@ class ProspectUpdate(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     service: Optional[str] = None
     status: Optional[ProspectStatus] = None
     source: Optional[str] = None
@@ -34,6 +36,7 @@ class ProspectResponse(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     service: Optional[str] = None
     status: ProspectStatus
     source: Optional[str] = None
