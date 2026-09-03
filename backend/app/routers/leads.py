@@ -9,7 +9,7 @@ from ..core.email import send_lead_notification_email
 from ..models.lead import Lead
 from ..models.notification_recipient import NotificationRecipient
 from ..models.user import User
-from ..schemas.lead import LeadCreate, LeadResponse
+from ..schemas.lead import LeadCreate, LeadManualCreate, LeadResponse, LeadUpdate
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
@@ -43,6 +43,24 @@ def create_lead(
     return lead
 
 
+@router.post("/manual", response_model=LeadResponse, status_code=201)
+def create_lead_manual(
+    body: LeadManualCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    lead = Lead(**body.model_dump())
+    db.add(lead)
+    db.commit()
+    db.refresh(lead)
+
+    recipient_emails = [r.email for r in db.query(NotificationRecipient).all()]
+    background_tasks.add_task(send_lead_notification_email, lead, recipient_emails)
+
+    return lead
+
+
 @router.get("/", response_model=List[LeadResponse])
 def list_leads(
     skip: int = 0,
@@ -57,6 +75,29 @@ def list_leads(
         .limit(limit)
         .all()
     )
+
+
+@router.put("/{lead_id}", response_model=LeadResponse)
+def update_lead(
+    lead_id: int,
+    body: LeadUpdate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+
+    data = body.model_dump(exclude_unset=True)
+    if "name" in data and not (data["name"] or "").strip():
+        raise HTTPException(status_code=422, detail="El nombre no puede quedar vacío")
+
+    for field, value in data.items():
+        setattr(lead, field, value)
+
+    db.commit()
+    db.refresh(lead)
+    return lead
 
 
 @router.delete("/{lead_id}", status_code=204)

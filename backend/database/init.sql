@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS leads (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
-    email       VARCHAR(255) NOT NULL,
+    email       VARCHAR(255),
     phone       VARCHAR(50),
     company     VARCHAR(255),
     service     VARCHAR(100),

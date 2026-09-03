@@ -18,6 +18,7 @@ interface ProspectFormModalProps {
   initialForm: ProspectCreate;
   onClose: () => void;
   onSaved: (prospect: Prospect) => void;
+  hideLostOnCreate?: boolean;
 }
 
 function toFormValues(prospect: Prospect): ProspectCreate {
@@ -33,7 +34,7 @@ function toFormValues(prospect: Prospect): ProspectCreate {
   };
 }
 
-export default function ProspectFormModal({ editing, initialForm, onClose, onSaved }: ProspectFormModalProps) {
+export default function ProspectFormModal({ editing, initialForm, onClose, onSaved, hideLostOnCreate }: ProspectFormModalProps) {
   const initialFormRef = useRef<ProspectCreate>(editing ? toFormValues(editing) : initialForm);
   const [form, setForm] = useState<ProspectCreate>(initialFormRef.current);
   const [saving, setSaving] = useState(false);
@@ -49,11 +50,17 @@ export default function ProspectFormModal({ editing, initialForm, onClose, onSav
 
   // "Reunión agendada" is reachable only through the booking flow (never a
   // manual pick). Once a prospect is there, the only allowed move is "Perdido".
-  const statusOptions = (
-    editing?.status === "meeting_scheduled"
-      ? (["meeting_scheduled", "lost"] as ProspectStatus[])
-      : (["meeting_to_schedule", "call_later", "lost"] as ProspectStatus[])
-  ).map((s) => ({ value: s, label: STATUS_LABELS[s] }));
+  // The blank "Nuevo prospecto" form also hides "Perdido" (hideLostOnCreate) —
+  // conversions still offer it.
+  let statusValues: ProspectStatus[];
+  if (editing?.status === "meeting_scheduled") {
+    statusValues = ["meeting_scheduled", "lost"];
+  } else if (!editing && hideLostOnCreate) {
+    statusValues = ["meeting_to_schedule", "call_later"];
+  } else {
+    statusValues = ["meeting_to_schedule", "call_later", "lost"];
+  }
+  const statusOptions = statusValues.map((s) => ({ value: s, label: STATUS_LABELS[s] }));
 
   function validateForm(): boolean {
     const errors: Record<string, string> = {};

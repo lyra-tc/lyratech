@@ -91,6 +91,36 @@ def test_send_posts_to_resend_with_expected_payload(monkeypatch):
     assert captured["headers"]["Authorization"] == "Bearer test-key"
 
 
+def test_send_omits_reply_to_when_lead_has_no_email(monkeypatch):
+    captured = {}
+
+    class FakeResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"id": "resend-test-id"}
+
+    def fake_post(url, json, headers, timeout):
+        captured["json"] = json
+        return FakeResponse()
+
+    monkeypatch.setattr(email_module.httpx, "post", fake_post)
+    monkeypatch.setattr(settings, "RESEND_API_KEY", "test-key")
+
+    email_module.send_lead_notification_email(
+        _make_lead(email=None), ["team@lyratech.com.mx"]
+    )  # must not raise
+
+    assert "reply_to" not in captured["json"]
+    assert captured["json"]["to"] == ["team@lyratech.com.mx"]
+
+
+def test_build_html_handles_lead_without_email():
+    html = email_module.build_lead_notification_html(_make_lead(email=None))
+    assert "Ada Lovelace" in html
+
+
 def test_send_swallows_http_errors(monkeypatch):
     import httpx as httpx_module
 

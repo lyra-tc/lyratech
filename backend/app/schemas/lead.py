@@ -1,6 +1,12 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from datetime import datetime
 from typing import Optional
+
+
+def _blank_to_none(v):
+    if isinstance(v, str) and not v.strip():
+        return None
+    return v
 
 
 class LeadCreate(BaseModel):
@@ -13,10 +19,32 @@ class LeadCreate(BaseModel):
     turnstile_token: str
 
 
+class LeadManualCreate(BaseModel):
+    name: str
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    company: Optional[str] = None
+    service: Optional[str] = None
+    message: Optional[str] = None
+
+    _email_blank = field_validator("email", mode="before")(_blank_to_none)
+
+
+class LeadUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    company: Optional[str] = None
+    service: Optional[str] = None
+    message: Optional[str] = None
+
+    _email_blank = field_validator("email", mode="before")(_blank_to_none)
+
+
 class LeadResponse(BaseModel):
     id: int
     name: str
-    email: str
+    email: Optional[str] = None
     phone: Optional[str] = None
     company: Optional[str] = None
     service: Optional[str] = None

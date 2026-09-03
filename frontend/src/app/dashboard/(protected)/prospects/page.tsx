@@ -368,6 +368,7 @@ export default function ProspectsPage() {
           initialForm={EMPTY_FORM}
           onClose={() => setShowModal(false)}
           onSaved={handleSaved}
+          hideLostOnCreate
         />
       )}
 

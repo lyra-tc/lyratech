@@ -75,6 +75,21 @@ def ensure_leads_prospects_swap() -> None:
             )
 
 
+def ensure_leads_email_nullable_schema() -> None:
+    if engine.dialect.name != "mysql":
+        return  # SQLite/pytest builds the column from the model
+    inspector = inspect(engine)
+    if "leads" not in inspector.get_table_names():
+        return
+    cols = {c["name"]: c for c in inspector.get_columns("leads")}
+    email_col = cols.get("email")
+    if email_col is not None and not email_col["nullable"]:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE leads MODIFY COLUMN email VARCHAR(255) NULL")
+            )
+
+
 def ensure_diagnostic_conversion_schema() -> None:
     inspector = inspect(engine)
     if "diagnostic_submissions" not in inspector.get_table_names():
@@ -163,6 +178,7 @@ def ensure_prospect_status_schema() -> None:
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
 ensure_leads_prospects_swap()
+ensure_leads_email_nullable_schema()
 ensure_diagnostic_conversion_schema()
 ensure_email_delivery_tracking_schema()
 ensure_prospect_status_schema()

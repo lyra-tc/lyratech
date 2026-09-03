@@ -107,3 +107,108 @@ def test_create_lead_dispatches_with_empty_list_when_no_recipients(client, monke
 
     assert client.post("/api/leads/", json=VALID_LEAD_PAYLOAD).status_code == 201
     assert captured["recipient_emails"] == []
+
+
+def test_manual_lead_without_email_ok(auth_client):
+    resp = auth_client.post("/api/leads/manual", json={"name": "P", "phone": "555 111 2222"})
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["name"] == "P"
+    assert body["email"] is None
+
+
+def test_create_lead_manual_requires_admin(client, non_admin_client):
+    payload = {"name": "M", "email": "m@example.com"}
+    assert client.post("/api/leads/manual", json=payload).status_code == 401
+    assert non_admin_client.post("/api/leads/manual", json=payload).status_code == 403
+
+
+def test_admin_creates_manual_lead(auth_client):
+    resp = auth_client.post(
+        "/api/leads/manual",
+        json={"name": "Manual Co", "email": "m@example.com", "service": "precio-fijo"},
+    )
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["name"] == "Manual Co"
+    assert body["email"] == "m@example.com"
+    assert body["service"] == "precio-fijo"
+    assert "id" in body
+
+
+def test_manual_lead_dispatches_notification(auth_client, monkeypatch):
+    auth_client.post(
+        "/api/notifications/recipients", json={"email": "team@lyratech.com.mx"}
+    )
+    captured = {}
+
+    def fake_send(lead, recipient_emails):
+        captured["lead_name"] = lead.name
+        captured["recipient_emails"] = recipient_emails
+
+    monkeypatch.setattr("app.routers.leads.send_lead_notification_email", fake_send)
+
+    resp = auth_client.post("/api/leads/manual", json={"name": "Notify Me"})
+    assert resp.status_code == 201
+    assert captured["lead_name"] == "Notify Me"
+    assert captured["recipient_emails"] == ["team@lyratech.com.mx"]
+
+
+def test_manual_lead_without_email_still_notifies(auth_client, monkeypatch):
+    auth_client.post("/api/notifications/recipients", json={"email": "team@lyratech.com.mx"})
+    captured = {}
+
+    def fake_send(lead, recipient_emails):
+        captured["email"] = lead.email
+        captured["recipients"] = recipient_emails
+
+    monkeypatch.setattr("app.routers.leads.send_lead_notification_email", fake_send)
+
+    resp = auth_client.post("/api/leads/manual", json={"name": "NoMail", "phone": "555"})
+    assert resp.status_code == 201
+    assert captured["email"] is None
+    assert captured["recipients"] == ["team@lyratech.com.mx"]
+
+
+def test_update_lead_requires_admin(client, non_admin_client):
+    assert client.put("/api/leads/1", json={}).status_code == 401
+    assert non_admin_client.put("/api/leads/1", json={}).status_code == 403
+
+
+def test_admin_updates_lead(auth_client):
+    lead_id = auth_client.post(
+        "/api/leads/manual", json={"name": "Editable", "email": "e@example.com"}
+    ).json()["id"]
+
+    resp = auth_client.put(f"/api/leads/{lead_id}", json={"company": "New Co"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["company"] == "New Co"
+    assert body["name"] == "Editable"
+    assert body["email"] == "e@example.com"
+
+
+def test_update_missing_lead_404(auth_client):
+    assert auth_client.put("/api/leads/999999", json={"name": "x"}).status_code == 404
+
+
+def test_manual_lead_accepts_empty_email_string(auth_client):
+    resp = auth_client.post(
+        "/api/leads/manual", json={"name": "E", "email": "", "phone": "555"}
+    )
+    assert resp.status_code == 201
+    assert resp.json()["email"] is None
+
+
+def test_update_lead_accepts_empty_email_string(auth_client):
+    lead_id = auth_client.post(
+        "/api/leads/manual", json={"name": "U", "email": "u@example.com"}
+    ).json()["id"]
+    resp = auth_client.put(f"/api/leads/{lead_id}", json={"email": ""})
+    assert resp.status_code == 200
+    assert resp.json()["email"] is None
+
+
+def test_update_lead_rejects_blank_name(auth_client):
+    lead_id = auth_client.post("/api/leads/manual", json={"name": "K", "phone": "5"}).json()["id"]
+    assert auth_client.put(f"/api/leads/{lead_id}", json={"name": "  "}).status_code == 422

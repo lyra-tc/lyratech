@@ -37,8 +37,11 @@ async function request<T>(
     const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
     const retryAfterHeader = res.headers.get("Retry-After");
     const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : undefined;
+    const detail = Array.isArray(err.detail)
+      ? err.detail.map((d: { msg?: string }) => d?.msg).filter(Boolean).join(", ")
+      : err.detail;
     throw new ApiError(
-      err.detail || "Error en la solicitud",
+      detail || "Error en la solicitud",
       res.status,
       Number.isFinite(retryAfterSeconds) ? retryAfterSeconds : undefined
     );
@@ -61,12 +64,21 @@ export interface UserInfo {
 export interface Lead {
   id: number;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
   company?: string;
   service?: string;
   message?: string;
   created_at: string;
+}
+
+export interface LeadManualCreate {
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  service?: string;
+  message?: string;
 }
 
 export interface LeadSubmit {
@@ -155,6 +167,10 @@ export const usersApi = {
 
 export const leadsApi = {
   list: () => request<Lead[]>("/api/leads/"),
+  createManual: (data: LeadManualCreate) =>
+    request<Lead>("/api/leads/manual", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: Partial<LeadManualCreate>) =>
+    request<Lead>(`/api/leads/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   remove: (id: number) => request<void>(`/api/leads/${id}`, { method: "DELETE" }),
 };
 

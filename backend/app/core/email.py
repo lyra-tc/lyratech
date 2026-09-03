@@ -85,7 +85,7 @@ def _build_email_shell(
 def build_lead_notification_html(lead: Lead) -> str:
     rows = [
         ("Nombre", lead.name),
-        ("Correo", lead.email),
+        ("Correo", lead.email or "-"),
         ("Telefono", lead.phone or "-"),
         ("Empresa", lead.company or "-"),
         ("Servicio", lead.service or "-"),
@@ -199,10 +199,11 @@ def send_lead_notification_email(lead: Lead, recipient_emails: list[str]) -> Non
         payload = {
             "from": f"{settings.NOTIFICATION_FROM_NAME} <{settings.NOTIFICATION_FROM_EMAIL}>",
             "to": recipient_emails,
-            "reply_to": lead.email,
             "subject": f"Nuevo lead: {lead.name}",
             "html": build_lead_notification_html(lead),
         }
+        if lead.email:
+            payload["reply_to"] = lead.email
         _send_email(payload)
     except Exception:
         logger.exception(

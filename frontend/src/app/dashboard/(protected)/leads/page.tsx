@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { HiOutlineSearch, HiOutlineTrash, HiOutlineSwitchHorizontal } from "react-icons/hi";
+import { HiOutlinePlus, HiOutlineSearch, HiOutlineTrash, HiOutlinePencil, HiOutlineSwitchHorizontal } from "react-icons/hi";
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
+import LeadFormModal from "@/components/Dashboard/LeadFormModal";
 import LoadingDots from "@/components/shared/LoadingDots";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { leadsApi } from "@/lib/api";
@@ -15,6 +16,8 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [converting, setConverting] = useState<Lead | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [editing, setEditing] = useState<Lead | null>(null);
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
 
@@ -40,7 +43,7 @@ export default function LeadsPage() {
       list = list.filter(
         (l) =>
           l.name.toLowerCase().includes(q) ||
-          l.email.toLowerCase().includes(q) ||
+          l.email?.toLowerCase().includes(q) ||
           l.company?.toLowerCase().includes(q)
       );
     }
@@ -76,6 +79,16 @@ export default function LeadsPage() {
     };
   }
 
+  function handleSaved(saved: Lead) {
+    setLeads((prev) =>
+      prev.some((l) => l.id === saved.id)
+        ? prev.map((l) => (l.id === saved.id ? saved : l))
+        : [saved, ...prev]
+    );
+    setShowCreate(false);
+    setEditing(null);
+  }
+
   const emptyMessage = search
     ? "No hay leads que coincidan con la búsqueda"
     : "Aún no hay leads";
@@ -90,6 +103,13 @@ export default function LeadsPage() {
               Envíos del formulario de contacto del sitio web
             </p>
           </div>
+          <button
+            onClick={() => { setEditing(null); setShowCreate(true); }}
+            className="flex items-center gap-2 bg-lyratech-purple hover:bg-button-light-purple text-white font-montserrat font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-button hover:scale-[1.02] text-sm"
+          >
+            <HiOutlinePlus size={18} />
+            <span className="hidden sm:block">Nuevo lead</span>
+          </button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
@@ -136,7 +156,7 @@ export default function LeadsPage() {
                         <span className="font-montserrat text-dark-blue/70 text-sm">{lead.company || "—"}</span>
                       </td>
                       <td className="px-4 py-3.5">
-                        <p className="font-montserrat text-dark-blue/70 text-sm">{lead.email}</p>
+                        <p className="font-montserrat text-dark-blue/70 text-sm">{lead.email || "—"}</p>
                         <p className="font-montserrat text-dark-blue/40 text-xs">{lead.phone || ""}</p>
                       </td>
                       <td className="px-4 py-3.5">
@@ -154,6 +174,9 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-1">
+                          <button onClick={() => { setShowCreate(false); setEditing(lead); }} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Editar">
+                            <HiOutlinePencil size={15} />
+                          </button>
                           <button onClick={() => setConverting(lead)} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Convertir a prospecto">
                             <HiOutlineSwitchHorizontal size={15} />
                           </button>
@@ -170,6 +193,14 @@ export default function LeadsPage() {
           )}
         </div>
       </div>
+
+      {(showCreate || editing) && (
+        <LeadFormModal
+          editing={editing}
+          onClose={() => { setShowCreate(false); setEditing(null); }}
+          onSaved={handleSaved}
+        />
+      )}
 
       {converting && (
         <ProspectFormModal
