@@ -15,8 +15,9 @@ async function request<T>(
   options: RequestInit & { skipAuthRedirect?: boolean } = {}
 ): Promise<T> {
   const { skipAuthRedirect, ...fetchOptions } = options;
+  const isForm = fetchOptions.body instanceof FormData;
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(isForm ? {} : { "Content-Type": "application/json" }),
     ...(fetchOptions.headers as Record<string, string>),
   };
 
@@ -51,6 +52,35 @@ async function request<T>(
   return res.json();
 }
 
+function triggerDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+const XLSX_MIME =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+export function downloadBase64Xlsx(b64: string, filename: string) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  triggerDownload(new Blob([bytes], { type: XLSX_MIME }), filename);
+}
+
+export async function downloadLeadTemplate(): Promise<void> {
+  const res = await fetch(`${API_URL}/api/leads/import/template`, {
+    credentials: "include",
+  });
+  if (!res.ok) throw new ApiError("No se pudo descargar la plantilla", res.status);
+  triggerDownload(await res.blob(), "plantilla-leads.xlsx");
+}
+
 export interface UserInfo {
   id: number;
   email: string;
@@ -72,6 +102,19 @@ export interface Lead {
   service?: string;
   message?: string;
   created_at: string;
+}
+
+export interface LeadImportSkip {
+  file: string;
+  row: number;
+  reason: string;
+}
+
+export interface LeadImportResult {
+  inserted: number;
+  skipped_count: number;
+  skipped: LeadImportSkip[];
+  report_xlsx_base64?: string | null;
 }
 
 export interface LeadManualCreate {
@@ -178,6 +221,11 @@ export const leadsApi = {
   update: (id: number, data: Partial<LeadManualCreate>) =>
     request<Lead>(`/api/leads/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   remove: (id: number) => request<void>(`/api/leads/${id}`, { method: "DELETE" }),
+  importLeads: (files: File[]) => {
+    const fd = new FormData();
+    files.forEach((f) => fd.append("files", f));
+    return request<LeadImportResult>("/api/leads/import", { method: "POST", body: fd });
+  },
 };
 
 export async function submitLead(data: LeadSubmit): Promise<Lead> {

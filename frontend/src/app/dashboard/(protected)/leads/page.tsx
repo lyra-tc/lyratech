@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { HiOutlinePlus, HiOutlineSearch, HiOutlineTrash, HiOutlinePencil, HiOutlineSwitchHorizontal } from "react-icons/hi";
+import { HiOutlinePlus, HiOutlineSearch, HiOutlineTrash, HiOutlinePencil, HiOutlineSwitchHorizontal, HiOutlineUpload } from "react-icons/hi";
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
 import LeadFormModal from "@/components/Dashboard/LeadFormModal";
+import LeadImportModal from "@/components/Dashboard/LeadImportModal";
 import LoadingDots from "@/components/shared/LoadingDots";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { leadsApi } from "@/lib/api";
-import type { Lead, ProspectCreate } from "@/lib/api";
+import type { Lead, ProspectCreate, LeadImportResult } from "@/lib/api";
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -17,6 +18,7 @@ export default function LeadsPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [converting, setConverting] = useState<Lead | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editing, setEditing] = useState<Lead | null>(null);
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
@@ -94,6 +96,10 @@ export default function LeadsPage() {
     setEditing(null);
   }
 
+  function handleImported(result: LeadImportResult) {
+    if (result.inserted > 0) loadData();
+  }
+
   const emptyMessage = search
     ? "No hay leads que coincidan con la búsqueda"
     : "Aún no hay leads";
@@ -108,13 +114,22 @@ export default function LeadsPage() {
               Envíos del formulario de contacto del sitio web
             </p>
           </div>
-          <button
-            onClick={() => { setEditing(null); setShowCreate(true); }}
-            className="flex items-center gap-2 bg-lyratech-purple hover:bg-button-light-purple text-white font-montserrat font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-button hover:scale-[1.02] text-sm"
-          >
-            <HiOutlinePlus size={18} />
-            <span className="hidden sm:block">Nuevo lead</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowImport(true)}
+              className="flex items-center gap-2 bg-lyratech-purple hover:bg-button-light-purple text-white font-montserrat font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-button hover:scale-[1.02] text-sm"
+            >
+              <HiOutlineUpload size={18} />
+              <span className="hidden sm:block">Importar leads</span>
+            </button>
+            <button
+              onClick={() => { setEditing(null); setShowCreate(true); }}
+              className="flex items-center gap-2 bg-lyratech-purple hover:bg-button-light-purple text-white font-montserrat font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-button hover:scale-[1.02] text-sm"
+            >
+              <HiOutlinePlus size={18} />
+              <span className="hidden sm:block">Nuevo lead</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
@@ -207,6 +222,13 @@ export default function LeadsPage() {
           editing={editing}
           onClose={() => { setShowCreate(false); setEditing(null); }}
           onSaved={handleSaved}
+        />
+      )}
+
+      {showImport && (
+        <LeadImportModal
+          onClose={() => setShowImport(false)}
+          onImported={handleImported}
         />
       )}
 

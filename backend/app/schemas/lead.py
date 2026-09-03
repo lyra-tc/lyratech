@@ -58,3 +58,16 @@ class LeadResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class LeadImportSkip(BaseModel):
+    file: str
+    row: int
+    reason: str
+
+
+class LeadImportResult(BaseModel):
+    inserted: int
+    skipped_count: int
+    skipped: list[LeadImportSkip]
+    report_xlsx_base64: Optional[str] = None
