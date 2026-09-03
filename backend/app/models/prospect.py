@@ -5,11 +5,8 @@ from ..database import Base
 
 
 class ProspectStatus(str, enum.Enum):
-    new = "new"
-    contacted = "contacted"
-    qualified = "qualified"
-    proposal = "proposal"
-    closed = "closed"
+    meeting_to_schedule = "meeting_to_schedule"
+    call_later = "call_later"
     lost = "lost"
 
 
@@ -22,7 +19,7 @@ class Prospect(Base):
     phone = Column(String(50))
     company = Column(String(255))
     service = Column(String(100))
-    status = Column(Enum(ProspectStatus), default=ProspectStatus.new)
+    status = Column(Enum(ProspectStatus), nullable=False, default=ProspectStatus.meeting_to_schedule)
     source = Column(String(100))
     notes = Column(Text)
     assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)

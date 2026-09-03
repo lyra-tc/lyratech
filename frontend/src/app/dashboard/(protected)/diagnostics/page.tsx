@@ -25,7 +25,7 @@ const CONVERSION_LABELS: Record<string, string> = {
 
 const CONVERSION_BADGE: Record<string, string> = {
   pending: "bg-gray-100 text-gray-500",
-  prospect: STATUS_COLORS.qualified,
+  prospect: "bg-lyratech-green/20 text-lyratech-green border-lyratech-green/30",
   lost: STATUS_COLORS.lost,
 };
 
@@ -180,7 +180,7 @@ export default function DiagnosticsPage() {
           phone,
           company: submission.company || "",
           service: serviceLabel,
-          status: "new",
+          status: "meeting_to_schedule",
           source: "Diagnóstico GO",
           notes,
         },

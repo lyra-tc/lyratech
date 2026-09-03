@@ -173,7 +173,7 @@ export default function ProspectFormModal({ editing, initialForm, onClose, onSav
             <div>
               <label className="block font-montserrat text-dark-blue/70 text-sm mb-1.5">Estado</label>
               <Dropdown
-                value={form.status ?? "new"}
+                value={form.status ?? "meeting_to_schedule"}
                 onChange={(v) => setForm({ ...form, status: v as ProspectStatus })}
                 options={STATUS_OPTIONS}
               />

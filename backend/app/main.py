@@ -127,11 +127,42 @@ def ensure_email_delivery_tracking_schema() -> None:
             )
 
 
+def ensure_prospect_status_schema() -> None:
+    if engine.dialect.name != "mysql":
+        return  # SQLite/pytest builds the enum from the model
+    inspector = inspect(engine)
+    if "prospects" not in inspector.get_table_names():
+        return
+
+    cols = {c["name"]: c for c in inspector.get_columns("prospects")}
+    status_enums = set(getattr(cols.get("status", {}).get("type", None), "enums", []) or [])
+
+    if status_enums - {"meeting_to_schedule", "call_later", "lost"}:
+        # Any value outside the 3 targets -> widen to a superset, remap
+        # everything non-lost to meeting_to_schedule, then narrow.
+        with engine.begin() as connection:
+            connection.execute(text(
+                "ALTER TABLE prospects MODIFY COLUMN status "
+                "ENUM('new','contacted','qualified','proposal','closed',"
+                "'meeting_scheduled','won','meeting_to_schedule','call_later','lost') NULL"
+            ))
+            connection.execute(text(
+                "UPDATE prospects SET status='meeting_to_schedule' "
+                "WHERE status <> 'lost' OR status IS NULL"
+            ))
+            connection.execute(text(
+                "ALTER TABLE prospects MODIFY COLUMN status "
+                "ENUM('meeting_to_schedule','call_later','lost') "
+                "NOT NULL DEFAULT 'meeting_to_schedule'"
+            ))
+
+
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
 ensure_leads_prospects_swap()
 ensure_diagnostic_conversion_schema()
 ensure_email_delivery_tracking_schema()
+ensure_prospect_status_schema()
 
 _seed_db = SessionLocal()
 try:

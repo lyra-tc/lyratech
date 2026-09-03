@@ -27,7 +27,7 @@ const EMPTY_FORM: ProspectCreate = {
   phone: "",
   company: "",
   service: "",
-  status: "new",
+  status: "meeting_to_schedule",
   source: "",
   notes: "",
 };
@@ -104,9 +104,9 @@ export default function ProspectsPage() {
 
   const stats = {
     total: prospects.length,
-    new: prospects.filter((p) => p.status === "new").length,
-    qualified: prospects.filter((p) => p.status === "qualified").length,
-    closed: prospects.filter((p) => p.status === "closed").length,
+    toSchedule: prospects.filter((p) => p.status === "meeting_to_schedule").length,
+    callLater: prospects.filter((p) => p.status === "call_later").length,
+    lost: prospects.filter((p) => p.status === "lost").length,
   };
 
   const emptyMessage =
@@ -222,9 +222,9 @@ export default function ProspectsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Total", value: stats.total, color: "bg-dark-blue" },
-            { label: "Nuevos", value: stats.new, color: "bg-blue" },
-            { label: "Calificados", value: stats.qualified, color: "bg-lyratech-green" },
-            { label: "Cerrados", value: stats.closed, color: "bg-lyratech-purple" },
+            { label: "Agendar reunión", value: stats.toSchedule, color: "bg-blue" },
+            { label: "Llamar más tarde", value: stats.callLater, color: "bg-yellow-500" },
+            { label: "Perdidos", value: stats.lost, color: "bg-red" },
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-white rounded-xl p-4 shadow-sm border border-black/5">
               <p className="font-montserrat text-dark-blue/50 text-xs mb-1">{label}</p>

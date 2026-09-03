@@ -1,3 +1,5 @@
+import pytest
+
 from .conftest import TestingSessionLocal
 from ..models.prospect import Prospect
 
@@ -23,7 +25,7 @@ def test_admin_can_create_and_read_prospect(auth_client):
     assert created.status_code == 201
     body = created.json()
     assert body["service"] == "precio-fijo"
-    assert body["status"] == "new"
+    assert body["status"] == "meeting_to_schedule"
     prospect_id = body["id"]
 
     fetched = auth_client.get(f"/api/prospects/{prospect_id}")
@@ -43,10 +45,10 @@ def test_admin_can_update_prospect(auth_client):
 
     updated = auth_client.put(
         f"/api/prospects/{prospect_id}",
-        json={"status": "qualified", "service": "equipo-dedicado"},
+        json={"status": "lost", "service": "equipo-dedicado"},
     )
     assert updated.status_code == 200
-    assert updated.json()["status"] == "qualified"
+    assert updated.json()["status"] == "lost"
     assert updated.json()["service"] == "equipo-dedicado"
 
 
@@ -71,3 +73,24 @@ def test_prospect_row_persists_service(auth_client):
         assert row.service == "diagnostico"
     finally:
         db.close()
+
+
+@pytest.mark.parametrize("status", ["meeting_to_schedule", "call_later", "lost"])
+def test_prospect_status_values_round_trip(auth_client, status):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "S", "source": "Web", "status": status}
+    )
+    assert created.status_code == 201
+    assert created.json()["status"] == status
+
+
+def test_prospect_rejects_removed_status_value(auth_client):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "X", "source": "Web", "status": "won"}
+    )
+    assert created.status_code == 422
+
+
+def test_prospect_default_status_is_meeting_to_schedule(auth_client):
+    created = auth_client.post("/api/prospects/", json={"name": "D", "source": "Web"})
+    assert created.json()["status"] == "meeting_to_schedule"

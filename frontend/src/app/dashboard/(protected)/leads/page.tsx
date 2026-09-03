@@ -70,7 +70,7 @@ export default function LeadsPage() {
       phone: lead.phone || "",
       company: lead.company || "",
       service: lead.service || "",
-      status: "new",
+      status: "meeting_to_schedule",
       source: "Web",
       notes: lead.message || "",
     };

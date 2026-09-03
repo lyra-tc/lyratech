@@ -79,13 +79,7 @@ export interface LeadSubmit {
   turnstile_token: string;
 }
 
-export type ProspectStatus =
-  | "new"
-  | "contacted"
-  | "qualified"
-  | "proposal"
-  | "closed"
-  | "lost";
+export type ProspectStatus = "meeting_to_schedule" | "call_later" | "lost";
 
 export interface Prospect {
   id: number;

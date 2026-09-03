@@ -10,7 +10,7 @@ class ProspectCreate(BaseModel):
     phone: Optional[str] = None
     company: Optional[str] = None
     service: Optional[str] = None
-    status: ProspectStatus = ProspectStatus.new
+    status: ProspectStatus = ProspectStatus.meeting_to_schedule
     source: Optional[str] = None
     notes: Optional[str] = None
     assigned_to: Optional[int] = None
