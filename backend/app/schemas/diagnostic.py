@@ -102,6 +102,8 @@ class DiagnosticSubmissionResponse(BaseModel):
     llm_status: str
     email_delivery_status: str
     email_delivery_error: Optional[str] = None
+    conversion_status: str
+    converted_prospect_id: Optional[int] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -116,9 +118,16 @@ class DiagnosticSubmissionListItem(BaseModel):
     recommended_primary_service: str
     recommended_secondary_service: Optional[str] = None
     email_delivery_status: str
+    email_provider_id: Optional[str] = None
+    conversion_status: str
+    converted_prospect_id: Optional[int] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class DiagnosticMarkConvertedRequest(BaseModel):
+    prospect_id: int
 
 
 class DiagnosticSubmitResult(BaseModel):

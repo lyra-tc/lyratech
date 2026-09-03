@@ -290,6 +290,9 @@ export interface DiagnosticSubmissionListItem {
   recommended_primary_service: string;
   recommended_secondary_service?: string;
   email_delivery_status: string;
+  email_provider_id?: string;
+  conversion_status: string;
+  converted_prospect_id?: number;
   created_at: string;
 }
 
@@ -341,12 +344,27 @@ export interface DiagnosticQuestionInput {
 }
 
 export const diagnosticsApi = {
-  listSubmissions: (search = "") =>
-    request<DiagnosticSubmissionListItem[]>(
-      `/api/diagnostics/submissions${search ? `?search=${encodeURIComponent(search)}` : ""}`
-    ),
+  listSubmissions: (search = "", conversion = "") => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (conversion) params.set("conversion", conversion);
+    const qs = params.toString();
+    return request<DiagnosticSubmissionListItem[]>(
+      `/api/diagnostics/submissions${qs ? `?${qs}` : ""}`
+    );
+  },
   getSubmission: (id: number) =>
     request<DiagnosticSubmissionDetail>(`/api/diagnostics/submissions/${id}`),
+  refreshEmailStatus: () =>
+    request<DiagnosticSubmissionListItem[]>(
+      "/api/diagnostics/submissions/refresh-email-status",
+      { method: "POST" }
+    ),
+  markConverted: (submissionId: number, prospectId: number) =>
+    request<DiagnosticSubmissionDetail>(
+      `/api/diagnostics/submissions/${submissionId}/mark-converted`,
+      { method: "POST", body: JSON.stringify({ prospect_id: prospectId }) }
+    ),
   removeSubmission: (id: number) =>
     request<void>(`/api/diagnostics/submissions/${id}`, { method: "DELETE" }),
   listQuestions: () => request<DiagnosticQuestion[]>("/api/diagnostics/questions"),

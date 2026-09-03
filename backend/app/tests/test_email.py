@@ -65,6 +65,9 @@ def test_send_posts_to_resend_with_expected_payload(monkeypatch):
         def raise_for_status(self):
             pass
 
+        def json(self):
+            return {"id": "resend-test-id"}
+
     def fake_post(url, json, headers, timeout):
         captured["url"] = url
         captured["json"] = json
@@ -108,6 +111,9 @@ def test_send_test_posts_to_resend_with_expected_payload(monkeypatch):
     class FakeResponse:
         def raise_for_status(self):
             pass
+
+        def json(self):
+            return {"id": "resend-test-id"}
 
     def fake_post(url, json, headers, timeout):
         captured["url"] = url

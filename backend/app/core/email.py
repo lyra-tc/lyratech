@@ -20,13 +20,17 @@ EMAIL_LINE = "#e6e8f2"
 EMAIL_PANEL = "#f8f9ff"
 
 
-def _send_email(payload: dict) -> None:
+def _send_email(payload: dict) -> str:
     if not settings.RESEND_API_KEY:
         raise RuntimeError("RESEND_API_KEY not configured")
 
     headers = {"Authorization": f"Bearer {settings.RESEND_API_KEY}"}
     response = httpx.post(RESEND_API_URL, json=payload, headers=headers, timeout=10.0)
     response.raise_for_status()
+    try:
+        return (response.json() or {}).get("id", "")
+    except ValueError:
+        return ""
 
 
 def _build_email_button(label: str, href: str) -> str:
@@ -255,9 +259,10 @@ def build_diagnostic_result_email_html(*, locale: str, llm_result: dict, submiss
 
 def send_diagnostic_result_email(
     *, to_email: str, locale: str, llm_result: dict, submission_name: str
-) -> None:
-    """Sends the user-facing diagnostic email. Raises on failure so the
-    caller can persist a real `email_delivery_status` on the submission."""
+) -> str:
+    """Sends the user-facing diagnostic email and returns the Resend message
+    id. Raises on failure so the caller can persist a real
+    `email_delivery_status` on the submission."""
     if not settings.RESEND_API_KEY:
         raise RuntimeError("RESEND_API_KEY not configured")
 
@@ -269,7 +274,7 @@ def send_diagnostic_result_email(
             locale=locale, llm_result=llm_result, submission_name=submission_name
         ),
     }
-    _send_email(payload)
+    return _send_email(payload)
 
 
 def build_diagnostic_notification_html(submission: DiagnosticSubmission) -> str:

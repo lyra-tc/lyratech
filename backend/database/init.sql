@@ -111,9 +111,15 @@ CREATE TABLE IF NOT EXISTS diagnostic_submissions (
     llm_status                      VARCHAR(20) NOT NULL DEFAULT 'ok',
     email_delivery_status           VARCHAR(20) NOT NULL DEFAULT 'pending',
     email_delivery_error            TEXT,
+    email_provider_id               VARCHAR(64),
+    conversion_status               VARCHAR(20) NOT NULL DEFAULT 'pending',
+    converted_prospect_id           INT,
+    converted_at                    DATETIME NULL,
     created_at                      DATETIME DEFAULT (now()),
+    CONSTRAINT fk_diag_converted_prospect FOREIGN KEY (converted_prospect_id) REFERENCES prospects(id) ON DELETE SET NULL,
     INDEX ix_diagnostic_submissions_id (id),
-    INDEX idx_created_at (created_at)
+    INDEX idx_created_at (created_at),
+    INDEX idx_conversion_status (conversion_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------

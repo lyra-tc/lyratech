@@ -75,9 +75,63 @@ def ensure_leads_prospects_swap() -> None:
             )
 
 
+def ensure_diagnostic_conversion_schema() -> None:
+    inspector = inspect(engine)
+    if "diagnostic_submissions" not in inspector.get_table_names():
+        return
+    columns = {c["name"] for c in inspector.get_columns("diagnostic_submissions")}
+
+    if "conversion_status" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "ALTER TABLE diagnostic_submissions "
+                    "ADD COLUMN conversion_status VARCHAR(20) NOT NULL DEFAULT 'pending'"
+                )
+            )
+
+    if "converted_prospect_id" not in columns:
+        ddl = "ALTER TABLE diagnostic_submissions ADD COLUMN converted_prospect_id INT"
+        if engine.dialect.name == "mysql":
+            ddl += (
+                ", ADD CONSTRAINT fk_diag_converted_prospect "
+                "FOREIGN KEY (converted_prospect_id) REFERENCES prospects(id) "
+                "ON DELETE SET NULL"
+            )
+        with engine.begin() as connection:
+            connection.execute(text(ddl))
+
+    if "converted_at" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE diagnostic_submissions ADD COLUMN converted_at DATETIME NULL")
+            )
+
+    index_names = {ix["name"] for ix in inspect(engine).get_indexes("diagnostic_submissions")}
+    if "idx_conversion_status" not in index_names:
+        with engine.begin() as connection:
+            connection.execute(
+                text("CREATE INDEX idx_conversion_status ON diagnostic_submissions (conversion_status)")
+            )
+
+
+def ensure_email_delivery_tracking_schema() -> None:
+    inspector = inspect(engine)
+    if "diagnostic_submissions" not in inspector.get_table_names():
+        return
+    columns = {c["name"] for c in inspector.get_columns("diagnostic_submissions")}
+    if "email_provider_id" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE diagnostic_submissions ADD COLUMN email_provider_id VARCHAR(64)")
+            )
+
+
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
 ensure_leads_prospects_swap()
+ensure_diagnostic_conversion_schema()
+ensure_email_delivery_tracking_schema()
 
 _seed_db = SessionLocal()
 try:

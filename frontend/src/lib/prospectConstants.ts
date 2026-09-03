@@ -18,4 +18,4 @@ export const STATUS_COLORS: Record<ProspectStatus, string> = {
   lost: "bg-red/20 text-red border-red/30",
 };
 
-export const SOURCES = ["Web", "Referido", "Redes sociales", "Email", "Evento", "Otro"];
+export const SOURCES = ["Web", "Referido", "Redes sociales", "Email", "Evento", "Diagnóstico GO", "Otro"];
