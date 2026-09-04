@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   HiOutlinePlus,
   HiOutlineSearch,
@@ -14,8 +14,10 @@ import BookingModal from "@/components/shared/BookingModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Dropdown from "@/components/shared/Dropdown";
+import Pagination from "@/components/shared/Pagination";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { prospectsApi } from "@/lib/api";
-import type { Prospect, ProspectCreate, ProspectStatus } from "@/lib/api";
+import type { Prospect, ProspectCreate, ProspectStatus, ProspectStats } from "@/lib/api";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/prospectConstants";
 
 const STATUS_FILTER_OPTIONS = [
@@ -37,10 +39,15 @@ const EMPTY_FORM: ProspectCreate = {
 
 export default function ProspectsPage() {
   const [prospects, setProspects] = useState<Prospect[]>([]);
-  const [filtered, setFiltered] = useState<Prospect[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<ProspectStatus | "all">("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState<ProspectStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const debouncedSearch = useDebouncedValue(search);
+  const reqId = useRef(0);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Prospect | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -54,13 +61,31 @@ export default function ProspectsPage() {
   useEscapeKey(() => closeConfirmBooked(), confirmBooked !== null && !markingBooked);
 
   const loadData = useCallback(async () => {
+    const id = ++reqId.current;
+    setLoading(true);
     try {
-      const data = await prospectsApi.list();
-      setProspects(data);
+      const data = await prospectsApi.list({
+        page,
+        pageSize,
+        search: debouncedSearch,
+        status: statusFilter === "all" ? "" : statusFilter,
+      });
+      if (id === reqId.current) {
+        setProspects(data.items);
+        setTotal(data.total);
+      }
     } catch {
       /* ignore — request() already redirects to login on 401 */
     } finally {
-      setLoading(false);
+      if (id === reqId.current) setLoading(false);
+    }
+  }, [page, pageSize, debouncedSearch, statusFilter]);
+
+  const loadStats = useCallback(async () => {
+    try {
+      setStats(await prospectsApi.stats());
+    } catch {
+      /* ignore */
     }
   }, []);
 
@@ -69,19 +94,8 @@ export default function ProspectsPage() {
   }, [loadData]);
 
   useEffect(() => {
-    let list = prospects;
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.email?.toLowerCase().includes(q) ||
-          p.company?.toLowerCase().includes(q)
-      );
-    }
-    if (statusFilter !== "all") list = list.filter((p) => p.status === statusFilter);
-    setFiltered(list);
-  }, [prospects, search, statusFilter]);
+    loadStats();
+  }, [loadStats]);
 
   function openCreate() {
     setEditing(null);
@@ -93,18 +107,16 @@ export default function ProspectsPage() {
     setShowModal(true);
   }
 
-  function handleSaved(saved: Prospect) {
-    setProspects((prev) =>
-      prev.some((p) => p.id === saved.id)
-        ? prev.map((p) => (p.id === saved.id ? saved : p))
-        : [saved, ...prev]
-    );
+  function handleSaved() {
+    loadData();
+    loadStats();
   }
 
   async function handleDelete(id: number) {
     try {
       await prospectsApi.remove(id);
-      setProspects((prev) => prev.filter((p) => p.id !== id));
+      await loadData();
+      loadStats();
     } catch { /* ignore */ } finally {
       setDeleteId(null);
     }
@@ -128,8 +140,9 @@ export default function ProspectsPage() {
     setMarkingBooked(true);
     setBookingError("");
     try {
-      const saved = await prospectsApi.update(prospect.id, { status: "meeting_scheduled" });
-      handleSaved(saved);
+      await prospectsApi.update(prospect.id, { status: "meeting_scheduled" });
+      await loadData();
+      loadStats();
       closeConfirmBooked();
     } catch (err: unknown) {
       setBookingError(err instanceof Error ? err.message : "Error al actualizar el estado");
@@ -138,13 +151,13 @@ export default function ProspectsPage() {
     }
   }
 
-  const stats = {
-    total: prospects.length,
-    toSchedule: prospects.filter((p) => p.status === "meeting_to_schedule").length,
-    callLater: prospects.filter((p) => p.status === "call_later").length,
-    scheduled: prospects.filter((p) => p.status === "meeting_scheduled").length,
-    lost: prospects.filter((p) => p.status === "lost").length,
-  };
+  const tiles = [
+    { label: "Total", value: stats?.total ?? 0, color: "bg-dark-blue" },
+    { label: "Agendar reunión", value: stats?.meeting_to_schedule ?? 0, color: "bg-blue" },
+    { label: "Llamar más tarde", value: stats?.call_later ?? 0, color: "bg-yellow-500" },
+    { label: "Reunión agendada", value: stats?.meeting_scheduled ?? 0, color: "bg-lyratech-purple" },
+    { label: "Perdidos", value: stats?.lost ?? 0, color: "bg-red" },
+  ];
 
   const emptyMessage =
     search || statusFilter !== "all"
@@ -158,7 +171,7 @@ export default function ProspectsPage() {
         <LoadingDots />
       </div>
     );
-  } else if (filtered.length === 0) {
+  } else if (prospects.length === 0) {
     tableContent = (
       <div className="py-16 text-center">
         <p className="font-montserrat text-dark-blue/40 text-sm">{emptyMessage}</p>
@@ -178,7 +191,7 @@ export default function ProspectsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-black/5">
-            {filtered.map((prospect) => (
+            {prospects.map((prospect) => (
               <tr
                 key={prospect.id}
                 onClick={() => setViewing(prospect)}
@@ -271,13 +284,7 @@ export default function ProspectsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-          {[
-            { label: "Total", value: stats.total, color: "bg-dark-blue" },
-            { label: "Agendar reunión", value: stats.toSchedule, color: "bg-blue" },
-            { label: "Llamar más tarde", value: stats.callLater, color: "bg-yellow-500" },
-            { label: "Reunión agendada", value: stats.scheduled, color: "bg-lyratech-purple" },
-            { label: "Perdidos", value: stats.lost, color: "bg-red" },
-          ].map(({ label, value, color }) => (
+          {tiles.map(({ label, value, color }) => (
             <div key={label} className="bg-white rounded-xl p-4 shadow-sm border border-black/5">
               <p className="font-montserrat text-dark-blue/50 text-xs mb-1">{label}</p>
               <div className="flex items-end gap-2">
@@ -296,14 +303,14 @@ export default function ProspectsPage() {
               type="text"
               placeholder="Buscar por nombre, email o empresa..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-black/10 rounded-xl text-sm font-montserrat text-dark-blue placeholder-dark-blue/30 outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
             />
           </div>
           <div className="w-full sm:w-56">
             <Dropdown
               value={statusFilter}
-              onChange={(v) => setStatusFilter(v as ProspectStatus | "all")}
+              onChange={(v) => { setStatusFilter(v as ProspectStatus | "all"); setPage(1); }}
               options={STATUS_FILTER_OPTIONS}
             />
           </div>
@@ -313,6 +320,14 @@ export default function ProspectsPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
           {tableContent}
         </div>
+
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
       </div>
 
       {/* View Modal */}

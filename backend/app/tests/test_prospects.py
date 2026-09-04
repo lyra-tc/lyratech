@@ -177,6 +177,43 @@ def test_meeting_scheduled_not_assignable_from_other_statuses(auth_client, start
     assert resp.status_code == 409
 
 
+def test_list_prospects_paginates(auth_client):
+    for i in range(30):
+        auth_client.post("/api/prospects/", json={"name": f"P{i}", "source": "Web"})
+    body = auth_client.get("/api/prospects/", params={"page": 2, "page_size": 10}).json()
+    assert body["total"] == 30
+    assert len(body["items"]) == 10
+
+
+def test_list_prospects_status_filter(auth_client):
+    a = auth_client.post("/api/prospects/", json={"name": "A", "source": "Web"}).json()["id"]
+    auth_client.post("/api/prospects/", json={"name": "B", "source": "Web"})
+    auth_client.put(f"/api/prospects/{a}", json={"status": "lost"})
+    body = auth_client.get("/api/prospects/", params={"status": "lost"}).json()
+    assert body["total"] == 1
+    assert body["items"][0]["status"] == "lost"
+
+
+def test_prospects_stats(auth_client):
+    auth_client.post("/api/prospects/", json={"name": "A", "source": "Web"})
+    auth_client.post("/api/prospects/", json={"name": "B", "source": "Web"})
+    c = auth_client.post("/api/prospects/", json={"name": "C", "source": "Web"}).json()["id"]
+    auth_client.put(f"/api/prospects/{c}", json={"status": "lost"})
+    body = auth_client.get("/api/prospects/stats").json()
+    assert body == {
+        "total": 3,
+        "meeting_to_schedule": 2,
+        "call_later": 0,
+        "meeting_scheduled": 0,
+        "lost": 1,
+    }
+
+
+def test_prospects_stats_requires_admin(client, non_admin_client):
+    assert client.get("/api/prospects/stats").status_code == 401
+    assert non_admin_client.get("/api/prospects/stats").status_code == 403
+
+
 def test_prospect_persists_industry(auth_client):
     created = auth_client.post(
         "/api/prospects/",

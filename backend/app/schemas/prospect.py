@@ -46,3 +46,16 @@ class ProspectResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ProspectPage(BaseModel):
+    items: list[ProspectResponse]
+    total: int
+
+
+class ProspectStats(BaseModel):
+    total: int
+    meeting_to_schedule: int
+    call_later: int
+    meeting_scheduled: int
+    lost: int

@@ -56,6 +56,28 @@ def test_list_leads_requires_auth(client):
     assert client.get("/api/leads/").status_code == 401
 
 
+def test_list_leads_paginates(auth_client):
+    for i in range(30):
+        auth_client.post("/api/leads/manual", json={"name": f"L{i}", "email": f"l{i}@x.com"})
+    resp = auth_client.get("/api/leads/", params={"page": 2, "page_size": 10})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] == 30
+    assert len(body["items"]) == 10
+
+
+def test_list_leads_search_filters_total(auth_client):
+    auth_client.post("/api/leads/manual", json={"name": "Findme Unique", "email": "u@x.com"})
+    auth_client.post("/api/leads/manual", json={"name": "Other", "email": "o@x.com"})
+    body = auth_client.get("/api/leads/", params={"search": "Findme"}).json()
+    assert body["total"] == 1
+    assert body["items"][0]["name"] == "Findme Unique"
+
+
+def test_list_leads_page_size_capped(auth_client):
+    assert auth_client.get("/api/leads/", params={"page_size": 500}).status_code == 422
+
+
 def test_delete_lead_requires_auth(client):
     assert client.delete("/api/leads/1").status_code == 401
 
@@ -68,7 +90,7 @@ def test_admin_can_list_and_delete_leads(client, auth_client, monkeypatch):
 
     listed = auth_client.get("/api/leads/")
     assert listed.status_code == 200
-    assert any(item["id"] == lead_id for item in listed.json())
+    assert any(item["id"] == lead_id for item in listed.json()["items"])
 
     assert auth_client.delete(f"/api/leads/{lead_id}").status_code == 204
     assert auth_client.delete(f"/api/leads/{lead_id}").status_code == 404
@@ -229,7 +251,7 @@ def test_manual_lead_persists_industry_and_address(auth_client):
     assert body["industry"] == "Manufactura"
     assert body["address"] == "Av. Siempre Viva 742"
 
-    listed = auth_client.get("/api/leads/").json()
+    listed = auth_client.get("/api/leads/").json()["items"]
     row = next(x for x in listed if x["id"] == body["id"])
     assert row["industry"] == "Manufactura"
     assert row["address"] == "Av. Siempre Viva 742"
@@ -246,7 +268,7 @@ def test_update_lead_industry_address(auth_client):
     assert resp.json()["industry"] == "Retail"
     assert resp.json()["address"] == "Calle 1"
 
-    listed = auth_client.get("/api/leads/").json()
+    listed = auth_client.get("/api/leads/").json()["items"]
     row = next(x for x in listed if x["id"] == lead_id)
     assert row["industry"] == "Retail"
     assert row["address"] == "Calle 1"

@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { HiOutlineSearch, HiOutlineTrash, HiOutlineEye, HiOutlineSwitchHorizontal, HiOutlineRefresh } from "react-icons/hi";
 import LoadingDots from "@/components/shared/LoadingDots";
 import DiagnosticSubmissionDetail from "@/components/Dashboard/DiagnosticSubmissionDetail";
 import Dropdown from "@/components/shared/Dropdown";
+import Pagination from "@/components/shared/Pagination";
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { diagnosticsApi } from "@/lib/api";
 import { STATUS_COLORS } from "@/lib/prospectConstants";
 import type { DiagnosticSubmissionListItem, ProspectCreate, Prospect } from "@/lib/api";
@@ -57,9 +59,13 @@ const EMAIL_STATUS_BADGE: Record<string, string> = {
 
 export default function DiagnosticsPage() {
   const [submissions, setSubmissions] = useState<DiagnosticSubmissionListItem[]>([]);
-  const [filtered, setFiltered] = useState<DiagnosticSubmissionListItem[]>([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const debouncedSearch = useDebouncedValue(search);
+  const reqId = useRef(0);
   const [viewingId, setViewingId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [conversionFilter, setConversionFilter] = useState<ConversionFilter>("all");
@@ -70,79 +76,69 @@ export default function DiagnosticsPage() {
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (silent = false) => {
+    const id = ++reqId.current;
+    if (!silent) setLoading(true);
     try {
-      const data = await diagnosticsApi.listSubmissions();
-      setSubmissions(data);
+      const data = await diagnosticsApi.listSubmissions({
+        page,
+        pageSize,
+        search: debouncedSearch,
+        conversion: conversionFilter === "all" ? "" : conversionFilter,
+      });
+      if (id === reqId.current) {
+        setSubmissions(data.items);
+        setTotal(data.total);
+      }
     } catch {
       /* ignore — request() already redirects to login on 401 */
     } finally {
-      setLoading(false);
+      if (id === reqId.current && !silent) setLoading(false);
     }
-  }, []);
+  }, [page, pageSize, debouncedSearch, conversionFilter]);
 
   const refreshEmailStatuses = useCallback(async () => {
     setRefreshing(true);
     try {
-      const data = await diagnosticsApi.refreshEmailStatus();
-      setSubmissions(data);
+      await diagnosticsApi.refreshEmailStatus();
       try {
         sessionStorage.setItem("diag_email_status_refreshed_at", String(Date.now()));
       } catch {
         /* sessionStorage unavailable — fine */
       }
+      await loadData(true);
     } catch {
       /* ignore */
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [loadData]);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      await loadData();
-      if (cancelled) return;
-      let lastRefreshed = 0;
-      try {
-        lastRefreshed = Number(sessionStorage.getItem("diag_email_status_refreshed_at")) || 0;
-      } catch {
-        /* sessionStorage unavailable */
-      }
-      // Skip the (slow) auto-refresh if we ran one in the last 2 minutes.
-      if (Date.now() - lastRefreshed > 120_000) {
-        refreshEmailStatuses();
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [loadData, refreshEmailStatuses]);
+    loadData();
+  }, [loadData]);
 
-  // Search + conversion filtering is client-side over the already-loaded list
-  // (the submissions list is not paginated); the server params exist but aren't used here.
+  // Mount-only: trigger the (slow) email-status auto-refresh once, unless one ran
+  // in the last 2 minutes.
+  const didFirstRefreshCheck = useRef(false);
   useEffect(() => {
-    let list = submissions;
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.email.toLowerCase().includes(q) ||
-          s.company?.toLowerCase().includes(q)
-      );
+    if (didFirstRefreshCheck.current) return;
+    didFirstRefreshCheck.current = true;
+    let lastRefreshed = 0;
+    try {
+      lastRefreshed = Number(sessionStorage.getItem("diag_email_status_refreshed_at")) || 0;
+    } catch {
+      /* sessionStorage unavailable */
     }
-    if (conversionFilter !== "all") {
-      list = list.filter((s) => s.conversion_status === conversionFilter);
+    if (Date.now() - lastRefreshed > 120_000) {
+      refreshEmailStatuses();
     }
-    setFiltered(list);
-  }, [submissions, search, conversionFilter]);
+  }, [refreshEmailStatuses]);
 
   async function handleDelete(id: number) {
     try {
       await diagnosticsApi.removeSubmission(id);
-      setSubmissions((prev) => prev.filter((s) => s.id !== id));
+      await loadData();
     } catch {
       /* ignore */
     } finally {
@@ -196,14 +192,8 @@ export default function DiagnosticsPage() {
     setConvertError(null);
     const target = converting.submissionId;
     try {
-      const updated = await diagnosticsApi.markConverted(target, prospect.id);
-      setSubmissions((prev) =>
-        prev.map((s) =>
-          s.id === target
-            ? { ...s, conversion_status: updated.conversion_status, converted_prospect_id: updated.converted_prospect_id }
-            : s
-        )
-      );
+      await diagnosticsApi.markConverted(target, prospect.id);
+      await loadData();
     } catch {
       setConvertError(
         "El prospecto se creó correctamente, pero no se pudo marcar el diagnóstico como convertido. El prospecto ya existe en el pipeline — no lo conviertas de nuevo desde aquí; márcalo manualmente o contacta soporte."
@@ -234,14 +224,14 @@ export default function DiagnosticsPage() {
               type="text"
               placeholder="Buscar por nombre, email o empresa..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-black/10 rounded-xl text-sm font-montserrat text-dark-blue placeholder-dark-blue/30 outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
             />
           </div>
           <div className="w-full sm:w-56">
             <Dropdown
               value={conversionFilter}
-              onChange={(v) => setConversionFilter(v as ConversionFilter)}
+              onChange={(v) => { setConversionFilter(v as ConversionFilter); setPage(1); }}
               options={CONVERSION_FILTER_OPTIONS}
             />
           </div>
@@ -269,7 +259,7 @@ export default function DiagnosticsPage() {
             <div className="py-16 flex items-center justify-center">
               <LoadingDots />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : submissions.length === 0 ? (
             <div className="py-16 text-center">
               <p className="font-montserrat text-dark-blue/40 text-sm">{emptyMessage}</p>
             </div>
@@ -286,7 +276,7 @@ export default function DiagnosticsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/5">
-                  {filtered.map((submission) => (
+                  {submissions.map((submission) => (
                     <tr key={submission.id} className="hover:bg-beige/40 transition-colors group">
                       <td className="px-4 py-3.5">
                         <p className="font-montserrat font-semibold text-dark-blue text-sm">{submission.name}</p>
@@ -353,6 +343,14 @@ export default function DiagnosticsPage() {
             </div>
           )}
         </div>
+
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
       </div>
 
       {viewingId !== null && (

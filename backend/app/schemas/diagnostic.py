@@ -126,6 +126,11 @@ class DiagnosticSubmissionListItem(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class DiagnosticSubmissionPage(BaseModel):
+    items: list[DiagnosticSubmissionListItem]
+    total: int
+
+
 class DiagnosticMarkConvertedRequest(BaseModel):
     prospect_id: int
 

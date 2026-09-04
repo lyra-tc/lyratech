@@ -46,6 +46,19 @@ class LeadImportError(Exception):
     """Raised for an unreadable / unsupported / empty upload."""
 
 
+def normalize_phone(raw) -> str:
+    """Reduce a phone string to digits only for duplicate comparison.
+
+    Formatting (spaces, parentheses, dashes, dots) is dropped. A Mexican
+    country code (``52`` / ``+52``) on an otherwise 10-digit number is stripped
+    so ``+52 442 223 7492`` and ``(442) 223-7492`` match.
+    """
+    digits = re.sub(r"\D", "", str(raw or ""))
+    if len(digits) == 12 and digits.startswith("52"):
+        digits = digits[2:]
+    return digits
+
+
 def _normalize_header(value) -> str:
     s = unicodedata.normalize("NFKD", str(value or ""))
     s = "".join(c for c in s if not unicodedata.combining(c))
@@ -157,7 +170,7 @@ def plan_import(
             skipped.append((row, reason))
             continue
         email = row.get("email", "").strip().lower()
-        phone = row.get("phone", "").strip()
+        phone = normalize_phone(row.get("phone", ""))
         if email and (email in existing_emails or email in seen_emails):
             skipped.append((row, "Correo ya registrado en leads"))
             continue

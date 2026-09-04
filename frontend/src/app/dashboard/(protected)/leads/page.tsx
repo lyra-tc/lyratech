@@ -1,20 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { HiOutlinePlus, HiOutlineSearch, HiOutlineTrash, HiOutlinePencil, HiOutlineSwitchHorizontal, HiOutlineUpload } from "react-icons/hi";
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
 import LeadFormModal from "@/components/Dashboard/LeadFormModal";
 import LeadImportModal from "@/components/Dashboard/LeadImportModal";
 import LoadingDots from "@/components/shared/LoadingDots";
+import Pagination from "@/components/shared/Pagination";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { leadsApi } from "@/lib/api";
 import type { Lead, ProspectCreate, LeadImportResult } from "@/lib/api";
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filtered, setFiltered] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const debouncedSearch = useDebouncedValue(search);
+  const reqId = useRef(0);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [converting, setConverting] = useState<Lead | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -24,38 +30,29 @@ export default function LeadsPage() {
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
 
   const loadData = useCallback(async () => {
+    const id = ++reqId.current;
+    setLoading(true);
     try {
-      const data = await leadsApi.list();
-      setLeads(data);
+      const data = await leadsApi.list({ page, pageSize, search: debouncedSearch });
+      if (id === reqId.current) {
+        setLeads(data.items);
+        setTotal(data.total);
+      }
     } catch {
       /* ignore — request() already redirects to login on 401 */
     } finally {
-      setLoading(false);
+      if (id === reqId.current) setLoading(false);
     }
-  }, []);
+  }, [page, pageSize, debouncedSearch]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  useEffect(() => {
-    let list = leads;
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (l) =>
-          l.name.toLowerCase().includes(q) ||
-          l.email?.toLowerCase().includes(q) ||
-          l.company?.toLowerCase().includes(q)
-      );
-    }
-    setFiltered(list);
-  }, [leads, search]);
-
   async function handleDelete(id: number) {
     try {
       await leadsApi.remove(id);
-      setLeads((prev) => prev.filter((l) => l.id !== id));
+      await loadData();
     } catch { /* ignore */ } finally {
       setDeleteId(null);
     }
@@ -65,7 +62,7 @@ export default function LeadsPage() {
     try {
       await leadsApi.remove(leadId);
     } catch { /* ignore */ }
-    setLeads((prev) => prev.filter((l) => l.id !== leadId));
+    await loadData();
   }
 
   function convertInitialForm(lead: Lead): ProspectCreate {
@@ -86,12 +83,8 @@ export default function LeadsPage() {
     };
   }
 
-  function handleSaved(saved: Lead) {
-    setLeads((prev) =>
-      prev.some((l) => l.id === saved.id)
-        ? prev.map((l) => (l.id === saved.id ? saved : l))
-        : [saved, ...prev]
-    );
+  function handleSaved() {
+    loadData();
     setShowCreate(false);
     setEditing(null);
   }
@@ -139,7 +132,7 @@ export default function LeadsPage() {
               type="text"
               placeholder="Buscar por nombre, email o empresa..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-black/10 rounded-xl text-sm font-montserrat text-dark-blue placeholder-dark-blue/30 outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
             />
           </div>
@@ -150,7 +143,7 @@ export default function LeadsPage() {
             <div className="py-16 flex items-center justify-center">
               <LoadingDots />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : leads.length === 0 ? (
             <div className="py-16 text-center">
               <p className="font-montserrat text-dark-blue/40 text-sm">{emptyMessage}</p>
             </div>
@@ -167,7 +160,7 @@ export default function LeadsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/5">
-                  {filtered.map((lead) => (
+                  {leads.map((lead) => (
                     <tr key={lead.id} className="hover:bg-beige/40 transition-colors group">
                       <td className="px-4 py-3.5">
                         <p className="font-montserrat font-semibold text-dark-blue text-sm">{lead.name}</p>
@@ -215,6 +208,14 @@ export default function LeadsPage() {
             </div>
           )}
         </div>
+
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
       </div>
 
       {(showCreate || editing) && (

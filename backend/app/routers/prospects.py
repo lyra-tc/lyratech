@@ -1,28 +1,60 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session
-from typing import List
 from ..core.deps import get_db, get_current_admin
 from ..models.prospect import Prospect, ProspectStatus
 from ..models.user import User
-from ..schemas.prospect import ProspectCreate, ProspectUpdate, ProspectResponse
+from ..schemas.prospect import (
+    ProspectCreate,
+    ProspectPage,
+    ProspectStats,
+    ProspectUpdate,
+    ProspectResponse,
+)
 
 router = APIRouter(prefix="/prospects", tags=["prospects"])
 
 
-@router.get("/", response_model=List[ProspectResponse])
+@router.get("/", response_model=ProspectPage)
 def list_prospects(
-    skip: int = 0,
-    limit: int = 100,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(25, ge=1, le=100),
+    search: str = Query(""),
+    status: str = Query(""),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
-    return (
-        db.query(Prospect)
-        .order_by(Prospect.created_at.desc())
-        .offset(skip)
-        .limit(limit)
+    query = db.query(Prospect)
+    if search:
+        like = f"%{search}%"
+        query = query.filter(
+            Prospect.name.ilike(like)
+            | Prospect.email.ilike(like)
+            | Prospect.company.ilike(like)
+        )
+    valid = {s.value for s in ProspectStatus}
+    if status in valid:
+        query = query.filter(Prospect.status == status)
+    total = query.count()
+    items = (
+        query.order_by(Prospect.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
         .all()
     )
+    return {"items": items, "total": total}
+
+
+@router.get("/stats", response_model=ProspectStats)
+def prospect_stats(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    counts = dict(
+        db.query(Prospect.status, func.count(Prospect.id)).group_by(Prospect.status).all()
+    )
+    by_status = {s.value: int(counts.get(s, 0)) for s in ProspectStatus}
+    return {"total": sum(by_status.values()), **by_status}
 
 
 @router.post("/", response_model=ProspectResponse, status_code=201)

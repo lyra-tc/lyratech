@@ -104,6 +104,19 @@ export interface Lead {
   created_at: string;
 }
 
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+}
+
+export interface ProspectStats {
+  total: number;
+  meeting_to_schedule: number;
+  call_later: number;
+  meeting_scheduled: number;
+  lost: number;
+}
+
 export interface LeadImportSkip {
   file: string;
   row: number;
@@ -215,15 +228,19 @@ export const usersApi = {
 };
 
 export const leadsApi = {
-  list: () => request<Lead[]>("/api/leads/"),
+  list: (params: { page: number; pageSize: number; search?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    return request<Paginated<Lead>>(`/api/leads/?${qs.toString()}`);
+  },
   createManual: (data: LeadManualCreate) =>
     request<Lead>("/api/leads/manual", { method: "POST", body: JSON.stringify(data) }),
   update: (id: number, data: Partial<LeadManualCreate>) =>
     request<Lead>(`/api/leads/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   remove: (id: number) => request<void>(`/api/leads/${id}`, { method: "DELETE" }),
-  importLeads: (files: File[]) => {
+  importLeadsOne: (file: File) => {
     const fd = new FormData();
-    files.forEach((f) => fd.append("files", f));
+    fd.append("files", file);
     return request<LeadImportResult>("/api/leads/import", { method: "POST", body: fd });
   },
 };
@@ -242,7 +259,13 @@ export async function submitLead(data: LeadSubmit): Promise<Lead> {
 }
 
 export const prospectsApi = {
-  list: () => request<Prospect[]>("/api/prospects/"),
+  list: (params: { page: number; pageSize: number; search?: string; status?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    if (params.status) qs.set("status", params.status);
+    return request<Paginated<Prospect>>(`/api/prospects/?${qs.toString()}`);
+  },
+  stats: () => request<ProspectStats>("/api/prospects/stats"),
   create: (data: ProspectCreate) =>
     request<Prospect>("/api/prospects/", { method: "POST", body: JSON.stringify(data) }),
   update: (id: number, data: Partial<ProspectCreate>) =>
@@ -408,14 +431,11 @@ export interface DiagnosticQuestionInput {
 }
 
 export const diagnosticsApi = {
-  listSubmissions: (search = "", conversion = "") => {
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (conversion) params.set("conversion", conversion);
-    const qs = params.toString();
-    return request<DiagnosticSubmissionListItem[]>(
-      `/api/diagnostics/submissions${qs ? `?${qs}` : ""}`
-    );
+  listSubmissions: (params: { page: number; pageSize: number; search?: string; conversion?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    if (params.conversion) qs.set("conversion", params.conversion);
+    return request<Paginated<DiagnosticSubmissionListItem>>(`/api/diagnostics/submissions?${qs.toString()}`);
   },
   getSubmission: (id: number) =>
     request<DiagnosticSubmissionDetail>(`/api/diagnostics/submissions/${id}`),

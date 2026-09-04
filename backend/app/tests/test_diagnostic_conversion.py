@@ -30,7 +30,7 @@ def _make_submission(**overrides) -> int:
 def test_list_and_detail_include_conversion_status(auth_client):
     sid = _make_submission()
     item = next(
-        i for i in auth_client.get("/api/diagnostics/submissions").json() if i["id"] == sid
+        i for i in auth_client.get("/api/diagnostics/submissions").json()["items"] if i["id"] == sid
     )
     assert item["conversion_status"] == "pending"
     assert item["converted_prospect_id"] is None
@@ -44,10 +44,10 @@ def test_list_submissions_filters_by_conversion(auth_client):
 
     ids = [i["id"] for i in auth_client.get(
         "/api/diagnostics/submissions", params={"conversion": "prospect"}
-    ).json()]
+    ).json()["items"]]
     assert converted_id in ids and pending_id not in ids
 
-    ids_all = [i["id"] for i in auth_client.get("/api/diagnostics/submissions").json()]
+    ids_all = [i["id"] for i in auth_client.get("/api/diagnostics/submissions").json()["items"]]
     assert pending_id in ids_all and converted_id in ids_all
 
 
@@ -55,7 +55,7 @@ def test_list_submissions_ignores_unknown_conversion_value(auth_client):
     sid = _make_submission()
     ids = [i["id"] for i in auth_client.get(
         "/api/diagnostics/submissions", params={"conversion": "garbage"}
-    ).json()]
+    ).json()["items"]]
     assert sid in ids
 
 

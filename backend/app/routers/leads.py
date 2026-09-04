@@ -6,12 +6,12 @@ from fastapi import (
     Depends,
     File,
     HTTPException,
+    Query,
     Request,
     Response,
     UploadFile,
 )
 from sqlalchemy.orm import Session
-from typing import List
 from ..core.deps import get_db, get_current_admin
 from ..core.idempotency import claim_turnstile_token
 from ..core.limiter import limiter
@@ -22,6 +22,7 @@ from ..core.lead_import import (
     TEMPLATE_HEADERS,
     LeadImportError,
     build_xlsx,
+    normalize_phone,
     parse_upload,
     plan_import,
 )
@@ -33,6 +34,7 @@ from ..schemas.lead import (
     LeadImportResult,
     LeadImportSkip,
     LeadManualCreate,
+    LeadPage,
     LeadResponse,
     LeadUpdate,
 )
@@ -129,9 +131,9 @@ async def import_leads(
         if e and e.strip()
     }
     existing_phones = {
-        p.strip()
+        normalize_phone(p)
         for (p,) in db.query(Lead.phone).filter(Lead.phone.isnot(None)).all()
-        if p and p.strip()
+        if p and normalize_phone(p)
     }
 
     to_insert, skipped = plan_import(all_rows, existing_emails, existing_phones)
@@ -162,20 +164,28 @@ async def import_leads(
     )
 
 
-@router.get("/", response_model=List[LeadResponse])
+@router.get("/", response_model=LeadPage)
 def list_leads(
-    skip: int = 0,
-    limit: int = 100,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(25, ge=1, le=100),
+    search: str = Query(""),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
-    return (
-        db.query(Lead)
-        .order_by(Lead.created_at.desc())
-        .offset(skip)
-        .limit(limit)
+    query = db.query(Lead)
+    if search:
+        like = f"%{search}%"
+        query = query.filter(
+            Lead.name.ilike(like) | Lead.email.ilike(like) | Lead.company.ilike(like)
+        )
+    total = query.count()
+    items = (
+        query.order_by(Lead.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
         .all()
     )
+    return {"items": items, "total": total}
 
 
 @router.put("/{lead_id}", response_model=LeadResponse)

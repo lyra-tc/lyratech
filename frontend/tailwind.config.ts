@@ -32,8 +32,13 @@ export default {
         slideInUp: 'slideInUp 0.5s ease-out forwards',
         marquee: 'marquee 40s linear infinite',
         'marquee-reverse': 'marqueeReverse 18s linear infinite',
+        'import-shimmer': 'importShimmer 1s linear infinite',
       },
       keyframes: {
+        importShimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(300%)' },
+        },
         marquee: {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-50%)' },

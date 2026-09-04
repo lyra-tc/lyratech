@@ -4,7 +4,7 @@ import time
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from ..config import settings
@@ -35,6 +35,7 @@ from ..schemas.diagnostic import (
     DiagnosticQuestionResponse,
     DiagnosticQuestionUpdate,
     DiagnosticSubmissionListItem,
+    DiagnosticSubmissionPage,
     DiagnosticSubmissionResponse,
     DiagnosticSubmitRequest,
     DiagnosticSubmitResult,
@@ -267,10 +268,12 @@ def submit_diagnostic(
     )
 
 
-@router.get("/submissions", response_model=List[DiagnosticSubmissionListItem])
+@router.get("/submissions", response_model=DiagnosticSubmissionPage)
 def list_submissions(
     search: str = "",
     conversion: str = "",
+    page: int = Query(1, ge=1),
+    page_size: int = Query(25, ge=1, le=100),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
@@ -284,7 +287,14 @@ def list_submissions(
         )
     if conversion in {"pending", "prospect", "lost"}:
         query = query.filter(DiagnosticSubmission.conversion_status == conversion)
-    return query.order_by(DiagnosticSubmission.created_at.desc()).all()
+    total = query.count()
+    items = (
+        query.order_by(DiagnosticSubmission.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    return {"items": items, "total": total}
 
 
 @router.post(

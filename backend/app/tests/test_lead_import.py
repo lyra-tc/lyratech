@@ -7,6 +7,7 @@ from ..core.lead_import import (
     LeadImportError,
     TEMPLATE_HEADERS,
     build_xlsx,
+    normalize_phone,
     parse_upload,
     plan_import,
     validate_row,
@@ -102,6 +103,33 @@ def test_plan_dedupes_existing_email():
     assert skipped[0][1] == "Correo ya registrado en leads"
 
 
+def test_normalize_phone_strips_formatting():
+    assert normalize_phone("( 442) 223 7492") == "4422237492"
+    assert normalize_phone("(442)223-7492") == "4422237492"
+    assert normalize_phone("+52 442 223 7492") == "4422237492"
+    assert normalize_phone("52 442 223 7492") == "4422237492"
+    assert normalize_phone("442.223.7492") == "4422237492"
+    assert normalize_phone("") == ""
+    assert normalize_phone(None) == ""
+
+
+def test_plan_dedupes_phone_ignoring_formatting():
+    rows = [{"name": "A", "email": "", "phone": "(442) 223-7492"}]
+    to_insert, skipped = plan_import(rows, set(), {"4422237492"})
+    assert to_insert == []
+    assert "Teléfono" in skipped[0][1]
+
+
+def test_plan_within_batch_phone_dedupe_ignores_formatting():
+    rows = [
+        {"name": "A", "email": "", "phone": "442 223 7492"},
+        {"name": "B", "email": "", "phone": "(442)223-7492"},
+    ]
+    to_insert, skipped = plan_import(rows, set(), set())
+    assert len(to_insert) == 1
+    assert len(skipped) == 1
+
+
 def test_plan_dedupes_phone_only_when_no_email():
     rows = [{"name": "A", "email": "", "phone": "55"}]
     to_insert, skipped = plan_import(rows, set(), {"55"})
@@ -171,7 +199,7 @@ def test_import_csv_inserts_rows(auth_client):
     assert body["inserted"] == 2
     assert body["skipped_count"] == 0
     assert body["report_xlsx_base64"] is None
-    listed = auth_client.get("/api/leads/").json()
+    listed = auth_client.get("/api/leads/").json()["items"]
     ada = next(x for x in listed if x["email"] == "ada@x.com")
     assert ada["industry"] == "TI"
     assert ada["address"] == "Calle 1"
@@ -210,6 +238,14 @@ def test_import_skips_duplicate_email(auth_client):
 def test_import_skips_duplicate_phone_when_no_email(auth_client):
     auth_client.post("/api/leads/manual", json={"name": "Existing", "phone": "5551234"})
     files = {"files": ("l.csv", _csv_bytes([_row("Dup", "", "5551234")]), "text/csv")}
+    body = auth_client.post("/api/leads/import", files=files).json()
+    assert body["inserted"] == 0
+    assert "Teléfono" in body["skipped"][0]["reason"]
+
+
+def test_import_skips_duplicate_phone_different_format(auth_client):
+    auth_client.post("/api/leads/manual", json={"name": "Existing", "phone": "(442) 223-7492"})
+    files = {"files": ("l.csv", _csv_bytes([_row("Dup", "", "442 223 7492")]), "text/csv")}
     body = auth_client.post("/api/leads/import", files=files).json()
     assert body["inserted"] == 0
     assert "Teléfono" in body["skipped"][0]["reason"]

@@ -60,6 +60,11 @@ class LeadResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class LeadPage(BaseModel):
+    items: list[LeadResponse]
+    total: int
+
+
 class LeadImportSkip(BaseModel):
     file: str
     row: int
