@@ -53,6 +53,19 @@ def _reset_schema_and_limiter():
     Base.metadata.drop_all(bind=engine)
 
 
+@pytest.fixture(autouse=True)
+def _force_test_cookie_settings(monkeypatch):
+    """Pin session-cookie config so tests don't depend on the local .env.
+
+    In particular a real AUTH_COOKIE_DOMAIN would make the cookie Secure, and
+    the http TestClient would then never send it back.
+    """
+    from ..config import settings
+
+    monkeypatch.setattr(settings, "AUTH_COOKIE_NAME", "lyratech_session", raising=False)
+    monkeypatch.setattr(settings, "AUTH_COOKIE_DOMAIN", "", raising=False)
+
+
 @pytest.fixture
 def client():
     return TestClient(_build_test_app())

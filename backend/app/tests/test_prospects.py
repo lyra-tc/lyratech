@@ -1,116 +1,226 @@
-VALID_PAYLOAD = {
-    "name": "Ada Lovelace",
-    "email": "ada@example.com",
-    "phone": "+52 555 000 0000",
-    "company": "Acme",
-    "service": "automatizaciones",
-    "message": "Quiero saber más",
-    "turnstile_token": "test-token",
-}
+import pytest
 
-
-def test_create_prospect_success(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
-    )
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 201
-    body = response.json()
-    assert body["name"] == "Ada Lovelace"
-    assert body["email"] == "ada@example.com"
-    assert "turnstile_token" not in body
-
-
-def test_create_prospect_turnstile_failure(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: False,
-    )
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 400
-
-
-def test_create_prospect_rate_limited(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
-    )
-    for i in range(5):
-        payload = {**VALID_PAYLOAD, "turnstile_token": f"test-token-{i}"}
-        assert client.post("/api/prospects/", json=payload).status_code == 201
-
-    payload = {**VALID_PAYLOAD, "turnstile_token": "test-token-5"}
-    response = client.post("/api/prospects/", json=payload)
-    assert response.status_code == 429
-
-
-def test_create_prospect_duplicate_token_rejected(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
-    )
-    first = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert first.status_code == 201
-
-    second = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert second.status_code == 409
+from .conftest import TestingSessionLocal
+from ..models.prospect import Prospect
 
 
 def test_list_prospects_requires_auth(client):
-    response = client.get("/api/prospects/")
-    assert response.status_code == 401
+    assert client.get("/api/prospects/").status_code == 401
 
 
-def test_delete_prospect_requires_auth(client):
-    response = client.delete("/api/prospects/1")
-    assert response.status_code == 401
+def test_list_prospects_requires_admin(non_admin_client):
+    assert non_admin_client.get("/api/prospects/").status_code == 403
 
 
-def test_create_prospect_dispatches_notification_to_configured_recipients(
-    client, auth_client, monkeypatch
-):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
+def test_admin_can_create_and_read_prospect(auth_client):
+    created = auth_client.post(
+        "/api/prospects/",
+        json={
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "service": "precio-fijo",
+            "source": "Web",
+        },
     )
+    assert created.status_code == 201
+    body = created.json()
+    assert body["service"] == "precio-fijo"
+    assert body["status"] == "meeting_to_schedule"
+    prospect_id = body["id"]
+
+    fetched = auth_client.get(f"/api/prospects/{prospect_id}")
+    assert fetched.status_code == 200
+    assert fetched.json()["name"] == "Ada Lovelace"
+
+
+def test_get_missing_prospect_returns_404(auth_client):
+    assert auth_client.get("/api/prospects/99999").status_code == 404
+
+
+def test_admin_can_update_prospect(auth_client):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "Grace", "source": "Web"}
+    )
+    prospect_id = created.json()["id"]
+
+    updated = auth_client.put(
+        f"/api/prospects/{prospect_id}",
+        json={"status": "lost", "service": "equipo-dedicado"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["status"] == "lost"
+    assert updated.json()["service"] == "equipo-dedicado"
+
+
+def test_admin_can_delete_prospect(auth_client):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "Temp", "source": "Web"}
+    )
+    prospect_id = created.json()["id"]
+    assert auth_client.delete(f"/api/prospects/{prospect_id}").status_code == 204
+    assert auth_client.delete(f"/api/prospects/{prospect_id}").status_code == 404
+
+
+def test_prospect_row_persists_service(auth_client):
     auth_client.post(
-        "/api/notifications/recipients", json={"email": "team@lyratech.com.mx"}
+        "/api/prospects/",
+        json={"name": "Persisted", "service": "diagnostico", "source": "Web"},
+    )
+    db = TestingSessionLocal()
+    try:
+        row = db.query(Prospect).filter(Prospect.name == "Persisted").first()
+        assert row is not None
+        assert row.service == "diagnostico"
+    finally:
+        db.close()
+
+
+@pytest.mark.parametrize("status", ["meeting_to_schedule", "call_later", "lost"])
+def test_prospect_status_values_round_trip(auth_client, status):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "S", "source": "Web", "status": status}
+    )
+    assert created.status_code == 201
+    assert created.json()["status"] == status
+
+
+def test_prospect_rejects_removed_status_value(auth_client):
+    created = auth_client.post(
+        "/api/prospects/", json={"name": "X", "source": "Web", "status": "won"}
+    )
+    assert created.status_code == 422
+
+
+def test_prospect_default_status_is_meeting_to_schedule(auth_client):
+    created = auth_client.post("/api/prospects/", json={"name": "D", "source": "Web"})
+    assert created.json()["status"] == "meeting_to_schedule"
+
+
+def test_booking_flow_sets_meeting_scheduled(auth_client):
+    created = auth_client.post("/api/prospects/", json={"name": "B", "source": "Web"})
+    prospect_id = created.json()["id"]
+
+    updated = auth_client.put(
+        f"/api/prospects/{prospect_id}", json={"status": "meeting_scheduled"}
+    )
+    assert updated.status_code == 200
+    assert updated.json()["status"] == "meeting_scheduled"
+
+
+def test_create_prospect_rejects_meeting_scheduled(auth_client):
+    created = auth_client.post(
+        "/api/prospects/",
+        json={"name": "X", "source": "Web", "status": "meeting_scheduled"},
+    )
+    assert created.status_code == 422
+    assert (
+        created.json()["detail"]
+        == "No se puede crear un prospecto directamente en Reunión agendada"
     )
 
-    captured = {}
 
-    def fake_send(prospect, recipient_emails):
-        captured["prospect_name"] = prospect.name
-        captured["recipient_emails"] = recipient_emails
+def test_meeting_scheduled_can_move_to_lost(auth_client):
+    pid = auth_client.post(
+        "/api/prospects/", json={"name": "M", "source": "Web"}
+    ).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
 
-    monkeypatch.setattr(
-        "app.routers.prospects.send_prospect_notification_email", fake_send
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"status": "lost"})
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "lost"
+
+
+@pytest.mark.parametrize("target", ["meeting_to_schedule", "call_later"])
+def test_meeting_scheduled_locked_from_reverting(auth_client, target):
+    pid = auth_client.post(
+        "/api/prospects/", json={"name": "L", "source": "Web"}
+    ).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
+
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"status": target})
+    assert resp.status_code == 409
+    assert (
+        resp.json()["detail"]
+        == "Un prospecto en Reunión agendada solo puede pasar a Perdido"
     )
 
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 201
-    assert captured["prospect_name"] == "Ada Lovelace"
-    assert captured["recipient_emails"] == ["team@lyratech.com.mx"]
 
+def test_meeting_scheduled_can_be_re_saved_unchanged(auth_client):
+    pid = auth_client.post("/api/prospects/", json={"name": "R", "source": "Web"}).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
 
-def test_create_prospect_dispatches_with_empty_list_when_no_recipients_configured(
-    client, monkeypatch
-):
-    monkeypatch.setattr(
-        "app.routers.prospects.verify_turnstile_token",
-        lambda token, remote_ip=None: True,
+    resp = auth_client.put(
+        f"/api/prospects/{pid}", json={"status": "meeting_scheduled", "notes": "x"}
     )
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "meeting_scheduled"
+    assert resp.json()["notes"] == "x"
 
-    captured = {}
 
-    def fake_send(prospect, recipient_emails):
-        captured["recipient_emails"] = recipient_emails
+def test_meeting_scheduled_field_edit_without_status(auth_client):
+    pid = auth_client.post("/api/prospects/", json={"name": "F", "source": "Web"}).json()["id"]
+    auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
 
-    monkeypatch.setattr(
-        "app.routers.prospects.send_prospect_notification_email", fake_send
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"notes": "edited"})
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "meeting_scheduled"
+    assert resp.json()["notes"] == "edited"
+
+
+@pytest.mark.parametrize("start", ["call_later", "lost"])
+def test_meeting_scheduled_not_assignable_from_other_statuses(auth_client, start):
+    pid = auth_client.post(
+        "/api/prospects/", json={"name": "N", "source": "Web", "status": start}
+    ).json()["id"]
+
+    resp = auth_client.put(f"/api/prospects/{pid}", json={"status": "meeting_scheduled"})
+    assert resp.status_code == 409
+
+
+def test_list_prospects_paginates(auth_client):
+    for i in range(30):
+        auth_client.post("/api/prospects/", json={"name": f"P{i}", "source": "Web"})
+    body = auth_client.get("/api/prospects/", params={"page": 2, "page_size": 10}).json()
+    assert body["total"] == 30
+    assert len(body["items"]) == 10
+
+
+def test_list_prospects_status_filter(auth_client):
+    a = auth_client.post("/api/prospects/", json={"name": "A", "source": "Web"}).json()["id"]
+    auth_client.post("/api/prospects/", json={"name": "B", "source": "Web"})
+    auth_client.put(f"/api/prospects/{a}", json={"status": "lost"})
+    body = auth_client.get("/api/prospects/", params={"status": "lost"}).json()
+    assert body["total"] == 1
+    assert body["items"][0]["status"] == "lost"
+
+
+def test_prospects_stats(auth_client):
+    auth_client.post("/api/prospects/", json={"name": "A", "source": "Web"})
+    auth_client.post("/api/prospects/", json={"name": "B", "source": "Web"})
+    c = auth_client.post("/api/prospects/", json={"name": "C", "source": "Web"}).json()["id"]
+    auth_client.put(f"/api/prospects/{c}", json={"status": "lost"})
+    body = auth_client.get("/api/prospects/stats").json()
+    assert body == {
+        "total": 3,
+        "meeting_to_schedule": 2,
+        "call_later": 0,
+        "meeting_scheduled": 0,
+        "lost": 1,
+    }
+
+
+def test_prospects_stats_requires_admin(client, non_admin_client):
+    assert client.get("/api/prospects/stats").status_code == 401
+    assert non_admin_client.get("/api/prospects/stats").status_code == 403
+
+
+def test_prospect_persists_industry(auth_client):
+    created = auth_client.post(
+        "/api/prospects/",
+        json={"name": "Ind Co", "source": "Web", "industry": "Salud"},
     )
+    assert created.status_code == 201
+    assert created.json()["industry"] == "Salud"
 
-    response = client.post("/api/prospects/", json=VALID_PAYLOAD)
-    assert response.status_code == 201
-    assert captured["recipient_emails"] == []
+    fetched = auth_client.get(f"/api/prospects/{created.json()['id']}")
+    assert fetched.json()["industry"] == "Salud"

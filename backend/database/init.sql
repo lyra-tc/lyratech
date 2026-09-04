@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
--- Leads
+-- Leads (raw public inbound from the contact form)
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS leads (
     id          INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,7 +36,26 @@ CREATE TABLE IF NOT EXISTS leads (
     email       VARCHAR(255),
     phone       VARCHAR(50),
     company     VARCHAR(255),
-    status      ENUM('new','contacted','qualified','proposal','closed','lost') DEFAULT 'new',
+    industry    VARCHAR(120),
+    address     VARCHAR(255),
+    service     VARCHAR(100),
+    message     TEXT,
+    created_at  DATETIME DEFAULT (now()),
+    INDEX ix_leads_id (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+-- Prospects (admin-managed sales pipeline)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS prospects (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    email       VARCHAR(255),
+    phone       VARCHAR(50),
+    company     VARCHAR(255),
+    industry    VARCHAR(120),
+    service     VARCHAR(100),
+    status      ENUM('meeting_to_schedule','call_later','meeting_scheduled','lost') NOT NULL DEFAULT 'meeting_to_schedule',
     source      VARCHAR(100),
     notes       TEXT,
     assigned_to INT,
@@ -46,21 +65,6 @@ CREATE TABLE IF NOT EXISTS leads (
     INDEX idx_status (status),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
--- Prospects (public contact form submissions)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS prospects (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL,
-    email       VARCHAR(255) NOT NULL,
-    phone       VARCHAR(50),
-    company     VARCHAR(255),
-    service     VARCHAR(100),
-    message     TEXT,
-    created_at  DATETIME DEFAULT (now()),
-    INDEX ix_prospects_id (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 -- Notification recipients (dashboard-configurable email list)
@@ -110,15 +114,21 @@ CREATE TABLE IF NOT EXISTS diagnostic_submissions (
     llm_status                      VARCHAR(20) NOT NULL DEFAULT 'ok',
     email_delivery_status           VARCHAR(20) NOT NULL DEFAULT 'pending',
     email_delivery_error            TEXT,
+    email_provider_id               VARCHAR(64),
+    conversion_status               VARCHAR(20) NOT NULL DEFAULT 'pending',
+    converted_prospect_id           INT,
+    converted_at                    DATETIME NULL,
     created_at                      DATETIME DEFAULT (now()),
+    CONSTRAINT fk_diag_converted_prospect FOREIGN KEY (converted_prospect_id) REFERENCES prospects(id) ON DELETE SET NULL,
     INDEX ix_diagnostic_submissions_id (id),
-    INDEX idx_created_at (created_at)
+    INDEX idx_created_at (created_at),
+    INDEX idx_conversion_status (conversion_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 -- Used Turnstile tokens: idempotency guard so a duplicate submit
 -- (double-click, network retry, replayed request) with the same
--- Turnstile token on /prospects or /diagnostics/submit is rejected
+-- Turnstile token on /leads or /diagnostics/submit is rejected
 -- instead of processed twice. Rows older than 30 days are cleaned up by
 -- the backend at startup (see app/core/idempotency.py).
 -- --------------------------------------------------------

@@ -1,29 +1,48 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator
 from datetime import datetime
 from typing import Optional
-from ..models.lead import LeadStatus
+
+
+def _blank_to_none(v):
+    if isinstance(v, str) and not v.strip():
+        return None
+    return v
 
 
 class LeadCreate(BaseModel):
     name: str
-    email: Optional[str] = None
+    email: EmailStr
     phone: Optional[str] = None
     company: Optional[str] = None
-    status: LeadStatus = LeadStatus.new
-    source: Optional[str] = None
-    notes: Optional[str] = None
-    assigned_to: Optional[int] = None
+    service: Optional[str] = None
+    message: Optional[str] = None
+    turnstile_token: str
+
+
+class LeadManualCreate(BaseModel):
+    name: str
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    company: Optional[str] = None
+    service: Optional[str] = None
+    message: Optional[str] = None
+    industry: Optional[str] = None
+    address: Optional[str] = None
+
+    _email_blank = field_validator("email", mode="before")(_blank_to_none)
 
 
 class LeadUpdate(BaseModel):
     name: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     phone: Optional[str] = None
     company: Optional[str] = None
-    status: Optional[LeadStatus] = None
-    source: Optional[str] = None
-    notes: Optional[str] = None
-    assigned_to: Optional[int] = None
+    service: Optional[str] = None
+    message: Optional[str] = None
+    industry: Optional[str] = None
+    address: Optional[str] = None
+
+    _email_blank = field_validator("email", mode="before")(_blank_to_none)
 
 
 class LeadResponse(BaseModel):
@@ -32,11 +51,28 @@ class LeadResponse(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     company: Optional[str] = None
-    status: LeadStatus
-    source: Optional[str] = None
-    notes: Optional[str] = None
-    assigned_to: Optional[int] = None
+    service: Optional[str] = None
+    message: Optional[str] = None
+    industry: Optional[str] = None
+    address: Optional[str] = None
     created_at: datetime
-    updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class LeadPage(BaseModel):
+    items: list[LeadResponse]
+    total: int
+
+
+class LeadImportSkip(BaseModel):
+    file: str
+    row: int
+    reason: str
+
+
+class LeadImportResult(BaseModel):
+    inserted: int
+    skipped_count: int
+    skipped: list[LeadImportSkip]
+    report_xlsx_base64: Optional[str] = None

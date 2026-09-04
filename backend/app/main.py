@@ -41,8 +41,168 @@ def ensure_user_management_schema() -> None:
                 )
             )
 
+
+def ensure_leads_prospects_swap() -> None:
+    if engine.dialect.name != "mysql":
+        return  # the chained RENAME TABLE form below is MySQL-only
+
+    inspector = inspect(engine)
+    table_names = set(inspector.get_table_names())
+    if "leads" not in table_names or "prospects" not in table_names:
+        return
+
+    lead_columns = {c["name"] for c in inspector.get_columns("leads")}
+    if "message" not in lead_columns:
+        # Roles are still the old way round -- swap the two tables atomically.
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "RENAME TABLE leads TO _leads_prospects_swap_tmp, "
+                    "prospects TO leads, "
+                    "_leads_prospects_swap_tmp TO prospects"
+                )
+            )
+
+    # Independent of the swap above and safe to run on every boot: the pipeline
+    # table needs a `service` column the old `leads` table never had. Kept
+    # separate so a crash between the RENAME and here self-heals next boot.
+    # Fresh inspector: the cached metadata above is stale after the RENAME.
+    prospect_columns = {c["name"] for c in inspect(engine).get_columns("prospects")}
+    if "service" not in prospect_columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE prospects ADD COLUMN service VARCHAR(100)")
+            )
+
+
+def ensure_leads_email_nullable_schema() -> None:
+    if engine.dialect.name != "mysql":
+        return  # SQLite/pytest builds the column from the model
+    inspector = inspect(engine)
+    if "leads" not in inspector.get_table_names():
+        return
+    cols = {c["name"]: c for c in inspector.get_columns("leads")}
+    email_col = cols.get("email")
+    if email_col is not None and not email_col["nullable"]:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE leads MODIFY COLUMN email VARCHAR(255) NULL")
+            )
+
+
+def ensure_diagnostic_conversion_schema() -> None:
+    inspector = inspect(engine)
+    if "diagnostic_submissions" not in inspector.get_table_names():
+        return
+    columns = {c["name"] for c in inspector.get_columns("diagnostic_submissions")}
+
+    if "conversion_status" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "ALTER TABLE diagnostic_submissions "
+                    "ADD COLUMN conversion_status VARCHAR(20) NOT NULL DEFAULT 'pending'"
+                )
+            )
+
+    if "converted_prospect_id" not in columns:
+        ddl = "ALTER TABLE diagnostic_submissions ADD COLUMN converted_prospect_id INT"
+        if engine.dialect.name == "mysql":
+            ddl += (
+                ", ADD CONSTRAINT fk_diag_converted_prospect "
+                "FOREIGN KEY (converted_prospect_id) REFERENCES prospects(id) "
+                "ON DELETE SET NULL"
+            )
+        with engine.begin() as connection:
+            connection.execute(text(ddl))
+
+    if "converted_at" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE diagnostic_submissions ADD COLUMN converted_at DATETIME NULL")
+            )
+
+    index_names = {ix["name"] for ix in inspect(engine).get_indexes("diagnostic_submissions")}
+    if "idx_conversion_status" not in index_names:
+        with engine.begin() as connection:
+            connection.execute(
+                text("CREATE INDEX idx_conversion_status ON diagnostic_submissions (conversion_status)")
+            )
+
+
+def ensure_email_delivery_tracking_schema() -> None:
+    inspector = inspect(engine)
+    if "diagnostic_submissions" not in inspector.get_table_names():
+        return
+    columns = {c["name"] for c in inspector.get_columns("diagnostic_submissions")}
+    if "email_provider_id" not in columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text("ALTER TABLE diagnostic_submissions ADD COLUMN email_provider_id VARCHAR(64)")
+            )
+
+
+def ensure_prospect_status_schema() -> None:
+    if engine.dialect.name != "mysql":
+        return  # SQLite/pytest builds the enum from the model
+    inspector = inspect(engine)
+    if "prospects" not in inspector.get_table_names():
+        return
+
+    cols = {c["name"]: c for c in inspector.get_columns("prospects")}
+    status_enums = set(getattr(cols.get("status", {}).get("type", None), "enums", []) or [])
+
+    if status_enums != {"meeting_to_schedule", "call_later", "meeting_scheduled", "lost"}:
+        # ENUM doesn't exactly match the 4 targets. Widen to VARCHAR so any
+        # historical value survives the copy, fold everything that isn't a
+        # target (and NULL) to meeting_to_schedule, then narrow to the 4-value
+        # ENUM. Each DDL is an implicit commit, so a crash mid-way leaves the
+        # gate open and the next boot re-runs; the UPDATE is idempotent.
+        with engine.begin() as connection:
+            connection.execute(text(
+                "ALTER TABLE prospects MODIFY COLUMN status VARCHAR(32) NULL"
+            ))
+            connection.execute(text(
+                "UPDATE prospects SET status='meeting_to_schedule' "
+                "WHERE status NOT IN "
+                "('meeting_to_schedule','call_later','meeting_scheduled','lost') "
+                "OR status IS NULL"
+            ))
+            connection.execute(text(
+                "ALTER TABLE prospects MODIFY COLUMN status "
+                "ENUM('meeting_to_schedule','call_later','meeting_scheduled','lost') "
+                "NOT NULL DEFAULT 'meeting_to_schedule'"
+            ))
+
+
+def ensure_industry_address_schema() -> None:
+    if engine.dialect.name != "mysql":
+        return  # SQLite/pytest builds the columns from the models
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+    if "leads" in tables:
+        cols = {c["name"] for c in inspector.get_columns("leads")}
+        if "industry" not in cols:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE leads ADD COLUMN industry VARCHAR(120)"))
+        if "address" not in cols:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE leads ADD COLUMN address VARCHAR(255)"))
+    if "prospects" in tables:
+        cols = {c["name"] for c in inspect(engine).get_columns("prospects")}
+        if "industry" not in cols:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE prospects ADD COLUMN industry VARCHAR(120)"))
+
+
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
+ensure_leads_prospects_swap()
+ensure_leads_email_nullable_schema()
+ensure_diagnostic_conversion_schema()
+ensure_email_delivery_tracking_schema()
+ensure_prospect_status_schema()
+ensure_industry_address_schema()
 
 _seed_db = SessionLocal()
 try:

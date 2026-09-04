@@ -1,11 +1,18 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { HiOutlineSearch, HiOutlineTrash, HiOutlineEye } from "react-icons/hi";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { HiOutlineSearch, HiOutlineTrash, HiOutlineEye, HiOutlineSwitchHorizontal, HiOutlineRefresh } from "react-icons/hi";
 import LoadingDots from "@/components/shared/LoadingDots";
 import DiagnosticSubmissionDetail from "@/components/Dashboard/DiagnosticSubmissionDetail";
+import Dropdown from "@/components/shared/Dropdown";
+import Pagination from "@/components/shared/Pagination";
+import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { diagnosticsApi } from "@/lib/api";
-import type { DiagnosticSubmissionListItem } from "@/lib/api";
+import { STATUS_COLORS } from "@/lib/prospectConstants";
+import type { DiagnosticSubmissionListItem, ProspectCreate, Prospect } from "@/lib/api";
 
 const SERVICE_LABELS: Record<string, string> = {
   process_automation: "Automatización de Procesos",
@@ -13,58 +20,186 @@ const SERVICE_LABELS: Record<string, string> = {
   dedicated_team: "Equipo Dedicado",
 };
 
+const CONVERSION_LABELS: Record<string, string> = {
+  pending: "Pendiente",
+  prospect: "Prospecto",
+  lost: "Perdido",
+};
+
+const CONVERSION_BADGE: Record<string, string> = {
+  pending: "bg-gray-100 text-gray-500",
+  prospect: "bg-lyratech-green/20 text-lyratech-green border-lyratech-green/30",
+  lost: STATUS_COLORS.lost,
+};
+
+type ConversionFilter = "all" | "pending" | "prospect" | "lost";
+
+const CONVERSION_FILTER_OPTIONS: { value: ConversionFilter; label: string }[] = [
+  { value: "all", label: "Todas las conversiones" },
+  { value: "pending", label: "Pendiente" },
+  { value: "prospect", label: "Prospecto" },
+  { value: "lost", label: "Perdido" },
+];
+
 const EMAIL_STATUS_LABELS: Record<string, string> = {
   pending: "Pendiente",
   sent: "Enviado",
+  delayed: "Retrasado",
+  delivered: "Entregado",
+  bounced: "Rebotado",
+  complained: "Queja",
   failed: "Falló",
+};
+
+const EMAIL_STATUS_BADGE: Record<string, string> = {
+  delivered: "bg-lyratech-green/10 text-lyratech-green",
+  bounced: "bg-red/10 text-red",
+  complained: "bg-red/10 text-red",
+  failed: "bg-red/10 text-red",
 };
 
 export default function DiagnosticsPage() {
   const [submissions, setSubmissions] = useState<DiagnosticSubmissionListItem[]>([]);
-  const [filtered, setFiltered] = useState<DiagnosticSubmissionListItem[]>([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const debouncedSearch = useDebouncedValue(search);
+  const reqId = useRef(0);
   const [viewingId, setViewingId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [conversionFilter, setConversionFilter] = useState<ConversionFilter>("all");
+  const [converting, setConverting] = useState<{ submissionId: number; form: ProspectCreate } | null>(null);
+  const [convertError, setConvertError] = useState<string | null>(null);
+  const [preparingId, setPreparingId] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  useEscapeKey(() => setDeleteId(null), deleteId !== null);
+  useScrollLock(deleteId !== null);
+
+  const loadData = useCallback(async (silent = false) => {
+    const id = ++reqId.current;
+    if (!silent) setLoading(true);
     try {
-      const data = await diagnosticsApi.listSubmissions();
-      setSubmissions(data);
+      const data = await diagnosticsApi.listSubmissions({
+        page,
+        pageSize,
+        search: debouncedSearch,
+        conversion: conversionFilter === "all" ? "" : conversionFilter,
+      });
+      if (id === reqId.current) {
+        setSubmissions(data.items);
+        setTotal(data.total);
+      }
     } catch {
       /* ignore — request() already redirects to login on 401 */
     } finally {
-      setLoading(false);
+      if (id === reqId.current && !silent) setLoading(false);
     }
-  }, []);
+  }, [page, pageSize, debouncedSearch, conversionFilter]);
+
+  const refreshEmailStatuses = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await diagnosticsApi.refreshEmailStatus();
+      try {
+        sessionStorage.setItem("diag_email_status_refreshed_at", String(Date.now()));
+      } catch {
+        /* sessionStorage unavailable — fine */
+      }
+      await loadData(true);
+    } catch {
+      /* ignore */
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadData]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
+  // Mount-only: trigger the (slow) email-status auto-refresh once, unless one ran
+  // in the last 2 minutes.
+  const didFirstRefreshCheck = useRef(false);
   useEffect(() => {
-    let list = submissions;
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.email.toLowerCase().includes(q) ||
-          s.company?.toLowerCase().includes(q)
-      );
+    if (didFirstRefreshCheck.current) return;
+    didFirstRefreshCheck.current = true;
+    let lastRefreshed = 0;
+    try {
+      lastRefreshed = Number(sessionStorage.getItem("diag_email_status_refreshed_at")) || 0;
+    } catch {
+      /* sessionStorage unavailable */
     }
-    setFiltered(list);
-  }, [submissions, search]);
+    if (Date.now() - lastRefreshed > 120_000) {
+      refreshEmailStatuses();
+    }
+  }, [refreshEmailStatuses]);
 
   async function handleDelete(id: number) {
     try {
       await diagnosticsApi.removeSubmission(id);
-      setSubmissions((prev) => prev.filter((s) => s.id !== id));
+      await loadData();
     } catch {
       /* ignore */
     } finally {
       setDeleteId(null);
+    }
+  }
+
+  async function openConvert(submission: DiagnosticSubmissionListItem) {
+    setConvertError(null);
+    setPreparingId(submission.id);
+    let phone = "";
+    let summary = "";
+    try {
+      const detail = await diagnosticsApi.getSubmission(submission.id);
+      phone = detail.phone || "";
+      summary =
+        typeof detail.llm_response_json?.summary === "string"
+          ? (detail.llm_response_json.summary as string)
+          : "";
+    } catch {
+      /* fall back to list data */
+    }
+    try {
+      const serviceLabel =
+        SERVICE_LABELS[submission.recommended_primary_service] ||
+        submission.recommended_primary_service;
+      const notes =
+        `Desde Diagnóstico GO #${submission.id} · Servicio recomendado: ${serviceLabel}` +
+        (summary ? ` · Resumen: ${summary}` : "");
+      setConverting({
+        submissionId: submission.id,
+        form: {
+          name: submission.name,
+          email: submission.email,
+          phone,
+          company: submission.company || "",
+          industry: "",
+          service: serviceLabel,
+          status: "meeting_to_schedule",
+          source: "Diagnóstico GO",
+          notes,
+        },
+      });
+    } finally {
+      setPreparingId(null);
+    }
+  }
+
+  async function handleConverted(prospect: Prospect) {
+    if (!converting) return;
+    setConvertError(null);
+    const target = converting.submissionId;
+    try {
+      await diagnosticsApi.markConverted(target, prospect.id);
+      await loadData();
+    } catch {
+      setConvertError(
+        "El prospecto se creó correctamente, pero no se pudo marcar el diagnóstico como convertido. El prospecto ya existe en el pipeline — no lo conviertas de nuevo desde aquí; márcalo manualmente o contacta soporte."
+      );
     }
   }
 
@@ -91,18 +226,42 @@ export default function DiagnosticsPage() {
               type="text"
               placeholder="Buscar por nombre, email o empresa..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-black/10 rounded-xl text-sm font-montserrat text-dark-blue placeholder-dark-blue/30 outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all"
             />
           </div>
+          <div className="w-full sm:w-56">
+            <Dropdown
+              value={conversionFilter}
+              onChange={(v) => { setConversionFilter(v as ConversionFilter); setPage(1); }}
+              options={CONVERSION_FILTER_OPTIONS}
+            />
+          </div>
+          <button
+            onClick={refreshEmailStatuses}
+            disabled={refreshing}
+            className="flex items-center justify-center gap-2 border border-black/15 text-dark-blue/70 hover:text-dark-blue hover:bg-beige font-montserrat font-semibold px-4 py-2.5 rounded-xl transition-all text-sm disabled:opacity-50 whitespace-nowrap"
+          >
+            <HiOutlineRefresh size={16} className={refreshing ? "animate-spin" : ""} />
+            {refreshing ? "Actualizando..." : "Actualizar estados"}
+          </button>
         </div>
+
+        {convertError && (
+          <div className="mb-5 rounded-xl border border-red/30 bg-red/10 px-4 py-3 text-sm font-montserrat text-red flex items-start justify-between gap-3">
+            <span>{convertError}</span>
+            <button onClick={() => setConvertError(null)} className="shrink-0 font-semibold hover:underline">
+              Cerrar
+            </button>
+          </div>
+        )}
 
         <div className="bg-white rounded-2xl shadow-sm border border-black/5 overflow-hidden">
           {loading ? (
             <div className="py-16 flex items-center justify-center">
               <LoadingDots />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : submissions.length === 0 ? (
             <div className="py-16 text-center">
               <p className="font-montserrat text-dark-blue/40 text-sm">{emptyMessage}</p>
             </div>
@@ -111,7 +270,7 @@ export default function DiagnosticsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-black/5 bg-beige/60">
-                    {["Nombre", "Empresa", "Servicio recomendado", "Idioma", "Correo", "Fecha", "Acciones"].map((h) => (
+                    {["Nombre", "Empresa", "Servicio recomendado", "Idioma", "Correo", "Conversión", "Fecha", "Acciones"].map((h) => (
                       <th key={h} className="text-left px-4 py-3 font-montserrat-bold text-dark-blue/50 text-xs uppercase tracking-wide">
                         {h}
                       </th>
@@ -119,7 +278,7 @@ export default function DiagnosticsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/5">
-                  {filtered.map((submission) => (
+                  {submissions.map((submission) => (
                     <tr key={submission.id} className="hover:bg-beige/40 transition-colors group">
                       <td className="px-4 py-3.5">
                         <p className="font-montserrat font-semibold text-dark-blue text-sm">{submission.name}</p>
@@ -139,14 +298,15 @@ export default function DiagnosticsPage() {
                       <td className="px-4 py-3.5">
                         <span
                           className={`font-montserrat text-xs font-semibold px-2 py-1 rounded-full ${
-                            submission.email_delivery_status === "sent"
-                              ? "bg-lyratech-green/10 text-lyratech-green"
-                              : submission.email_delivery_status === "failed"
-                              ? "bg-red/10 text-red"
-                              : "bg-gray-100 text-gray-500"
+                            EMAIL_STATUS_BADGE[submission.email_delivery_status] || "bg-gray-100 text-gray-500"
                           }`}
                         >
                           {EMAIL_STATUS_LABELS[submission.email_delivery_status] || submission.email_delivery_status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <span className={`font-montserrat text-xs font-semibold px-2 py-1 rounded-full ${CONVERSION_BADGE[submission.conversion_status] || CONVERSION_BADGE.pending}`}>
+                          {CONVERSION_LABELS[submission.conversion_status] || submission.conversion_status}
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
@@ -159,7 +319,17 @@ export default function DiagnosticsPage() {
                         </p>
                       </td>
                       <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1">
+                          {submission.conversion_status === "pending" && (
+                            <button
+                              onClick={() => openConvert(submission)}
+                              disabled={preparingId === submission.id}
+                              className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors disabled:opacity-50"
+                              title="Convertir a prospecto"
+                            >
+                              <HiOutlineSwitchHorizontal size={15} />
+                            </button>
+                          )}
                           <button onClick={() => setViewingId(submission.id)} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Ver detalle">
                             <HiOutlineEye size={15} />
                           </button>
@@ -175,6 +345,14 @@ export default function DiagnosticsPage() {
             </div>
           )}
         </div>
+
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
       </div>
 
       {viewingId !== null && (
@@ -210,6 +388,15 @@ export default function DiagnosticsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {converting && (
+        <ProspectFormModal
+          editing={null}
+          initialForm={converting.form}
+          onClose={() => setConverting(null)}
+          onSaved={handleConverted}
+        />
       )}
     </>
   );

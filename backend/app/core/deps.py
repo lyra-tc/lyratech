@@ -1,14 +1,18 @@
 from datetime import timezone
+from typing import Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import PyJWTError as JWTError
 from sqlalchemy.orm import Session
+from ..config import settings
 from ..database import SessionLocal
 from ..core.security import decode_token
 from ..models.user import User
 
-bearer_scheme = HTTPBearer()
+# auto_error=False so a request without an Authorization header falls through to
+# the session cookie instead of being rejected with 403 by the scheme itself.
+optional_bearer = HTTPBearer(auto_error=False)
 
 
 def get_db():
@@ -20,7 +24,8 @@ def get_db():
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_bearer),
     db: Session = Depends(get_db),
 ) -> User:
     exc = HTTPException(
@@ -28,8 +33,15 @@ def get_current_user(
         detail="Token inválido o expirado",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    token = request.cookies.get(settings.AUTH_COOKIE_NAME)
+    if not token and credentials is not None:
+        token = credentials.credentials
+    if not token:
+        raise exc
+
     try:
-        payload = decode_token(credentials.credentials)
+        payload = decode_token(token)
         email: str = payload.get("sub")
         issued_at = payload.get("iat")
         if not email or issued_at is None:

@@ -1,6 +1,10 @@
-﻿from typing import List, Optional
+﻿import logging
+import threading
+import time
+from datetime import datetime, timezone
+from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from ..config import settings
@@ -14,26 +18,32 @@ from ..core.email import send_diagnostic_notification_email, send_diagnostic_res
 from ..core.idempotency import claim_turnstile_token
 from ..core.limiter import limiter
 from ..core.openrouter import OpenRouterError, build_fallback_result, generate_diagnostic
+from ..core.resend_status import fetch_delivery_status
 from ..core.turnstile import verify_turnstile_token
 from ..database import SessionLocal
 from ..models.diagnostic_question import DiagnosticQuestion
 from ..models.diagnostic_submission import DiagnosticSubmission
 from ..models.notification_recipient import NotificationRecipient
+from ..models.prospect import Prospect, ProspectStatus
 from ..models.user import User
 from ..schemas.diagnostic import (
     DiagnosticActiveOption,
     DiagnosticActiveQuestion,
+    DiagnosticMarkConvertedRequest,
     DiagnosticQuestionCreate,
     DiagnosticQuestionReorder,
     DiagnosticQuestionResponse,
     DiagnosticQuestionUpdate,
     DiagnosticSubmissionListItem,
+    DiagnosticSubmissionPage,
     DiagnosticSubmissionResponse,
     DiagnosticSubmitRequest,
     DiagnosticSubmitResult,
 )
 
 router = APIRouter(prefix="/diagnostics", tags=["diagnostics"])
+
+logger = logging.getLogger(__name__)
 
 
 def _question_to_dict(question: DiagnosticQuestion) -> dict:
@@ -92,7 +102,7 @@ def _dispatch_diagnostic_emails(
         if not submission:
             return
         try:
-            send_diagnostic_result_email(
+            provider_id = send_diagnostic_result_email(
                 to_email=submission.email,
                 locale=submission.locale,
                 llm_result=llm_result,
@@ -100,6 +110,7 @@ def _dispatch_diagnostic_emails(
             )
             submission.email_delivery_status = "sent"
             submission.email_delivery_error = None
+            submission.email_provider_id = provider_id or None
         except Exception as exc:
             submission.email_delivery_status = "failed"
             submission.email_delivery_error = str(exc)
@@ -108,6 +119,49 @@ def _dispatch_diagnostic_emails(
         send_diagnostic_notification_email(submission, recipient_emails)
     finally:
         db.close()
+
+
+_EMAIL_STATUS_TERMINAL = {"delivered", "bounced", "complained", "failed"}
+_EMAIL_REFRESH_BATCH = 15
+_EMAIL_REFRESH_TIMEOUT = 3.0
+# Per-process guard: under multiple workers each has its own lock. Good enough
+# for this admin-only, low-volume action.
+_email_refresh_lock = threading.Lock()
+
+
+def _refresh_email_delivery_statuses(db: Session) -> None:
+    # Non-blocking: if a refresh is already running (another tab / a double
+    # click), skip rather than pile on duplicate Resend calls.
+    if not _email_refresh_lock.acquire(blocking=False):
+        return
+    try:
+        rows = (
+            db.query(DiagnosticSubmission)
+            .filter(
+                DiagnosticSubmission.email_provider_id.isnot(None),
+                ~DiagnosticSubmission.email_delivery_status.in_(_EMAIL_STATUS_TERMINAL),
+            )
+            .order_by(DiagnosticSubmission.created_at.desc())
+            .limit(_EMAIL_REFRESH_BATCH)
+            .all()
+        )
+        changed = 0
+        for index, row in enumerate(rows):
+            if index > 0:
+                time.sleep(0.35)  # stay under Resend's ~2 req/s limit
+            new_status = fetch_delivery_status(
+                row.email_provider_id, timeout=_EMAIL_REFRESH_TIMEOUT
+            )
+            if new_status and new_status != row.email_delivery_status:
+                row.email_delivery_status = new_status
+                changed += 1
+        db.commit()
+        logger.info(
+            "Refreshed Resend delivery status: %d checked, %d updated",
+            len(rows), changed,
+        )
+    finally:
+        _email_refresh_lock.release()
 
 
 @router.post("/submit", response_model=DiagnosticSubmitResult, status_code=201)
@@ -214,9 +268,12 @@ def submit_diagnostic(
     )
 
 
-@router.get("/submissions", response_model=List[DiagnosticSubmissionListItem])
+@router.get("/submissions", response_model=DiagnosticSubmissionPage)
 def list_submissions(
     search: str = "",
+    conversion: str = "",
+    page: int = Query(1, ge=1),
+    page_size: int = Query(25, ge=1, le=100),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
@@ -228,7 +285,66 @@ def list_submissions(
             | (DiagnosticSubmission.email.ilike(like))
             | (DiagnosticSubmission.company.ilike(like))
         )
-    return query.order_by(DiagnosticSubmission.created_at.desc()).all()
+    if conversion in {"pending", "prospect", "lost"}:
+        query = query.filter(DiagnosticSubmission.conversion_status == conversion)
+    total = query.count()
+    items = (
+        query.order_by(DiagnosticSubmission.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    return {"items": items, "total": total}
+
+
+@router.post(
+    "/submissions/refresh-email-status",
+    response_model=List[DiagnosticSubmissionListItem],
+)
+def refresh_email_status(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    _refresh_email_delivery_statuses(db)
+    return (
+        db.query(DiagnosticSubmission)
+        .order_by(DiagnosticSubmission.created_at.desc())
+        .all()
+    )
+
+
+@router.post(
+    "/submissions/{submission_id}/mark-converted",
+    response_model=DiagnosticSubmissionResponse,
+)
+def mark_submission_converted(
+    submission_id: int,
+    body: DiagnosticMarkConvertedRequest,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    submission = (
+        db.query(DiagnosticSubmission)
+        .filter(DiagnosticSubmission.id == submission_id)
+        .first()
+    )
+    if not submission:
+        raise HTTPException(status_code=404, detail="Diagnóstico no encontrado")
+    if submission.conversion_status != "pending":
+        raise HTTPException(status_code=409, detail="Este diagnóstico ya fue convertido")
+
+    prospect = db.query(Prospect).filter(Prospect.id == body.prospect_id).first()
+    if not prospect:
+        raise HTTPException(status_code=404, detail="Prospecto no encontrado")
+
+    submission.conversion_status = (
+        "lost" if prospect.status == ProspectStatus.lost else "prospect"
+    )
+    submission.converted_prospect_id = prospect.id
+    submission.converted_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    db.commit()
+    db.refresh(submission)
+    return submission
 
 
 @router.get("/submissions/{submission_id}", response_model=DiagnosticSubmissionResponse)

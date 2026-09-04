@@ -18,11 +18,13 @@ import {
   HiOutlineUsers,
 } from "react-icons/hi";
 import Logo from "@/assets/images/Navbar/White_Logo.png";
+import ScrollToTopButton from "@/components/Dashboard/ScrollToTopButton";
+import { auth } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
-  { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineUsers },
-  { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineInboxIn },
+  { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineUsers },
+  { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineInboxIn },
   { label: "Diagnosticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
   { label: "Preguntas", mobileLabel: "Preg.", href: "/dashboard/diagnostics/questions", icon: HiOutlineClipboardList },
   { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail },
@@ -55,10 +57,13 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
     setMobileMoreOpen(false);
   }, [pathname]);
 
-  function handleLogout() {
-    localStorage.removeItem("lyratech_token");
-    localStorage.removeItem("lyratech_user");
-    router.push("/dashboard/login");
+  async function handleLogout() {
+    try {
+      await auth.logout();
+    } catch {
+      /* clear the cookie best-effort; redirect regardless */
+    }
+    router.replace("/dashboard/login");
   }
 
   const initials = user?.full_name
@@ -166,8 +171,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
     </div>
   );
 
-  if (isMobile) {
-    return (
+  const mobileShell = (
       <div className="min-h-screen bg-beige flex flex-col">
         <header className="fixed left-0 right-0 top-0 z-40 flex h-14 items-center justify-between border-b border-white/10 bg-dark-blue px-4">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -324,10 +328,9 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
           </button>
         </nav>
       </div>
-    );
-  }
+  );
 
-  return (
+  const desktopShell = (
     <div className="min-h-screen bg-beige flex">
       <aside
         className={`fixed left-0 top-0 z-30 h-full border-r border-white/10 bg-dark-blue transition-all duration-300 ${
@@ -348,5 +351,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
         {children}
       </main>
     </div>
+  );
+
+  return (
+    <>
+      {isMobile ? mobileShell : desktopShell}
+      <ScrollToTopButton />
+    </>
   );
 }

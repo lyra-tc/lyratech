@@ -1,4 +1,5 @@
 from app.core.diagnostic_seed import seed_diagnostic_questions
+from app.models.diagnostic_submission import DiagnosticSubmission
 from app.tests.conftest import TestingSessionLocal
 
 
@@ -162,7 +163,7 @@ def test_list_and_get_submission_after_submit(client, auth_client, monkeypatch):
     ).json()["submission_id"]
 
     list_res = auth_client.get("/api/diagnostics/submissions")
-    assert any(item["id"] == submission_id for item in list_res.json())
+    assert any(item["id"] == submission_id for item in list_res.json()["items"])
 
     detail_res = auth_client.get(f"/api/diagnostics/submissions/{submission_id}")
     assert detail_res.status_code == 200
@@ -177,8 +178,36 @@ def test_search_submissions_by_company(client, auth_client, monkeypatch):
     )
     client.post("/api/diagnostics/submit", json=VALID_SUBMIT_PAYLOAD)
 
-    assert len(auth_client.get("/api/diagnostics/submissions", params={"search": "Acme"}).json()) == 1
-    assert len(auth_client.get("/api/diagnostics/submissions", params={"search": "Nonexistent"}).json()) == 0
+    assert len(auth_client.get("/api/diagnostics/submissions", params={"search": "Acme"}).json()["items"]) == 1
+    assert len(auth_client.get("/api/diagnostics/submissions", params={"search": "Nonexistent"}).json()["items"]) == 0
+
+
+def test_submissions_paginate(auth_client):
+    db = TestingSessionLocal()
+    try:
+        for i in range(12):
+            db.add(
+                DiagnosticSubmission(
+                    name=f"P{i}",
+                    email=f"p{i}@x.com",
+                    locale="es",
+                    raw_answers_json={},
+                    normalized_answers_en_json={},
+                    service_scores_json={},
+                    recommended_primary_service="process_automation",
+                    llm_status="ok",
+                    email_delivery_status="pending",
+                )
+            )
+        db.commit()
+    finally:
+        db.close()
+
+    body = auth_client.get(
+        "/api/diagnostics/submissions", params={"page": 2, "page_size": 5}
+    ).json()
+    assert body["total"] == 12
+    assert len(body["items"]) == 5
 
 
 def test_delete_submission(client, auth_client, monkeypatch):

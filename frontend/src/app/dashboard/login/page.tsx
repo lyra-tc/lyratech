@@ -19,10 +19,20 @@ function LoginForm() {
   const [lockedSecondsLeft, setLockedSecondsLeft] = useState(0);
   const registered = params.get("registered") === "1";
 
+  // If a valid session cookie is already present, skip the form.
   useEffect(() => {
-    if (localStorage.getItem("lyratech_token")) {
-      router.replace("/dashboard/leads");
-    }
+    let cancelled = false;
+    auth
+      .me({ skipAuthRedirect: true })
+      .then(() => {
+        if (!cancelled) router.replace("/dashboard/prospects");
+      })
+      .catch(() => {
+        /* no valid session — stay on the login form */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   useEffect(() => {
@@ -46,11 +56,8 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const { access_token } = await auth.login(email, password);
-      localStorage.setItem("lyratech_token", access_token);
-      const user = await auth.me();
-      localStorage.setItem("lyratech_user", JSON.stringify(user));
-      router.push("/dashboard/leads");
+      await auth.login(email, password);
+      router.push("/dashboard/prospects");
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 429) {
         setLockedSecondsLeft(err.retryAfterSeconds ?? 60);

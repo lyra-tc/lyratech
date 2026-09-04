@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Integer, JSON, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.sql import func
 from ..database import Base
 
@@ -25,4 +25,10 @@ class DiagnosticSubmission(Base):
     llm_status = Column(String(20), nullable=False, default="ok")
     email_delivery_status = Column(String(20), nullable=False, default="pending")
     email_delivery_error = Column(Text, nullable=True)
+    email_provider_id = Column(String(64), nullable=True)
+    conversion_status = Column(String(20), nullable=False, default="pending")
+    converted_prospect_id = Column(
+        Integer, ForeignKey("prospects.id", ondelete="SET NULL"), nullable=True
+    )
+    converted_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, server_default=func.now())

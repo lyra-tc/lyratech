@@ -20,14 +20,14 @@ Incluye:
 
 - Rutas localizadas en `frontend/src/app/[locale]`.
 - Idiomas soportados: `es`, `en`, `fr`, `de`.
-- Formularios publicos de contacto/prospects protegidos con Turnstile.
+- Formulario publico de contacto (crea `leads`) protegido con Turnstile.
 - Flujo `Diagnostic GO` con preguntas dinamicas, scoring y resultado enriquecido por LLM.
 
 ### Dashboard
 
 - Login, registro y perfil (cualquier usuario activo).
-- Gestion de `Leads` — solo admin.
-- Gestion de `Prospects` (ver/borrar) — solo admin. El alta viene del formulario publico.
+- Gestion de `Leads` (ver/borrar) — solo admin. El alta viene del formulario publico de contacto.
+- Gestion de `Prospects` (pipeline: alta/edicion/borrado) — solo admin. Los leads se convierten en prospects.
 - Gestion de `Notifications` (destinatarios) — solo admin.
 - Gestion de `Diagnosticos` enviados (ver/borrar) — solo admin.
 - Gestion de `Preguntas` del diagnostico, incluyendo reorder — solo admin.
@@ -39,7 +39,7 @@ Incluye:
 - Cualquier otro registro nuevo queda `pendiente` (`is_active = false`) hasta que un admin lo active desde `/dashboard/users`.
 - `is_superadmin` no se otorga por ningun flujo automatico ni por nombre — solo se asigna manualmente en la base de datos. Es una salvaguarda extra: la cuenta `superadmin` no puede ser editada, desactivada ni eliminada desde el dashboard (ni por otros admins).
 - Solo un `superadmin` puede quitar `admin` a otro admin normal.
-- Todos los endpoints de datos de negocio (`leads`, `prospects`, `notifications`, `diagnostics` admin) requieren `is_admin`; un usuario activo pero no-admin solo puede usar su propio perfil (`/auth/me`, cambio de contrasena).
+- Todos los endpoints de datos de negocio (`prospects`, `notifications`, `diagnostics` admin, y la lectura/borrado de `leads`) requieren `is_admin`; el alta de `leads` es publica (formulario de contacto). Un usuario activo pero no-admin solo puede usar su propio perfil (`/auth/me`, cambio de contrasena).
 
 ## Seguridad
 
@@ -48,7 +48,7 @@ Incluye:
 - Cambiar la contrasena (por el propio usuario o por un admin) invalida cualquier token emitido antes de ese momento (`users.password_changed_at` + claim `iat` del JWT).
 - Contrasenas con `bcrypt`; minimo 6 caracteres al registrar y al cambiar contrasena.
 - Rate limiting por IP (`slowapi`): login `5/minuto`, registro `5/hora`, formulario de contacto y envio de diagnostico `5/hora` cada uno.
-- Proteccion anti-duplicado en `prospects` y `diagnostics/submit`: cada token de Turnstile solo puede reclamarse una vez (tabla `used_turnstile_tokens`, ver `app/core/idempotency.py`), evitando doble registro/doble llamada a OpenRouter por doble-click o reintento de red. El frontend tambien bloquea el segundo click antes de disparar la peticion.
+- Proteccion anti-duplicado en `leads` y `diagnostics/submit`: cada token de Turnstile solo puede reclamarse una vez (tabla `used_turnstile_tokens`, ver `app/core/idempotency.py`), evitando doble registro/doble llamada a OpenRouter por doble-click o reintento de red. El frontend tambien bloquea el segundo click antes de disparar la peticion.
 - CORS restringido a los origenes del frontend (`BACKEND_CORS_ORIGINS`), no wildcard.
 - Logging de eventos de seguridad (login fallido/exitoso, registro, cambios de rol, borrado de cuentas, reset de contrasena por admin) via logger `security`.
 - Sin SQL crudo: todo el acceso a datos pasa por SQLAlchemy ORM parametrizado.
@@ -127,16 +127,16 @@ Niveles de acceso: **publico** (sin token), **auth** (cualquier usuario activo),
 
 ### Leads
 
+- `POST /api/leads/` — publico, `5/hora` por IP, protegido con Turnstile (formulario de contacto)
 - `GET /api/leads/` — admin
-- `POST /api/leads/` — admin
-- `GET /api/leads/{lead_id}` — admin
-- `PUT /api/leads/{lead_id}` — admin
 - `DELETE /api/leads/{lead_id}` — admin
 
 ### Prospects
 
-- `POST /api/prospects/` — publico, `5/hora` por IP
 - `GET /api/prospects/` — admin
+- `POST /api/prospects/` — admin
+- `GET /api/prospects/{prospect_id}` — admin
+- `PUT /api/prospects/{prospect_id}` — admin
 - `DELETE /api/prospects/{prospect_id}` — admin
 
 ### Notifications
