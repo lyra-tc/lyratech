@@ -5,6 +5,7 @@ import { HiOutlineCheck, HiOutlineMail, HiOutlineTrash } from "react-icons/hi";
 import { notificationsApi } from "@/lib/api";
 import LoadingDots from "@/components/shared/LoadingDots";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import type { NotificationRecipient } from "@/lib/api";
 
 export default function NotificationsSettings() {
@@ -17,6 +18,7 @@ export default function NotificationsSettings() {
   const [removingRecipientId, setRemovingRecipientId] = useState<number | null>(null);
   const [testingRecipientId, setTestingRecipientId] = useState<number | null>(null);
 
+  useScrollLock(deleteRecipientId !== null);
   useEscapeKey(() => setDeleteRecipientId(null), deleteRecipientId !== null);
 
   const inputClass =

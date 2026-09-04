@@ -12,6 +12,7 @@ import {
 import { leadsApi, downloadLeadTemplate, downloadBase64Xlsx } from "@/lib/api";
 import type { LeadImportResult } from "@/lib/api";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 interface LeadImportModalProps {
   onClose: () => void;
@@ -128,6 +129,7 @@ function ImportFileRow({ entry }: { entry: FileProgress }) {
 }
 
 export default function LeadImportModal({ onClose, onImported }: LeadImportModalProps) {
+  useScrollLock();
   const [files, setFiles] = useState<File[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [importing, setImporting] = useState(false);

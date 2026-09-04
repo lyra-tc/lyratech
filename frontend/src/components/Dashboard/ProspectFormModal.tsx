@@ -9,6 +9,7 @@ import Dropdown from "@/components/shared/Dropdown";
 import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { deepEqual } from "@/lib/deepEqual";
 
 const SOURCE_OPTIONS = SOURCES.map((s) => ({ value: s, label: s }));
@@ -36,6 +37,7 @@ function toFormValues(prospect: Prospect): ProspectCreate {
 }
 
 export default function ProspectFormModal({ editing, initialForm, onClose, onSaved, hideLostOnCreate }: ProspectFormModalProps) {
+  useScrollLock();
   const initialFormRef = useRef<ProspectCreate>(editing ? toFormValues(editing) : initialForm);
   const [form, setForm] = useState<ProspectCreate>(initialFormRef.current);
   const [saving, setSaving] = useState(false);

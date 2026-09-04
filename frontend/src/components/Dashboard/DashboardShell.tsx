@@ -18,6 +18,7 @@ import {
   HiOutlineUsers,
 } from "react-icons/hi";
 import Logo from "@/assets/images/Navbar/White_Logo.png";
+import ScrollToTopButton from "@/components/Dashboard/ScrollToTopButton";
 import { auth } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
@@ -170,8 +171,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
     </div>
   );
 
-  if (isMobile) {
-    return (
+  const mobileShell = (
       <div className="min-h-screen bg-beige flex flex-col">
         <header className="fixed left-0 right-0 top-0 z-40 flex h-14 items-center justify-between border-b border-white/10 bg-dark-blue px-4">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -328,10 +328,9 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
           </button>
         </nav>
       </div>
-    );
-  }
+  );
 
-  return (
+  const desktopShell = (
     <div className="min-h-screen bg-beige flex">
       <aside
         className={`fixed left-0 top-0 z-30 h-full border-r border-white/10 bg-dark-blue transition-all duration-300 ${
@@ -352,5 +351,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
         {children}
       </main>
     </div>
+  );
+
+  return (
+    <>
+      {isMobile ? mobileShell : desktopShell}
+      <ScrollToTopButton />
+    </>
   );
 }

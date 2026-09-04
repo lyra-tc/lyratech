@@ -13,6 +13,7 @@ import LoadingDots from "@/components/shared/LoadingDots";
 import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { auth, usersApi } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
@@ -55,6 +56,7 @@ export default function UsersPage() {
     passwordModal !== null && !passwordConfirmOpen && !passwordSaving
   );
   useEscapeKey(() => setDeleteModal(null), deleteModal !== null && !passwordConfirmOpen);
+  useScrollLock(passwordModal !== null || deleteModal !== null);
 
   const loadUsers = useCallback(async () => {
     const list = await usersApi.list();

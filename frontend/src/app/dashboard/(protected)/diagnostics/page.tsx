@@ -8,6 +8,7 @@ import Dropdown from "@/components/shared/Dropdown";
 import Pagination from "@/components/shared/Pagination";
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { diagnosticsApi } from "@/lib/api";
 import { STATUS_COLORS } from "@/lib/prospectConstants";
@@ -75,6 +76,7 @@ export default function DiagnosticsPage() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
+  useScrollLock(deleteId !== null);
 
   const loadData = useCallback(async (silent = false) => {
     const id = ++reqId.current;

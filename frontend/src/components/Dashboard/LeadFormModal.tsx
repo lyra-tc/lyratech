@@ -9,6 +9,7 @@ import Dropdown from "@/components/shared/Dropdown";
 import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { deepEqual } from "@/lib/deepEqual";
 
 const EMPTY_FORM: LeadManualCreate = {
@@ -42,6 +43,7 @@ function toFormValues(lead: Lead): LeadManualCreate {
 }
 
 export default function LeadFormModal({ editing, onClose, onSaved }: LeadFormModalProps) {
+  useScrollLock();
   const initialFormRef = useRef<LeadManualCreate>(editing ? toFormValues(editing) : EMPTY_FORM);
   const [form, setForm] = useState<LeadManualCreate>(initialFormRef.current);
   const [saving, setSaving] = useState(false);

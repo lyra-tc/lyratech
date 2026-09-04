@@ -5,6 +5,7 @@ import { HiOutlineX } from "react-icons/hi";
 import type { Prospect } from "@/lib/api";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/prospectConstants";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 interface ProspectViewModalProps {
   prospect: Prospect;
@@ -22,6 +23,7 @@ function formatDate(value: string) {
 }
 
 export default function ProspectViewModal({ prospect, onClose }: ProspectViewModalProps) {
+  useScrollLock();
   useEscapeKey(onClose);
 
   return (

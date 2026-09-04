@@ -6,6 +6,7 @@ import { diagnosticsApi } from "@/lib/api";
 import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { deepEqual } from "@/lib/deepEqual";
 import type {
   DiagnosticQuestion,
@@ -121,6 +122,7 @@ export default function DiagnosticQuestionFormModal({
   onClose,
   onSaved,
 }: DiagnosticQuestionFormModalProps) {
+  useScrollLock();
   const initialFormRef = useRef<FormState>(toFormValues(editing));
   const [form, setForm] = useState<FormState>(initialFormRef.current);
   const [activeLocale, setActiveLocale] = useState<"es" | "en" | "fr" | "de">("es");

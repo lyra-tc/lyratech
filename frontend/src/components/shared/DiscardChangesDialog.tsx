@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 interface DiscardChangesDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface DiscardChangesDialogProps {
  * delete-confirmation dialogs.
  */
 export default function DiscardChangesDialog({ open, onConfirm, onCancel }: DiscardChangesDialogProps) {
+  useScrollLock(open);
   useEscapeKey(onCancel, open);
 
   if (!open) return null;

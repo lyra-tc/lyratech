@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { HiOutlineSparkles, HiOutlineX } from "react-icons/hi";
 import LoadingDots from "@/components/shared/LoadingDots";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { diagnosticsApi } from "@/lib/api";
 import type { DiagnosticSubmissionDetail as DiagnosticSubmissionDetailType } from "@/lib/api";
 
@@ -57,6 +58,7 @@ export default function DiagnosticSubmissionDetail({
   const [detail, setDetail] = useState<DiagnosticSubmissionDetailType | null>(null);
   const [loading, setLoading] = useState(true);
 
+  useScrollLock();
   useEscapeKey(onClose);
 
   useEffect(() => {

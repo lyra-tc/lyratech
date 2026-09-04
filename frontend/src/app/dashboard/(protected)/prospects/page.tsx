@@ -12,6 +12,7 @@ import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
 import ProspectViewModal from "@/components/Dashboard/ProspectViewModal";
 import BookingModal from "@/components/shared/BookingModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Dropdown from "@/components/shared/Dropdown";
 import Pagination from "@/components/shared/Pagination";
@@ -59,6 +60,7 @@ export default function ProspectsPage() {
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
   useEscapeKey(() => closeConfirmBooked(), confirmBooked !== null && !markingBooked);
+  useScrollLock(deleteId !== null || confirmBooked !== null);
 
   const loadData = useCallback(async () => {
     const id = ++reqId.current;

@@ -8,6 +8,7 @@ import LeadImportModal from "@/components/Dashboard/LeadImportModal";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Pagination from "@/components/shared/Pagination";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { leadsApi } from "@/lib/api";
 import type { Lead, ProspectCreate, LeadImportResult } from "@/lib/api";
@@ -28,6 +29,7 @@ export default function LeadsPage() {
   const [editing, setEditing] = useState<Lead | null>(null);
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
+  useScrollLock(deleteId !== null);
 
   const loadData = useCallback(async () => {
     const id = ++reqId.current;
