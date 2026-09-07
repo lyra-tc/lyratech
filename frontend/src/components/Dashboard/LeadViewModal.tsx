@@ -3,7 +3,8 @@
 import React from "react";
 import { HiOutlineX } from "react-icons/hi";
 import type { Lead } from "@/lib/api";
-import { STATUS_LABELS, STATUS_COLORS } from "@/lib/leadConstants";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 interface LeadViewModalProps {
   lead: Lead;
@@ -21,6 +22,9 @@ function formatDate(value: string) {
 }
 
 export default function LeadViewModal({ lead, onClose }: LeadViewModalProps) {
+  useScrollLock();
+  useEscapeKey(onClose);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
@@ -37,14 +41,11 @@ export default function LeadViewModal({ lead, onClose }: LeadViewModalProps) {
           </button>
         </div>
         <div className="p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-montserrat font-semibold border ${STATUS_COLORS[lead.status]}`}>
-              {STATUS_LABELS[lead.status]}
-            </span>
-            {lead.source && (
-              <span className="text-dark-blue/50 text-xs font-montserrat">Fuente: {lead.source}</span>
-            )}
-          </div>
+          {lead.service && (
+            <div className="flex items-center gap-2">
+              <span className="text-dark-blue/50 text-xs font-montserrat">Servicio: {lead.service}</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -60,22 +61,24 @@ export default function LeadViewModal({ lead, onClose }: LeadViewModalProps) {
           <div>
             <p className="font-montserrat text-dark-blue/50 text-xs mb-1">Empresa</p>
             <p className="font-montserrat text-dark-blue text-sm">{lead.company || "—"}</p>
+            {lead.industry && (
+              <p className="font-montserrat text-dark-blue/40 text-xs mt-1">Giro: {lead.industry}</p>
+            )}
           </div>
 
           <div>
-            <p className="font-montserrat text-dark-blue/50 text-xs mb-1">Notas</p>
-            <p className="font-montserrat text-dark-blue text-sm whitespace-pre-wrap">{lead.notes || "—"}</p>
+            <p className="font-montserrat text-dark-blue/50 text-xs mb-1">Dirección</p>
+            <p className="font-montserrat text-dark-blue text-sm whitespace-pre-wrap">{lead.address || "—"}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-black/5">
-            <div>
-              <p className="font-montserrat text-dark-blue/40 text-xs mb-1">Creado</p>
-              <p className="font-montserrat text-dark-blue/70 text-xs">{formatDate(lead.created_at)}</p>
-            </div>
-            <div>
-              <p className="font-montserrat text-dark-blue/40 text-xs mb-1">Actualizado</p>
-              <p className="font-montserrat text-dark-blue/70 text-xs">{formatDate(lead.updated_at)}</p>
-            </div>
+          <div>
+            <p className="font-montserrat text-dark-blue/50 text-xs mb-1">Mensaje</p>
+            <p className="font-montserrat text-dark-blue text-sm whitespace-pre-wrap">{lead.message || "—"}</p>
+          </div>
+
+          <div className="pt-4 border-t border-black/5">
+            <p className="font-montserrat text-dark-blue/40 text-xs mb-1">Creado</p>
+            <p className="font-montserrat text-dark-blue/70 text-xs">{formatDate(lead.created_at)}</p>
           </div>
         </div>
       </div>

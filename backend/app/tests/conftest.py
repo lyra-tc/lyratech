@@ -12,7 +12,7 @@ from ..database import Base
 from ..core.deps import get_db, get_current_user
 from ..core.limiter import limiter
 from ..models.user import User
-from ..routers import auth, diagnostics, leads, notifications, prospects, users
+from ..routers import auth, clients, diagnostics, leads, notifications, prospects, users
 
 engine = create_engine(
     "sqlite:///:memory:",
@@ -41,6 +41,7 @@ def _build_test_app() -> FastAPI:
     app.include_router(notifications.router, prefix="/api")
     app.include_router(diagnostics.router, prefix="/api")
     app.include_router(leads.router, prefix="/api")
+    app.include_router(clients.router, prefix="/api")
     app.dependency_overrides[get_db] = _override_get_db
     return app
 
@@ -51,6 +52,19 @@ def _reset_schema_and_limiter():
     limiter.reset()
     yield
     Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture(autouse=True)
+def _force_test_cookie_settings(monkeypatch):
+    """Pin session-cookie config so tests don't depend on the local .env.
+
+    In particular a real AUTH_COOKIE_DOMAIN would make the cookie Secure, and
+    the http TestClient would then never send it back.
+    """
+    from ..config import settings
+
+    monkeypatch.setattr(settings, "AUTH_COOKIE_NAME", "lyratech_session", raising=False)
+    monkeypatch.setattr(settings, "AUTH_COOKIE_DOMAIN", "", raising=False)
 
 
 @pytest.fixture

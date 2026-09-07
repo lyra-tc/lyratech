@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { HiOutlineCheck, HiOutlineMail, HiOutlineTrash } from "react-icons/hi";
 import { notificationsApi } from "@/lib/api";
 import LoadingDots from "@/components/shared/LoadingDots";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import type { NotificationRecipient } from "@/lib/api";
 
 export default function NotificationsSettings() {
@@ -15,6 +17,9 @@ export default function NotificationsSettings() {
   const [deleteRecipientId, setDeleteRecipientId] = useState<number | null>(null);
   const [removingRecipientId, setRemovingRecipientId] = useState<number | null>(null);
   const [testingRecipientId, setTestingRecipientId] = useState<number | null>(null);
+
+  useScrollLock(deleteRecipientId !== null);
+  useEscapeKey(() => setDeleteRecipientId(null), deleteRecipientId !== null);
 
   const inputClass =
     "w-full border border-black/15 rounded-xl px-4 py-2.5 text-sm font-montserrat text-dark-blue outline-none focus:border-lyratech-purple focus:ring-1 focus:ring-lyratech-purple transition-all bg-white";
@@ -84,7 +89,7 @@ export default function NotificationsSettings() {
         <div className="mb-6">
           <h1 className="font-montserrat-bold text-dark-blue text-2xl">Notificaciones</h1>
           <p className="font-montserrat text-dark-blue/50 text-sm mt-0.5">
-            Administra los correos que reciben avisos de nuevos prospectos y/o diagnósticos. Puedes agregar, eliminar y probar los correos de notificación desde esta sección.
+            Administra los correos que reciben avisos de nuevos leads y/o diagnósticos. Puedes agregar, eliminar y probar los correos de notificación desde esta sección.
           </p>
         </div>
 
@@ -93,7 +98,7 @@ export default function NotificationsSettings() {
             Correos de notificacion
           </h2>
           <p className="font-montserrat text-dark-blue/40 text-sm mb-5">
-            Estas direcciones reciben un aviso cada vez que llega un nuevo prospecto y/o diagnóstico desde el formulario de contacto o formulario de diagnóstico.
+            Estas direcciones reciben un aviso cada vez que llega un nuevo lead y/o diagnóstico desde el formulario de contacto o formulario de diagnóstico.
           </p>
 
           {recipientsLoading ? (

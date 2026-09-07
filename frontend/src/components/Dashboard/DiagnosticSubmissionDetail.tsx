@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { HiOutlineSparkles, HiOutlineX } from "react-icons/hi";
 import LoadingDots from "@/components/shared/LoadingDots";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { diagnosticsApi } from "@/lib/api";
 import type { DiagnosticSubmissionDetail as DiagnosticSubmissionDetailType } from "@/lib/api";
 
@@ -55,6 +57,9 @@ export default function DiagnosticSubmissionDetail({
 }: DiagnosticSubmissionDetailProps) {
   const [detail, setDetail] = useState<DiagnosticSubmissionDetailType | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useScrollLock();
+  useEscapeKey(onClose);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,6 +134,10 @@ export default function DiagnosticSubmissionDetail({
               <div>
                 <p className="mb-1 text-xs text-dark-blue/50 font-montserrat">Empresa</p>
                 <p className="text-sm text-dark-blue font-montserrat">{detail.company || "-"}</p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs text-dark-blue/50 font-montserrat">Giro de empresa</p>
+                <p className="text-sm text-dark-blue font-montserrat">{detail.industry || "-"}</p>
               </div>
               <div>
                 <p className="mb-1 text-xs text-dark-blue/50 font-montserrat">Idioma</p>

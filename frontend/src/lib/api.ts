@@ -10,28 +10,26 @@ export class ApiError extends Error {
   }
 }
 
-function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("lyratech_token");
-}
-
 async function request<T>(
   path: string,
   options: RequestInit & { skipAuthRedirect?: boolean } = {}
 ): Promise<T> {
   const { skipAuthRedirect, ...fetchOptions } = options;
-  const token = getToken();
+  const isForm = fetchOptions.body instanceof FormData;
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(isForm ? {} : { "Content-Type": "application/json" }),
     ...(fetchOptions.headers as Record<string, string>),
   };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_URL}${path}`, { ...fetchOptions, headers });
+  // Auth travels in an httpOnly session cookie, so every request must send
+  // credentials (the frontend and API share the lyratech.com.mx parent domain).
+  const res = await fetch(`${API_URL}${path}`, {
+    ...fetchOptions,
+    headers,
+    credentials: "include",
+  });
 
   if (res.status === 401 && !skipAuthRedirect) {
-    localStorage.removeItem("lyratech_token");
-    localStorage.removeItem("lyratech_user");
     window.location.href = "/dashboard/login";
     throw new Error("No autorizado");
   }
@@ -40,8 +38,11 @@ async function request<T>(
     const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
     const retryAfterHeader = res.headers.get("Retry-After");
     const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : undefined;
+    const detail = Array.isArray(err.detail)
+      ? err.detail.map((d: { msg?: string }) => d?.msg).filter(Boolean).join(", ")
+      : err.detail;
     throw new ApiError(
-      err.detail || "Error en la solicitud",
+      detail || "Error en la solicitud",
       res.status,
       Number.isFinite(retryAfterSeconds) ? retryAfterSeconds : undefined
     );
@@ -49,6 +50,35 @@ async function request<T>(
 
   if (res.status === 204) return undefined as T;
   return res.json();
+}
+
+function triggerDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+const XLSX_MIME =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+export function downloadBase64Xlsx(b64: string, filename: string) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  triggerDownload(new Blob([bytes], { type: XLSX_MIME }), filename);
+}
+
+export async function downloadLeadTemplate(): Promise<void> {
+  const res = await fetch(`${API_URL}/api/leads/import/template`, {
+    credentials: "include",
+  });
+  if (!res.ok) throw new ApiError("No se pudo descargar la plantilla", res.status);
+  triggerDownload(await res.blob(), "plantilla-leads.xlsx");
 }
 
 export interface UserInfo {
@@ -61,23 +91,77 @@ export interface UserInfo {
   created_at: string;
 }
 
-export function getCachedUser(): UserInfo | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem("lyratech_user");
-    return raw ? (JSON.parse(raw) as UserInfo) : null;
-  } catch {
-    return null;
-  }
-}
-
 export interface Lead {
   id: number;
   name: string;
   email?: string;
   phone?: string;
   company?: string;
-  status: LeadStatus;
+  industry?: string;
+  address?: string;
+  service?: string;
+  message?: string;
+  created_at: string;
+}
+
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+}
+
+export interface ProspectStats {
+  total: number;
+  meeting_to_schedule: number;
+  call_later: number;
+  meeting_scheduled: number;
+  lost: number;
+}
+
+export interface LeadImportSkip {
+  file: string;
+  row: number;
+  reason: string;
+}
+
+export interface LeadImportResult {
+  inserted: number;
+  skipped_count: number;
+  skipped: LeadImportSkip[];
+  report_xlsx_base64?: string | null;
+}
+
+export interface LeadManualCreate {
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  industry?: string;
+  address?: string;
+  service?: string;
+  message?: string;
+}
+
+export interface LeadSubmit {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  service?: string;
+  message?: string;
+  turnstile_token: string;
+}
+
+export type ProspectStatus = "meeting_to_schedule" | "call_later" | "meeting_scheduled" | "lost";
+
+export interface Prospect {
+  id: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  industry?: string;
+  service?: string;
+  status: ProspectStatus;
   source?: string;
   notes?: string;
   assigned_to?: number;
@@ -85,20 +169,14 @@ export interface Lead {
   updated_at: string;
 }
 
-export type LeadStatus =
-  | "new"
-  | "contacted"
-  | "qualified"
-  | "proposal"
-  | "closed"
-  | "lost";
-
-export interface LeadCreate {
+export interface ProspectCreate {
   name: string;
   email?: string;
   phone?: string;
   company?: string;
-  status?: LeadStatus;
+  industry?: string;
+  service?: string;
+  status?: ProspectStatus;
   source?: string;
   notes?: string;
 }
@@ -115,7 +193,10 @@ export const auth = {
       method: "POST",
       body: JSON.stringify({ email, full_name, password }),
     }),
-  me: () => request<UserInfo>("/api/auth/me"),
+  me: (options?: { skipAuthRedirect?: boolean }) =>
+    request<UserInfo>("/api/auth/me", options),
+  logout: () =>
+    request<void>("/api/auth/logout", { method: "POST", skipAuthRedirect: true }),
   updateProfile: (data: { full_name?: string; email?: string }) =>
     request<UserInfo>("/api/auth/me", {
       method: "PUT",
@@ -147,46 +228,25 @@ export const usersApi = {
 };
 
 export const leadsApi = {
-  list: () => request<Lead[]>("/api/leads/"),
-  create: (data: LeadCreate) =>
-    request<Lead>("/api/leads/", { method: "POST", body: JSON.stringify(data) }),
-  update: (id: number, data: Partial<LeadCreate> & { status?: LeadStatus }) =>
-    request<Lead>(`/api/leads/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
-  remove: (id: number) =>
-    request<void>(`/api/leads/${id}`, { method: "DELETE" }),
+  list: (params: { page: number; pageSize: number; search?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    return request<Paginated<Lead>>(`/api/leads/?${qs.toString()}`);
+  },
+  createManual: (data: LeadManualCreate) =>
+    request<Lead>("/api/leads/manual", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: Partial<LeadManualCreate>) =>
+    request<Lead>(`/api/leads/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  remove: (id: number) => request<void>(`/api/leads/${id}`, { method: "DELETE" }),
+  importLeadsOne: (file: File) => {
+    const fd = new FormData();
+    fd.append("files", file);
+    return request<LeadImportResult>("/api/leads/import", { method: "POST", body: fd });
+  },
 };
 
-export interface Prospect {
-  id: number;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  service?: string;
-  message?: string;
-  created_at: string;
-}
-
-export interface ProspectSubmit {
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  service?: string;
-  message?: string;
-  turnstile_token: string;
-}
-
-export const prospectsApi = {
-  list: () => request<Prospect[]>("/api/prospects/"),
-  remove: (id: number) => request<void>(`/api/prospects/${id}`, { method: "DELETE" }),
-};
-
-export async function submitProspect(data: ProspectSubmit): Promise<Prospect> {
-  const res = await fetch(`${API_URL}/api/prospects/`, {
+export async function submitLead(data: LeadSubmit): Promise<Lead> {
+  const res = await fetch(`${API_URL}/api/leads/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -197,6 +257,183 @@ export async function submitProspect(data: ProspectSubmit): Promise<Prospect> {
   }
   return res.json();
 }
+
+export const prospectsApi = {
+  list: (params: { page: number; pageSize: number; search?: string; status?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    if (params.status) qs.set("status", params.status);
+    return request<Paginated<Prospect>>(`/api/prospects/?${qs.toString()}`);
+  },
+  stats: () => request<ProspectStats>("/api/prospects/stats"),
+  create: (data: ProspectCreate) =>
+    request<Prospect>("/api/prospects/", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: Partial<ProspectCreate>) =>
+    request<Prospect>(`/api/prospects/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  remove: (id: number) =>
+    request<void>(`/api/prospects/${id}`, { method: "DELETE" }),
+};
+
+export type ClientStatus = "nuevo" | "en_proceso" | "con_mantenimiento" | "cerrado" | "perdido";
+export type ComisionTipo = "monto" | "porcentaje";
+export type PaymentType = "contado" | "diferido" | "iguala";
+
+export interface ClientPayment {
+  id: number;
+  due_date: string;
+  concept?: string | null;
+  amount: string;
+  is_paid: boolean;
+  paid_date?: string | null;
+}
+
+export interface ClientPaymentInput {
+  due_date: string;
+  concept?: string | null;
+  amount: string;
+  is_paid?: boolean;
+  paid_date?: string | null;
+}
+
+export interface Client {
+  id: number;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  company?: string | null;
+  industry?: string | null;
+  service?: string | null;
+  source?: string | null;
+  notes?: string | null;
+  responsable: string;
+  comisionista?: string | null;
+  comision_tipo?: ComisionTipo | null;
+  comision_valor?: string | null;
+  status: ClientStatus;
+  payment_type?: PaymentType | null;
+  project_start_date?: string | null;
+  project_amount?: string | null;
+  converted_from_prospect_id?: number | null;
+  created_at: string;
+  updated_at: string;
+  payments: ClientPayment[];
+}
+
+export interface ClientListItem {
+  id: number;
+  name: string;
+  company?: string | null;
+  industry?: string | null;
+  responsable: string;
+  status: ClientStatus;
+  project_amount?: string | null;
+  project_start_date?: string | null;
+  paid_total: string;
+  created_at: string;
+}
+
+export interface ClientStats {
+  total: number;
+  by_status: Record<ClientStatus, number>;
+  contratado_total: string;
+  cobrado_total: string;
+}
+
+export interface ClientFromProspectInput {
+  responsable: string;
+  comisionista?: string;
+  comision_tipo?: ComisionTipo | null;
+  comision_valor?: string | null;
+}
+
+export type ClientUpdateInput = Partial<
+  Omit<Client, "id" | "created_at" | "updated_at" | "payments" | "converted_from_prospect_id">
+> & { payments?: ClientPaymentInput[] };
+
+export const clientsApi = {
+  list: (params: { page: number; pageSize: number; search?: string; status?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    if (params.status) qs.set("status", params.status);
+    return request<Paginated<ClientListItem>>(`/api/clients/?${qs.toString()}`);
+  },
+  stats: () => request<ClientStats>("/api/clients/stats"),
+  get: (id: number) => request<Client>(`/api/clients/${id}`),
+  fromProspect: (prospectId: number, body: ClientFromProspectInput) =>
+    request<Client>(`/api/clients/from-prospect/${prospectId}`, { method: "POST", body: JSON.stringify(body) }),
+  update: (id: number, body: ClientUpdateInput) =>
+    request<Client>(`/api/clients/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+  remove: (id: number) => request<void>(`/api/clients/${id}`, { method: "DELETE" }),
+};
+
+// --- Clientes: ingresos --------------------------------------------------
+
+export interface RevenueMonth {
+  month: string; // "YYYY-MM"
+  total: string;
+  segments: Record<string, string>;
+}
+
+export interface RevenueKpis {
+  period_total: string;
+  current_month_total: string;
+  monthly_avg: string;
+  pending_to_collect: string;
+}
+
+export interface RevenueBreakdownRow {
+  key: string;
+  label: string;
+  total: string;
+}
+
+export interface RevenueResponse {
+  months: RevenueMonth[];
+  kpis: RevenueKpis;
+  breakdown: RevenueBreakdownRow[];
+  group_by: string;
+}
+
+export interface RevenueFilterOptions {
+  responsables: string[];
+  services: string[];
+  industries: string[];
+}
+
+export interface RevenueParams {
+  date_from: string;
+  date_to: string;
+  responsable?: string;
+  status?: string;
+  service?: string;
+  industry?: string;
+  group_by?: string;
+}
+
+function revenueQs(p: RevenueParams): string {
+  const qs = new URLSearchParams({ date_from: p.date_from, date_to: p.date_to });
+  if (p.responsable) qs.set("responsable", p.responsable);
+  if (p.status) qs.set("status", p.status);
+  if (p.service) qs.set("service", p.service);
+  if (p.industry) qs.set("industry", p.industry);
+  if (p.group_by) qs.set("group_by", p.group_by);
+  return qs.toString();
+}
+
+export const revenueApi = {
+  data: (p: RevenueParams) => request<RevenueResponse>(`/api/clients/revenue?${revenueQs(p)}`),
+  filters: () => request<RevenueFilterOptions>("/api/clients/revenue/filters"),
+  exportCsv: async (p: RevenueParams): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/clients/revenue/export?${revenueQs(p)}`, {
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new ApiError(err?.detail || "No se pudo exportar el CSV", res.status);
+    }
+    triggerDownload(await res.blob(), `ingresos_${p.date_from}_${p.date_to}.csv`);
+  },
+};
 
 export interface NotificationRecipient {
   id: number;
@@ -246,6 +483,7 @@ export interface DiagnosticSubmitPayload {
   email: string;
   phone?: string;
   company?: string;
+  industry?: string;
   locale: string;
   answers: Record<string, string[]>;
   turnstile_token: string;
@@ -296,16 +534,20 @@ export interface DiagnosticSubmissionListItem {
   id: number;
   name: string;
   email: string;
+  phone?: string;
   company?: string;
+  industry?: string;
   locale: string;
   recommended_primary_service: string;
   recommended_secondary_service?: string;
   email_delivery_status: string;
+  email_provider_id?: string;
+  conversion_status: string;
+  converted_prospect_id?: number;
   created_at: string;
 }
 
 export interface DiagnosticSubmissionDetail extends DiagnosticSubmissionListItem {
-  phone?: string;
   raw_answers_json: Record<string, string[]>;
   normalized_answers_en_json: Record<string, string[]>;
   service_scores_json: Record<string, number>;
@@ -352,12 +594,24 @@ export interface DiagnosticQuestionInput {
 }
 
 export const diagnosticsApi = {
-  listSubmissions: (search = "") =>
-    request<DiagnosticSubmissionListItem[]>(
-      `/api/diagnostics/submissions${search ? `?search=${encodeURIComponent(search)}` : ""}`
-    ),
+  listSubmissions: (params: { page: number; pageSize: number; search?: string; conversion?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    if (params.conversion) qs.set("conversion", params.conversion);
+    return request<Paginated<DiagnosticSubmissionListItem>>(`/api/diagnostics/submissions?${qs.toString()}`);
+  },
   getSubmission: (id: number) =>
     request<DiagnosticSubmissionDetail>(`/api/diagnostics/submissions/${id}`),
+  refreshEmailStatus: () =>
+    request<DiagnosticSubmissionListItem[]>(
+      "/api/diagnostics/submissions/refresh-email-status",
+      { method: "POST" }
+    ),
+  markConverted: (submissionId: number, prospectId: number) =>
+    request<DiagnosticSubmissionDetail>(
+      `/api/diagnostics/submissions/${submissionId}/mark-converted`,
+      { method: "POST", body: JSON.stringify({ prospect_id: prospectId }) }
+    ),
   removeSubmission: (id: number) =>
     request<void>(`/api/diagnostics/submissions/${id}`, { method: "DELETE" }),
   listQuestions: () => request<DiagnosticQuestion[]>("/api/diagnostics/questions"),

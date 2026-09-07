@@ -7,6 +7,7 @@
     "namePlaceholder": "Full name",
     "emailPlaceholder": "Email address",
     "companyPlaceholder": "Company",
+    "industryPlaceholder": "Industry",
     "phonePlaceholder": "Phone",
     "requiredField": "This field is required",
     "backButton": "Back",

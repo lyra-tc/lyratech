@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
 
+    # Session cookie holding the access token. Name differs per environment
+    # (prod vs dev share the .lyratech.com.mx parent domain). Domain is empty
+    # for local dev (host-only cookie over http); when set, the cookie is Secure.
+    AUTH_COOKIE_NAME: str = "lyratech_session"
+    AUTH_COOKIE_DOMAIN: str = ""
+
     TURNSTILE_SECRET_KEY: str = ""
 
     RESEND_API_KEY: str = ""
@@ -28,6 +34,10 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost:3002",
     ]
+
+    @property
+    def auth_cookie_secure(self) -> bool:
+        return bool(self.AUTH_COOKIE_DOMAIN)
 
     class Config:
         env_file = ".env"
