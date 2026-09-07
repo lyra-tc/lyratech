@@ -219,6 +219,9 @@ def test_convert_requires_auth(client):
 def test_non_admin_blocked_from_clients(non_admin_client):
     assert non_admin_client.get("/api/clients/").status_code == 403
     assert non_admin_client.get("/api/clients/stats").status_code == 403
+    assert non_admin_client.get("/api/clients/1").status_code == 403
+    assert non_admin_client.put("/api/clients/1", json={}).status_code == 403
+    assert non_admin_client.delete("/api/clients/1").status_code == 403
     assert non_admin_client.post(
         "/api/clients/from-prospect/1", json={"responsable": "Ana"}
     ).status_code == 403
@@ -233,7 +236,16 @@ def test_non_admin_blocked_from_revenue(non_admin_client):
 
 def test_non_admin_blocked_from_notifications(non_admin_client):
     assert non_admin_client.get("/api/notifications/recipients").status_code == 403
+    assert non_admin_client.post(
+        "/api/notifications/recipients", json={"email": "x@example.com"}
+    ).status_code == 403
+    assert non_admin_client.delete("/api/notifications/recipients/1").status_code == 403
 
 
 def test_non_admin_blocked_from_users(non_admin_client):
     assert non_admin_client.get("/api/users/").status_code == 403
+    assert non_admin_client.patch("/api/users/1", json={}).status_code == 403
+    assert non_admin_client.put(
+        "/api/users/1/reset-password", json={"new_password": "x"}
+    ).status_code == 403
+    assert non_admin_client.delete("/api/users/1").status_code == 403
