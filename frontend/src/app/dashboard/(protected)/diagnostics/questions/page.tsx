@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { HiOutlineMenuAlt4, HiOutlinePencil, HiOutlinePlus } from "react-icons/hi";
+import AdminOnly from "@/components/Dashboard/AdminOnly";
 import LoadingDots from "@/components/shared/LoadingDots";
 import DiagnosticQuestionFormModal from "@/components/Dashboard/DiagnosticQuestionFormModal";
 import { diagnosticsApi } from "@/lib/api";
@@ -25,7 +26,7 @@ function reorderQuestionsList(
   return reordered;
 }
 
-export default function DiagnosticQuestionsPage() {
+function DiagnosticQuestionsPageInner() {
   const [questions, setQuestions] = useState<DiagnosticQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<DiagnosticQuestion | null>(null);
@@ -245,5 +246,13 @@ export default function DiagnosticQuestionsPage() {
         />
       )}
     </>
+  );
+}
+
+export default function DiagnosticQuestionsPage() {
+  return (
+    <AdminOnly>
+      <DiagnosticQuestionsPageInner />
+    </AdminOnly>
   );
 }
