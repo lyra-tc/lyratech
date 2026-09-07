@@ -5,6 +5,7 @@ import { HiOutlinePlus, HiOutlineSearch, HiOutlineTrash, HiOutlinePencil, HiOutl
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
 import LeadFormModal from "@/components/Dashboard/LeadFormModal";
 import LeadImportModal from "@/components/Dashboard/LeadImportModal";
+import LeadViewModal from "@/components/Dashboard/LeadViewModal";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Pagination from "@/components/shared/Pagination";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
@@ -27,6 +28,7 @@ export default function LeadsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [editing, setEditing] = useState<Lead | null>(null);
+  const [viewing, setViewing] = useState<Lead | null>(null);
 
   useEscapeKey(() => setDeleteId(null), deleteId !== null);
   useScrollLock(deleteId !== null);
@@ -163,7 +165,11 @@ export default function LeadsPage() {
                 </thead>
                 <tbody className="divide-y divide-black/5">
                   {leads.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-beige/40 transition-colors group">
+                    <tr
+                      key={lead.id}
+                      onClick={() => setViewing(lead)}
+                      className="hover:bg-beige/40 transition-colors group cursor-pointer"
+                    >
                       <td className="px-4 py-3.5">
                         <p className="font-montserrat font-semibold text-dark-blue text-sm">{lead.name}</p>
                       </td>
@@ -192,13 +198,13 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-1">
-                          <button onClick={() => { setShowCreate(false); setEditing(lead); }} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Editar">
+                          <button onClick={(e) => { e.stopPropagation(); setShowCreate(false); setEditing(lead); }} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Editar">
                             <HiOutlinePencil size={15} />
                           </button>
-                          <button onClick={() => setConverting(lead)} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Convertir a prospecto">
+                          <button onClick={(e) => { e.stopPropagation(); setConverting(lead); }} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Convertir a prospecto">
                             <HiOutlineSwitchHorizontal size={15} />
                           </button>
-                          <button onClick={() => setDeleteId(lead.id)} className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors" title="Eliminar">
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteId(lead.id); }} className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors" title="Eliminar">
                             <HiOutlineTrash size={15} />
                           </button>
                         </div>
@@ -243,6 +249,8 @@ export default function LeadsPage() {
           onSaved={() => handleConverted(converting.id)}
         />
       )}
+
+      {viewing && <LeadViewModal lead={viewing} onClose={() => setViewing(null)} />}
 
       {deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
