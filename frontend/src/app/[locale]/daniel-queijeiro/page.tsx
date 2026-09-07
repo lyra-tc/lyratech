@@ -11,7 +11,7 @@ export default function DanielQ() {
             <Profile
                 imageSrc={DaniQImage}
                 name="Daniel Queijeiro Albo"
-                position="Co-Founder & COO"
+                position="Co-Founder & VP Engineering"
             />
             <ButtonLanguage />
             <Contact

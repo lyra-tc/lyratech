@@ -6,6 +6,7 @@ import DashboardShell from "@/components/Dashboard/DashboardShell";
 import LoadingDots from "@/components/shared/LoadingDots";
 import { auth } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
+import { UserProvider } from "@/lib/userContext";
 
 type AuthStatus = "checking" | "authenticated" | "unauthenticated";
 
@@ -55,5 +56,9 @@ export default function ProtectedDashboardLayout({ children }: { children: React
     return <FullScreenLoader />;
   }
 
-  return <DashboardShell user={user}>{children}</DashboardShell>;
+  return (
+    <UserProvider user={user}>
+      <DashboardShell user={user}>{children}</DashboardShell>
+    </UserProvider>
+  );
 }

@@ -8,8 +8,8 @@ def test_list_prospects_requires_auth(client):
     assert client.get("/api/prospects/").status_code == 401
 
 
-def test_list_prospects_requires_admin(non_admin_client):
-    assert non_admin_client.get("/api/prospects/").status_code == 403
+def test_list_prospects_allows_active_non_admin(non_admin_client):
+    assert non_admin_client.get("/api/prospects/").status_code == 200
 
 
 def test_admin_can_create_and_read_prospect(auth_client):
@@ -209,9 +209,9 @@ def test_prospects_stats(auth_client):
     }
 
 
-def test_prospects_stats_requires_admin(client, non_admin_client):
+def test_prospects_stats_requires_auth_not_admin(client, non_admin_client):
     assert client.get("/api/prospects/stats").status_code == 401
-    assert non_admin_client.get("/api/prospects/stats").status_code == 403
+    assert non_admin_client.get("/api/prospects/stats").status_code == 200
 
 
 def test_prospect_persists_industry(auth_client):

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { HiOutlineArrowLeft, HiOutlineTrash } from "react-icons/hi";
+import AdminOnly from "@/components/Dashboard/AdminOnly";
 import Dropdown from "@/components/shared/Dropdown";
 import LoadingDots from "@/components/shared/LoadingDots";
 import DiscardChangesDialog from "@/components/shared/DiscardChangesDialog";
@@ -96,7 +97,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
   );
 }
 
-export default function ClienteDetailPage() {
+function ClienteDetailPageInner() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
@@ -459,5 +460,13 @@ export default function ClienteDetailPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ClienteDetailPage() {
+  return (
+    <AdminOnly>
+      <ClienteDetailPageInner />
+    </AdminOnly>
   );
 }

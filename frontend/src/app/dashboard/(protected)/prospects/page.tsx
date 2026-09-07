@@ -23,6 +23,7 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { prospectsApi } from "@/lib/api";
 import type { Prospect, ProspectCreate, ProspectStatus, ProspectStats } from "@/lib/api";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/prospectConstants";
+import { useCurrentUser } from "@/lib/userContext";
 
 const STATUS_FILTER_OPTIONS = [
   { value: "all", label: "Todos los estados" },
@@ -42,6 +43,7 @@ const EMPTY_FORM: ProspectCreate = {
 };
 
 export default function ProspectsPage() {
+  const user = useCurrentUser();
   const router = useRouter();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [search, setSearch] = useState("");
@@ -244,13 +246,15 @@ export default function ProspectsPage() {
                 </td>
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setTransforming(prospect); }}
-                      className="p-1.5 rounded-lg hover:bg-lyratech-green/10 text-lyratech-green transition-colors"
-                      title="Transformar a cliente"
-                    >
-                      <HiOutlineBriefcase size={15} />
-                    </button>
+                    {user.is_admin && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setTransforming(prospect); }}
+                        className="p-1.5 rounded-lg hover:bg-lyratech-green/10 text-lyratech-green transition-colors"
+                        title="Transformar a cliente"
+                      >
+                        <HiOutlineBriefcase size={15} />
+                      </button>
+                    )}
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(prospect); }}
                       className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors"
@@ -258,13 +262,15 @@ export default function ProspectsPage() {
                     >
                       <HiOutlinePencil size={15} />
                     </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setDeleteId(prospect.id); }}
-                      className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors"
-                      title="Eliminar"
-                    >
-                      <HiOutlineTrash size={15} />
-                    </button>
+                    {user.is_admin && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeleteId(prospect.id); }}
+                        className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors"
+                        title="Eliminar"
+                      >
+                        <HiOutlineTrash size={15} />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -348,7 +354,7 @@ export default function ProspectsPage() {
       {viewing && <ProspectViewModal prospect={viewing} onClose={() => setViewing(null)} />}
 
       {/* Transform to client Modal */}
-      {transforming && (
+      {user.is_admin && transforming && (
         <TransformToClientModal
           prospect={transforming}
           onClose={() => setTransforming(null)}
@@ -420,7 +426,7 @@ export default function ProspectsPage() {
       )}
 
       {/* Delete Confirm */}
-      {deleteId !== null && (
+      {user.is_admin && deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"

@@ -237,6 +237,11 @@ export const leadsApi = {
     request<Lead>("/api/leads/manual", { method: "POST", body: JSON.stringify(data) }),
   update: (id: number, data: Partial<LeadManualCreate>) =>
     request<Lead>(`/api/leads/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  convert: (leadId: number, data: ProspectCreate) =>
+    request<Prospect>(`/api/leads/${leadId}/convert`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   remove: (id: number) => request<void>(`/api/leads/${id}`, { method: "DELETE" }),
   importLeadsOne: (file: File) => {
     const fd = new FormData();

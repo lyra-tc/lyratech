@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import AdminOnly from "@/components/Dashboard/AdminOnly";
 import LoadingDots from "@/components/shared/LoadingDots";
 import RevenueFilters from "@/components/Dashboard/RevenueFilters";
 import { revenueApi } from "@/lib/api";
@@ -22,7 +23,7 @@ const lastDay = (ym: string) => {
   return `${ym}-${String(new Date(y, m, 0).getDate()).padStart(2, "0")}`;
 };
 
-export default function IngresosPage() {
+function IngresosPageInner() {
   const [preset, setPreset] = useState("last12");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
@@ -211,5 +212,13 @@ export default function IngresosPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function IngresosPage() {
+  return (
+    <AdminOnly>
+      <IngresosPageInner />
+    </AdminOnly>
   );
 }

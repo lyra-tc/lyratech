@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { HiOutlineSearch, HiOutlineTrash } from "react-icons/hi";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import AdminOnly from "@/components/Dashboard/AdminOnly";
 import LoadingDots from "@/components/shared/LoadingDots";
 import Dropdown from "@/components/shared/Dropdown";
 import Pagination from "@/components/shared/Pagination";
@@ -19,7 +20,7 @@ const STATUS_FILTER_OPTIONS = [
   ...(Object.keys(CLIENT_STATUS_LABELS) as ClientStatus[]).map((s) => ({ value: s, label: CLIENT_STATUS_LABELS[s] })),
 ];
 
-export default function ClientesPage() {
+function ClientesPageInner() {
   const router = useRouter();
   const [clients, setClients] = useState<ClientListItem[]>([]);
   const [search, setSearch] = useState("");
@@ -296,5 +297,13 @@ export default function ClientesPage() {
         </div>
       )}
     </>
+  );
+}
+
+export default function ClientesPage() {
+  return (
+    <AdminOnly>
+      <ClientesPageInner />
+    </AdminOnly>
   );
 }

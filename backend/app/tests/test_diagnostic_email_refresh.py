@@ -80,10 +80,10 @@ def test_refresh_caps_batch_and_sleeps_between_only(auth_client, monkeypatch):
     assert len(sleeps) == 14           # sleep between iterations only, not after the last
 
 
-def test_refresh_requires_admin(non_admin_client):
+def test_refresh_allows_active_non_admin(non_admin_client):
     assert non_admin_client.post(
         "/api/diagnostics/submissions/refresh-email-status"
-    ).status_code == 403
+    ).status_code == 200
 
 
 def test_dispatch_stores_provider_id(monkeypatch):

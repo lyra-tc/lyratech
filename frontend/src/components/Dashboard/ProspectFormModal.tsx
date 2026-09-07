@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { HiOutlineX, HiOutlineCheck } from "react-icons/hi";
-import { prospectsApi } from "@/lib/api";
+import { prospectsApi, leadsApi } from "@/lib/api";
 import type { Prospect, ProspectCreate, ProspectStatus } from "@/lib/api";
 import { STATUS_LABELS, SOURCES } from "@/lib/prospectConstants";
 import Dropdown from "@/components/shared/Dropdown";
@@ -20,6 +20,9 @@ interface ProspectFormModalProps {
   onClose: () => void;
   onSaved: (prospect: Prospect) => void;
   hideLostOnCreate?: boolean;
+  /** Cuando está presente y no es edición, guardar convierte ese lead
+   *  (crea el prospecto + borra el lead en una sola llamada atómica). */
+  convertFromLeadId?: number;
 }
 
 function toFormValues(prospect: Prospect): ProspectCreate {
@@ -36,7 +39,7 @@ function toFormValues(prospect: Prospect): ProspectCreate {
   };
 }
 
-export default function ProspectFormModal({ editing, initialForm, onClose, onSaved, hideLostOnCreate }: ProspectFormModalProps) {
+export default function ProspectFormModal({ editing, initialForm, onClose, onSaved, hideLostOnCreate, convertFromLeadId }: ProspectFormModalProps) {
   useScrollLock();
   const initialFormRef = useRef<ProspectCreate>(editing ? toFormValues(editing) : initialForm);
   const [form, setForm] = useState<ProspectCreate>(initialFormRef.current);
@@ -84,9 +87,14 @@ export default function ProspectFormModal({ editing, initialForm, onClose, onSav
     setSaving(true);
     setFormError("");
     try {
-      const saved = editing
-        ? await prospectsApi.update(editing.id, form)
-        : await prospectsApi.create(form);
+      let saved: Prospect;
+      if (editing) {
+        saved = await prospectsApi.update(editing.id, form);
+      } else if (convertFromLeadId != null) {
+        saved = await leadsApi.convert(convertFromLeadId, form);
+      } else {
+        saved = await prospectsApi.create(form);
+      }
       onSaved(saved);
       onClose();
     } catch (err: unknown) {

@@ -12,7 +12,7 @@ from fastapi import (
     UploadFile,
 )
 from sqlalchemy.orm import Session
-from ..core.deps import get_db, get_current_admin
+from ..core.deps import get_db, get_current_admin, get_current_user
 from ..core.idempotency import claim_turnstile_token
 from ..core.limiter import limiter
 from ..core.turnstile import verify_turnstile_token
@@ -28,6 +28,7 @@ from ..core.lead_import import (
 )
 from ..models.lead import Lead
 from ..models.notification_recipient import NotificationRecipient
+from ..models.prospect import Prospect, ProspectStatus
 from ..models.user import User
 from ..schemas.lead import (
     LeadCreate,
@@ -38,6 +39,7 @@ from ..schemas.lead import (
     LeadResponse,
     LeadUpdate,
 )
+from ..schemas.prospect import ProspectCreate, ProspectResponse
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
@@ -80,7 +82,7 @@ def create_lead_manual(
     body: LeadManualCreate,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     lead = Lead(**body.model_dump())
     db.add(lead)
@@ -94,7 +96,7 @@ def create_lead_manual(
 
 
 @router.get("/import/template")
-def download_import_template(_: User = Depends(get_current_admin)):
+def download_import_template(_: User = Depends(get_current_user)):
     return Response(
         content=build_xlsx(TEMPLATE_HEADERS, []),
         media_type=_XLSX_MEDIA,
@@ -106,7 +108,7 @@ def download_import_template(_: User = Depends(get_current_admin)):
 async def import_leads(
     files: list[UploadFile] = File(...),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     all_rows: list[dict] = []
     for f in files:
@@ -170,7 +172,7 @@ def list_leads(
     page_size: int = Query(25, ge=1, le=100),
     search: str = Query(""),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     query = db.query(Lead)
     if search:
@@ -193,7 +195,7 @@ def update_lead(
     lead_id: int,
     body: LeadUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if not lead:
@@ -222,3 +224,26 @@ def delete_lead(
         raise HTTPException(status_code=404, detail="Lead no encontrado")
     db.delete(lead)
     db.commit()
+
+
+@router.post("/{lead_id}/convert", response_model=ProspectResponse, status_code=201)
+def convert_lead_to_prospect(
+    lead_id: int,
+    body: ProspectCreate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+    if body.status == ProspectStatus.meeting_scheduled:
+        raise HTTPException(
+            status_code=422,
+            detail="No se puede crear un prospecto directamente en Reunión agendada",
+        )
+    prospect = Prospect(**body.model_dump())
+    db.add(prospect)
+    db.delete(lead)
+    db.commit()
+    db.refresh(prospect)
+    return prospect

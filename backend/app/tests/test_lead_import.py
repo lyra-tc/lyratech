@@ -173,10 +173,10 @@ def _row(name="", email="", phone="", company="", industry="", address="", servi
     return [name, email, phone, company, industry, address, service, message]
 
 
-def test_import_requires_admin(client, non_admin_client):
+def test_import_requires_auth_not_admin(client, non_admin_client):
     files = {"files": ("x.csv", _csv_bytes([_row("A", "a@x.com")]), "text/csv")}
     assert client.post("/api/leads/import", files=files).status_code == 401
-    assert non_admin_client.post("/api/leads/import", files=files).status_code == 403
+    assert non_admin_client.post("/api/leads/import", files=files).status_code == 200
     assert client.get("/api/leads/import/template").status_code == 401
 
 
