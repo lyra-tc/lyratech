@@ -9,6 +9,7 @@ import {
   HiChevronLeft,
   HiChevronRight,
   HiDotsHorizontal,
+  HiOutlineBriefcase,
   HiOutlineChartBar,
   HiOutlineClipboardList,
   HiOutlineCog,
@@ -23,6 +24,7 @@ import { auth } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
+  { label: "Clientes", mobileLabel: "Clientes", href: "/dashboard/clientes", icon: HiOutlineBriefcase },
   { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineUsers },
   { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineInboxIn },
   { label: "Diagnosticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
@@ -75,10 +77,12 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
         .toUpperCase()
     : "?";
 
+  const isNavActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+
   const visibleNavItems = NAV_ITEMS.filter((item) => !item.adminOnly || user?.is_admin);
   const mobilePrimaryNavItems = visibleNavItems.slice(0, 2);
   const mobileMoreNavItems = visibleNavItems.slice(2);
-  const mobileMoreActive = mobileMoreNavItems.some(({ href }) => pathname === href);
+  const mobileMoreActive = mobileMoreNavItems.some(({ href }) => isNavActive(href));
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
@@ -97,7 +101,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {visibleNavItems.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href;
+          const active = isNavActive(href);
 
           return (
             <Link
@@ -242,7 +246,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
             <div className="mx-auto mb-5 h-1.5 w-14 rounded-full bg-slate-200" />
             <div className="grid grid-cols-2 gap-3">
               {mobileMoreNavItems.map(({ label, href, icon: Icon }) => {
-                const active = pathname === href;
+                const active = isNavActive(href);
 
                 return (
                   <Link
@@ -271,7 +275,7 @@ export default function DashboardShell({ user, children }: DashboardShellProps) 
 
         <nav className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-dark-blue px-2.5 py-2 shadow-2xl">
           {mobilePrimaryNavItems.map(({ mobileLabel, href, icon: Icon }) => {
-            const active = pathname === href;
+            const active = isNavActive(href);
 
             return (
               <Link

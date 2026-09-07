@@ -1,14 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   HiOutlinePlus,
   HiOutlineSearch,
   HiOutlinePencil,
   HiOutlineTrash,
   HiOutlineCalendar,
+  HiOutlineBriefcase,
 } from "react-icons/hi";
 import ProspectFormModal from "@/components/Dashboard/ProspectFormModal";
+import TransformToClientModal from "@/components/Dashboard/TransformToClientModal";
 import ProspectViewModal from "@/components/Dashboard/ProspectViewModal";
 import BookingModal from "@/components/shared/BookingModal";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
@@ -39,6 +42,7 @@ const EMPTY_FORM: ProspectCreate = {
 };
 
 export default function ProspectsPage() {
+  const router = useRouter();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<ProspectStatus | "all">("all");
@@ -53,6 +57,7 @@ export default function ProspectsPage() {
   const [editing, setEditing] = useState<Prospect | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [viewing, setViewing] = useState<Prospect | null>(null);
+  const [transforming, setTransforming] = useState<Prospect | null>(null);
   const [bookingProspect, setBookingProspect] = useState<Prospect | null>(null);
   const [confirmBooked, setConfirmBooked] = useState<Prospect | null>(null);
   const [bookingError, setBookingError] = useState("");
@@ -240,6 +245,13 @@ export default function ProspectsPage() {
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-1">
                     <button
+                      onClick={(e) => { e.stopPropagation(); setTransforming(prospect); }}
+                      className="p-1.5 rounded-lg hover:bg-lyratech-green/10 text-lyratech-green transition-colors"
+                      title="Transformar a cliente"
+                    >
+                      <HiOutlineBriefcase size={15} />
+                    </button>
+                    <button
                       onClick={(e) => { e.stopPropagation(); openEdit(prospect); }}
                       className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors"
                       title="Editar"
@@ -334,6 +346,20 @@ export default function ProspectsPage() {
 
       {/* View Modal */}
       {viewing && <ProspectViewModal prospect={viewing} onClose={() => setViewing(null)} />}
+
+      {/* Transform to client Modal */}
+      {transforming && (
+        <TransformToClientModal
+          prospect={transforming}
+          onClose={() => setTransforming(null)}
+          onDone={(client) => {
+            setTransforming(null);
+            loadData();
+            loadStats();
+            router.push(`/dashboard/clientes/${client.id}`);
+          }}
+        />
+      )}
 
       {/* Booking Modal */}
       <BookingModal

@@ -10,7 +10,7 @@ from .core.diagnostic_seed import seed_diagnostic_questions
 from .core.idempotency import cleanup_old_turnstile_tokens
 from .core.limiter import limiter
 from .database import Base, SessionLocal, engine
-from .routers import auth, diagnostics, leads, notifications, prospects, users
+from .routers import auth, clients, diagnostics, leads, notifications, prospects, users
 
 
 def ensure_user_management_schema() -> None:
@@ -267,6 +267,7 @@ app.include_router(leads.router, prefix="/api")
 app.include_router(prospects.router, prefix="/api")
 app.include_router(notifications.router, prefix="/api")
 app.include_router(diagnostics.router, prefix="/api")
+app.include_router(clients.router, prefix="/api")
 
 
 @app.get("/health")

@@ -274,6 +274,98 @@ export const prospectsApi = {
     request<void>(`/api/prospects/${id}`, { method: "DELETE" }),
 };
 
+export type ClientStatus = "nuevo" | "en_proceso" | "con_mantenimiento" | "cerrado" | "perdido";
+export type ComisionTipo = "monto" | "porcentaje";
+export type PaymentType = "contado" | "diferido" | "iguala";
+
+export interface ClientPayment {
+  id: number;
+  due_date: string;
+  concept?: string | null;
+  amount: string;
+  is_paid: boolean;
+  paid_date?: string | null;
+}
+
+export interface ClientPaymentInput {
+  due_date: string;
+  concept?: string | null;
+  amount: string;
+  is_paid?: boolean;
+  paid_date?: string | null;
+}
+
+export interface Client {
+  id: number;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  company?: string | null;
+  industry?: string | null;
+  service?: string | null;
+  source?: string | null;
+  notes?: string | null;
+  responsable: string;
+  comisionista?: string | null;
+  comision_tipo?: ComisionTipo | null;
+  comision_valor?: string | null;
+  status: ClientStatus;
+  payment_type?: PaymentType | null;
+  project_start_date?: string | null;
+  project_amount?: string | null;
+  converted_from_prospect_id?: number | null;
+  created_at: string;
+  updated_at: string;
+  payments: ClientPayment[];
+}
+
+export interface ClientListItem {
+  id: number;
+  name: string;
+  company?: string | null;
+  industry?: string | null;
+  responsable: string;
+  status: ClientStatus;
+  project_amount?: string | null;
+  project_start_date?: string | null;
+  paid_total: string;
+  created_at: string;
+}
+
+export interface ClientStats {
+  total: number;
+  by_status: Record<ClientStatus, number>;
+  contratado_total: string;
+  cobrado_total: string;
+}
+
+export interface ClientFromProspectInput {
+  responsable: string;
+  comisionista?: string;
+  comision_tipo?: ComisionTipo | null;
+  comision_valor?: string | null;
+}
+
+export type ClientUpdateInput = Partial<
+  Omit<Client, "id" | "created_at" | "updated_at" | "payments" | "converted_from_prospect_id">
+> & { payments?: ClientPaymentInput[] };
+
+export const clientsApi = {
+  list: (params: { page: number; pageSize: number; search?: string; status?: string }) => {
+    const qs = new URLSearchParams({ page: String(params.page), page_size: String(params.pageSize) });
+    if (params.search) qs.set("search", params.search);
+    if (params.status) qs.set("status", params.status);
+    return request<Paginated<ClientListItem>>(`/api/clients/?${qs.toString()}`);
+  },
+  stats: () => request<ClientStats>("/api/clients/stats"),
+  get: (id: number) => request<Client>(`/api/clients/${id}`),
+  fromProspect: (prospectId: number, body: ClientFromProspectInput) =>
+    request<Client>(`/api/clients/from-prospect/${prospectId}`, { method: "POST", body: JSON.stringify(body) }),
+  update: (id: number, body: ClientUpdateInput) =>
+    request<Client>(`/api/clients/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+  remove: (id: number) => request<void>(`/api/clients/${id}`, { method: "DELETE" }),
+};
+
 export interface NotificationRecipient {
   id: number;
   email: string;

@@ -67,6 +67,51 @@ CREATE TABLE IF NOT EXISTS prospects (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+-- Clients (converted from prospects) + their payment schedule
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS clients (
+    id                          INT AUTO_INCREMENT PRIMARY KEY,
+    name                        VARCHAR(255) NOT NULL,
+    email                       VARCHAR(255),
+    phone                       VARCHAR(50),
+    company                     VARCHAR(255),
+    industry                    VARCHAR(120),
+    service                     VARCHAR(100),
+    source                      VARCHAR(100),
+    notes                       TEXT,
+    responsable                 VARCHAR(255) NOT NULL,
+    comisionista                VARCHAR(255),
+    comision_tipo               ENUM('monto','porcentaje'),
+    comision_valor              DECIMAL(12,2),
+    status                      ENUM('nuevo','en_proceso','con_mantenimiento','cerrado','perdido') NOT NULL DEFAULT 'nuevo',
+    payment_type                ENUM('contado','diferido','iguala'),
+    project_start_date          DATE,
+    project_amount              DECIMAL(12,2),
+    converted_from_prospect_id  INT,
+    created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX ix_clients_id (id),
+    INDEX idx_clients_status (status),
+    INDEX idx_clients_created_at (created_at),
+    INDEX idx_clients_prospect (converted_from_prospect_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS client_payments (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    client_id   INT NOT NULL,
+    due_date    DATE NOT NULL,
+    concept     VARCHAR(255),
+    amount      DECIMAL(12,2) NOT NULL,
+    is_paid     TINYINT(1) NOT NULL DEFAULT 0,
+    paid_date   DATE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_payment_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+    INDEX ix_client_payments_id (id),
+    INDEX idx_client_payments_client (client_id),
+    INDEX idx_client_payments_due (due_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
 -- Notification recipients (dashboard-configurable email list)
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS notification_recipients (
