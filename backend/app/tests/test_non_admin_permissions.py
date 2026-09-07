@@ -212,3 +212,28 @@ def test_convert_rejects_meeting_scheduled_status_and_keeps_lead(non_admin_clien
 
 def test_convert_requires_auth(client):
     assert client.post("/api/leads/1/convert", json=_CONVERT_BODY).status_code == 401
+
+
+# --- Secciones prohibidas para `usuario` (candado de regresión) --------------
+
+def test_non_admin_blocked_from_clients(non_admin_client):
+    assert non_admin_client.get("/api/clients/").status_code == 403
+    assert non_admin_client.get("/api/clients/stats").status_code == 403
+    assert non_admin_client.post(
+        "/api/clients/from-prospect/1", json={"responsable": "Ana"}
+    ).status_code == 403
+
+
+def test_non_admin_blocked_from_revenue(non_admin_client):
+    rng = {"date_from": "2026-01-01", "date_to": "2026-03-31"}
+    assert non_admin_client.get("/api/clients/revenue", params=rng).status_code == 403
+    assert non_admin_client.get("/api/clients/revenue/filters").status_code == 403
+    assert non_admin_client.get("/api/clients/revenue/export", params=rng).status_code == 403
+
+
+def test_non_admin_blocked_from_notifications(non_admin_client):
+    assert non_admin_client.get("/api/notifications/recipients").status_code == 403
+
+
+def test_non_admin_blocked_from_users(non_admin_client):
+    assert non_admin_client.get("/api/users/").status_code == 403
