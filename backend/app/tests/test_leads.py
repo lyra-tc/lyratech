@@ -139,10 +139,10 @@ def test_manual_lead_without_email_ok(auth_client):
     assert body["email"] is None
 
 
-def test_create_lead_manual_requires_admin(client, non_admin_client):
+def test_create_lead_manual_requires_auth_not_admin(client, non_admin_client):
     payload = {"name": "M", "email": "m@example.com"}
     assert client.post("/api/leads/manual", json=payload).status_code == 401
-    assert non_admin_client.post("/api/leads/manual", json=payload).status_code == 403
+    assert non_admin_client.post("/api/leads/manual", json=payload).status_code == 201
 
 
 def test_admin_creates_manual_lead(auth_client):
@@ -192,9 +192,10 @@ def test_manual_lead_without_email_still_notifies(auth_client, monkeypatch):
     assert captured["recipients"] == ["team@lyratech.com.mx"]
 
 
-def test_update_lead_requires_admin(client, non_admin_client):
+def test_update_lead_requires_auth_not_admin(client, non_admin_client):
     assert client.put("/api/leads/1", json={}).status_code == 401
-    assert non_admin_client.put("/api/leads/1", json={}).status_code == 403
+    # autenticado (no-admin) pasa la guarda; el lead no existe -> 404
+    assert non_admin_client.put("/api/leads/1", json={}).status_code == 404
 
 
 def test_admin_updates_lead(auth_client):
