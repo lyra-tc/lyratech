@@ -366,6 +366,75 @@ export const clientsApi = {
   remove: (id: number) => request<void>(`/api/clients/${id}`, { method: "DELETE" }),
 };
 
+// --- Clientes: ingresos --------------------------------------------------
+
+export interface RevenueMonth {
+  month: string; // "YYYY-MM"
+  total: string;
+  segments: Record<string, string>;
+}
+
+export interface RevenueKpis {
+  period_total: string;
+  current_month_total: string;
+  monthly_avg: string;
+  pending_to_collect: string;
+}
+
+export interface RevenueBreakdownRow {
+  key: string;
+  label: string;
+  total: string;
+}
+
+export interface RevenueResponse {
+  months: RevenueMonth[];
+  kpis: RevenueKpis;
+  breakdown: RevenueBreakdownRow[];
+  group_by: string;
+}
+
+export interface RevenueFilterOptions {
+  responsables: string[];
+  services: string[];
+  industries: string[];
+}
+
+export interface RevenueParams {
+  date_from: string;
+  date_to: string;
+  responsable?: string;
+  status?: string;
+  service?: string;
+  industry?: string;
+  group_by?: string;
+}
+
+function revenueQs(p: RevenueParams): string {
+  const qs = new URLSearchParams({ date_from: p.date_from, date_to: p.date_to });
+  if (p.responsable) qs.set("responsable", p.responsable);
+  if (p.status) qs.set("status", p.status);
+  if (p.service) qs.set("service", p.service);
+  if (p.industry) qs.set("industry", p.industry);
+  if (p.group_by) qs.set("group_by", p.group_by);
+  return qs.toString();
+}
+
+export const revenueApi = {
+  data: (p: RevenueParams) => request<RevenueResponse>(`/api/clients/revenue?${revenueQs(p)}`),
+  filters: () => request<RevenueFilterOptions>("/api/clients/revenue/filters"),
+  exportCsv: async (p: RevenueParams): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/clients/revenue/export?${revenueQs(p)}`, {
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new ApiError(err?.detail || "No se pudo exportar el CSV", res.status);
+    }
+    triggerDownload(await res.blob(), `ingresos_${p.date_from}_${p.date_to}.csv`);
+  },
+};
+
 export interface NotificationRecipient {
   id: number;
   email: string;

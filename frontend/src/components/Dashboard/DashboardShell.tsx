@@ -16,6 +16,7 @@ import {
   HiOutlineInboxIn,
   HiOutlineLogout,
   HiOutlineMail,
+  HiOutlineTrendingUp,
   HiOutlineUsers,
 } from "react-icons/hi";
 import Logo from "@/assets/images/Navbar/White_Logo.png";
@@ -25,6 +26,7 @@ import type { UserInfo } from "@/lib/api";
 
 const NAV_ITEMS = [
   { label: "Clientes", mobileLabel: "Clientes", href: "/dashboard/clientes", icon: HiOutlineBriefcase },
+  { label: "Ingresos", mobileLabel: "Ingresos", href: "/dashboard/ingresos", icon: HiOutlineTrendingUp, adminOnly: true },
   { label: "Prospects", mobileLabel: "Prospects", href: "/dashboard/prospects", icon: HiOutlineUsers },
   { label: "Leads", mobileLabel: "Leads", href: "/dashboard/leads", icon: HiOutlineInboxIn },
   { label: "Diagnosticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },

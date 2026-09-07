@@ -1,6 +1,7 @@
+from datetime import date
 from decimal import Decimal
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -16,10 +17,38 @@ from ..schemas.client import (
     ClientUpdate,
     _check_commission,
 )
+from ..schemas.revenue import RevenueFilterOptions, RevenueResponse
+from ..services.client_revenue import (
+    GROUP_BY_KEYS,
+    compute_revenue,
+    export_rows,
+    filter_options,
+    rows_to_csv,
+)
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
 _COPIED = ("name", "email", "phone", "company", "industry", "service", "source", "notes")
+
+
+def _revenue_filter_params(
+    date_from: date = Query(...),
+    date_to: date = Query(...),
+    responsable: str = Query(""),
+    status: str = Query(""),
+    service: str = Query(""),
+    industry: str = Query(""),
+) -> dict:
+    if date_from > date_to:
+        raise HTTPException(status_code=422, detail="El rango de fechas es inválido")
+    return {
+        "date_from": date_from,
+        "date_to": date_to,
+        "responsable": responsable or None,
+        "status": status or None,
+        "service": service or None,
+        "industry": industry or None,
+    }
 
 
 def _apply_filters(query, search: str, status: str):
@@ -96,6 +125,43 @@ def client_stats(db: Session = Depends(get_db), _: User = Depends(get_current_ad
         "contratado_total": Decimal(str(contratado)),
         "cobrado_total": Decimal(str(cobrado)),
     }
+
+
+@router.get("/revenue", response_model=RevenueResponse)
+def client_revenue(
+    filters: dict = Depends(_revenue_filter_params),
+    group_by: str = Query("responsable"),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    if group_by not in GROUP_BY_KEYS:
+        raise HTTPException(status_code=422, detail="Criterio de agrupación inválido")
+    return compute_revenue(db, **filters, group_by=group_by)
+
+
+@router.get("/revenue/filters", response_model=RevenueFilterOptions)
+def revenue_filter_options(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    return filter_options(db)
+
+
+@router.get("/revenue/export")
+def revenue_export(
+    filters: dict = Depends(_revenue_filter_params),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    rows = export_rows(db, **filters)
+    filename = (
+        f"ingresos_{filters['date_from'].isoformat()}_{filters['date_to'].isoformat()}.csv"
+    )
+    return Response(
+        content=rows_to_csv(rows),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.post("/from-prospect/{prospect_id}", response_model=ClientResponse, status_code=201)
