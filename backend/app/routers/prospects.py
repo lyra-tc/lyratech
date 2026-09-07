@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from ..core.deps import get_db, get_current_admin
+from ..core.deps import get_db, get_current_admin, get_current_user
 from ..models.prospect import Prospect, ProspectStatus
 from ..models.user import User
 from ..schemas.prospect import (
@@ -22,7 +22,7 @@ def list_prospects(
     search: str = Query(""),
     status: str = Query(""),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     query = db.query(Prospect)
     if search:
@@ -48,7 +48,7 @@ def list_prospects(
 @router.get("/stats", response_model=ProspectStats)
 def prospect_stats(
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     counts = dict(
         db.query(Prospect.status, func.count(Prospect.id)).group_by(Prospect.status).all()
@@ -61,7 +61,7 @@ def prospect_stats(
 def create_prospect(
     body: ProspectCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     if body.status == ProspectStatus.meeting_scheduled:
         raise HTTPException(
@@ -79,7 +79,7 @@ def create_prospect(
 def get_prospect(
     prospect_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     prospect = db.query(Prospect).filter(Prospect.id == prospect_id).first()
     if not prospect:
@@ -92,7 +92,7 @@ def update_prospect(
     prospect_id: int,
     body: ProspectUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     prospect = db.query(Prospect).filter(Prospect.id == prospect_id).first()
     if not prospect:
