@@ -13,6 +13,7 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { diagnosticsApi } from "@/lib/api";
 import { STATUS_COLORS } from "@/lib/prospectConstants";
 import type { DiagnosticSubmissionListItem, ProspectCreate, Prospect } from "@/lib/api";
+import { useCurrentUser } from "@/lib/userContext";
 
 const SERVICE_LABELS: Record<string, string> = {
   process_automation: "Automatización de Procesos",
@@ -59,6 +60,7 @@ const EMAIL_STATUS_BADGE: Record<string, string> = {
 };
 
 export default function DiagnosticsPage() {
+  const user = useCurrentUser();
   const [submissions, setSubmissions] = useState<DiagnosticSubmissionListItem[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -339,9 +341,11 @@ export default function DiagnosticsPage() {
                           <button onClick={() => setViewingId(submission.id)} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Ver detalle">
                             <HiOutlineEye size={15} />
                           </button>
-                          <button onClick={() => setDeleteId(submission.id)} className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors" title="Eliminar">
-                            <HiOutlineTrash size={15} />
-                          </button>
+                          {user.is_admin && (
+                            <button onClick={() => setDeleteId(submission.id)} className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors" title="Eliminar">
+                              <HiOutlineTrash size={15} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -365,7 +369,7 @@ export default function DiagnosticsPage() {
         <DiagnosticSubmissionDetail submissionId={viewingId} onClose={() => setViewingId(null)} />
       )}
 
-      {deleteId !== null && (
+      {user.is_admin && deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"

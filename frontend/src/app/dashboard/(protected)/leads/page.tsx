@@ -13,8 +13,10 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { leadsApi } from "@/lib/api";
 import type { Lead, ProspectCreate, LeadImportResult } from "@/lib/api";
+import { useCurrentUser } from "@/lib/userContext";
 
 export default function LeadsPage() {
+  const user = useCurrentUser();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -60,13 +62,6 @@ export default function LeadsPage() {
     } catch { /* ignore */ } finally {
       setDeleteId(null);
     }
-  }
-
-  async function handleConverted(leadId: number) {
-    try {
-      await leadsApi.remove(leadId);
-    } catch { /* ignore */ }
-    await loadData();
   }
 
   function convertInitialForm(lead: Lead): ProspectCreate {
@@ -204,9 +199,11 @@ export default function LeadsPage() {
                           <button onClick={(e) => { e.stopPropagation(); setConverting(lead); }} className="p-1.5 rounded-lg hover:bg-lyratech-purple/10 text-lyratech-purple transition-colors" title="Convertir a prospecto">
                             <HiOutlineSwitchHorizontal size={15} />
                           </button>
-                          <button onClick={(e) => { e.stopPropagation(); setDeleteId(lead.id); }} className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors" title="Eliminar">
-                            <HiOutlineTrash size={15} />
-                          </button>
+                          {user.is_admin && (
+                            <button onClick={(e) => { e.stopPropagation(); setDeleteId(lead.id); }} className="p-1.5 rounded-lg hover:bg-red/10 text-red transition-colors" title="Eliminar">
+                              <HiOutlineTrash size={15} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -245,14 +242,15 @@ export default function LeadsPage() {
         <ProspectFormModal
           editing={null}
           initialForm={convertInitialForm(converting)}
+          convertFromLeadId={converting.id}
           onClose={() => setConverting(null)}
-          onSaved={() => handleConverted(converting.id)}
+          onSaved={() => { setConverting(null); loadData(); }}
         />
       )}
 
       {viewing && <LeadViewModal lead={viewing} onClose={() => setViewing(null)} />}
 
-      {deleteId !== null && (
+      {user.is_admin && deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"
