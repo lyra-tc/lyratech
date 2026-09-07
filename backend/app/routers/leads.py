@@ -28,6 +28,7 @@ from ..core.lead_import import (
 )
 from ..models.lead import Lead
 from ..models.notification_recipient import NotificationRecipient
+from ..models.prospect import Prospect, ProspectStatus
 from ..models.user import User
 from ..schemas.lead import (
     LeadCreate,
@@ -38,6 +39,7 @@ from ..schemas.lead import (
     LeadResponse,
     LeadUpdate,
 )
+from ..schemas.prospect import ProspectCreate, ProspectResponse
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
@@ -222,3 +224,26 @@ def delete_lead(
         raise HTTPException(status_code=404, detail="Lead no encontrado")
     db.delete(lead)
     db.commit()
+
+
+@router.post("/{lead_id}/convert", response_model=ProspectResponse, status_code=201)
+def convert_lead_to_prospect(
+    lead_id: int,
+    body: ProspectCreate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead no encontrado")
+    if body.status == ProspectStatus.meeting_scheduled:
+        raise HTTPException(
+            status_code=422,
+            detail="No se puede crear un prospecto directamente en Reunión agendada",
+        )
+    prospect = Prospect(**body.model_dump())
+    db.add(prospect)
+    db.delete(lead)
+    db.commit()
+    db.refresh(prospect)
+    return prospect

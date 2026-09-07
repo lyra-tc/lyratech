@@ -150,3 +150,65 @@ def test_non_admin_cannot_touch_questions(non_admin_client):
     assert non_admin_client.patch(
         "/api/diagnostics/questions/reorder", json={"ordered_ids": []}
     ).status_code == 403
+
+
+# --- Conversión lead -> prospecto (atómica) ---------------------------------
+
+_CONVERT_BODY = {
+    "name": "Converted Co",
+    "email": "conv@example.com",
+    "phone": "555 111 2222",
+    "company": "Acme",
+    "industry": "Retail",
+    "service": "automatizaciones",
+    "status": "meeting_to_schedule",
+    "source": "Web",
+    "notes": "desde lead",
+}
+
+
+def _seed_lead(auth_client, name="Lead To Convert") -> int:
+    return auth_client.post(
+        "/api/leads/manual", json={"name": name, "email": "lead@example.com", "phone": "5"}
+    ).json()["id"]
+
+
+def test_non_admin_converts_lead_creates_prospect_and_deletes_lead(non_admin_client, auth_client):
+    lead_id = _seed_lead(auth_client)
+
+    resp = non_admin_client.post(f"/api/leads/{lead_id}/convert", json=_CONVERT_BODY)
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["name"] == "Converted Co"
+    assert body["status"] == "meeting_to_schedule"
+    prospect_id = body["id"]
+
+    assert auth_client.get(f"/api/prospects/{prospect_id}").status_code == 200
+    remaining = [i["id"] for i in auth_client.get("/api/leads/").json()["items"]]
+    assert lead_id not in remaining
+
+
+def test_convert_missing_lead_returns_404_and_creates_nothing(non_admin_client, auth_client):
+    before = auth_client.get("/api/prospects/").json()["total"]
+    resp = non_admin_client.post("/api/leads/999999/convert", json=_CONVERT_BODY)
+    assert resp.status_code == 404
+    assert resp.json()["detail"] == "Lead no encontrado"
+    after = auth_client.get("/api/prospects/").json()["total"]
+    assert after == before
+
+
+def test_convert_rejects_meeting_scheduled_status_and_keeps_lead(non_admin_client, auth_client):
+    lead_id = _seed_lead(auth_client, name="Keep Me")
+    before = auth_client.get("/api/prospects/").json()["total"]
+    resp = non_admin_client.post(
+        f"/api/leads/{lead_id}/convert",
+        json={**_CONVERT_BODY, "status": "meeting_scheduled"},
+    )
+    assert resp.status_code == 422
+    remaining = [i["id"] for i in auth_client.get("/api/leads/").json()["items"]]
+    assert lead_id in remaining
+    assert auth_client.get("/api/prospects/").json()["total"] == before
+
+
+def test_convert_requires_auth(client):
+    assert client.post("/api/leads/1/convert", json=_CONVERT_BODY).status_code == 401
