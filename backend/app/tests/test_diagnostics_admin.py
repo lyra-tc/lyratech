@@ -210,6 +210,23 @@ def test_submissions_paginate(auth_client):
     assert len(body["items"]) == 5
 
 
+def test_list_and_get_submission_include_industry_and_phone(client, auth_client, monkeypatch):
+    _seed()
+    monkeypatch.setattr(
+        "app.routers.diagnostics.verify_turnstile_token", lambda token, remote_ip=None: True
+    )
+    payload = {**VALID_SUBMIT_PAYLOAD, "industry": "Restaurante"}
+    submission_id = client.post("/api/diagnostics/submit", json=payload).json()["submission_id"]
+
+    list_res = auth_client.get("/api/diagnostics/submissions")
+    item = next(i for i in list_res.json()["items"] if i["id"] == submission_id)
+    assert item["industry"] == "Restaurante"
+    assert item["phone"] == VALID_SUBMIT_PAYLOAD["phone"]
+
+    detail_res = auth_client.get(f"/api/diagnostics/submissions/{submission_id}")
+    assert detail_res.json()["industry"] == "Restaurante"
+
+
 def test_delete_submission(client, auth_client, monkeypatch):
     _seed()
     monkeypatch.setattr(

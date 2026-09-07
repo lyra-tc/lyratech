@@ -11,6 +11,7 @@ class DiagnosticSubmission(Base):
     email = Column(String(255), nullable=False)
     phone = Column(String(50))
     company = Column(String(255))
+    industry = Column(String(120))
     locale = Column(String(5), nullable=False, default="es")
     raw_answers_json = Column(JSON, nullable=False)
     normalized_answers_en_json = Column(JSON, nullable=False)

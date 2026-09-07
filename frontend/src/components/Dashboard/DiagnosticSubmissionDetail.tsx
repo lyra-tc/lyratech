@@ -136,6 +136,10 @@ export default function DiagnosticSubmissionDetail({
                 <p className="text-sm text-dark-blue font-montserrat">{detail.company || "-"}</p>
               </div>
               <div>
+                <p className="mb-1 text-xs text-dark-blue/50 font-montserrat">Giro de empresa</p>
+                <p className="text-sm text-dark-blue font-montserrat">{detail.industry || "-"}</p>
+              </div>
+              <div>
                 <p className="mb-1 text-xs text-dark-blue/50 font-montserrat">Idioma</p>
                 <p className="text-sm uppercase text-dark-blue font-montserrat">{detail.locale}</p>
               </div>

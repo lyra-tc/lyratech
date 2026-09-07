@@ -322,6 +322,7 @@ export interface DiagnosticSubmitPayload {
   email: string;
   phone?: string;
   company?: string;
+  industry?: string;
   locale: string;
   answers: Record<string, string[]>;
   turnstile_token: string;
@@ -372,7 +373,9 @@ export interface DiagnosticSubmissionListItem {
   id: number;
   name: string;
   email: string;
+  phone?: string;
   company?: string;
+  industry?: string;
   locale: string;
   recommended_primary_service: string;
   recommended_secondary_service?: string;
@@ -384,7 +387,6 @@ export interface DiagnosticSubmissionListItem {
 }
 
 export interface DiagnosticSubmissionDetail extends DiagnosticSubmissionListItem {
-  phone?: string;
   raw_answers_json: Record<string, string[]>;
   normalized_answers_en_json: Record<string, string[]>;
   service_scores_json: Record<string, number>;

@@ -7,6 +7,7 @@
     "namePlaceholder": "Nombre completo",
     "emailPlaceholder": "Correo electrónico",
     "companyPlaceholder": "Empresa",
+    "industryPlaceholder": "Giro de empresa",
     "phonePlaceholder": "Teléfono",
     "requiredField": "Este campo es requerido",
     "backButton": "Atrás",

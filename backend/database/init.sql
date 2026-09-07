@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS diagnostic_submissions (
     email                           VARCHAR(255) NOT NULL,
     phone                           VARCHAR(50),
     company                         VARCHAR(255),
+    industry                        VARCHAR(120),
     locale                          VARCHAR(5) NOT NULL DEFAULT 'es',
     raw_answers_json                JSON NOT NULL,
     normalized_answers_en_json      JSON NOT NULL,

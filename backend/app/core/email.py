@@ -293,6 +293,7 @@ def build_diagnostic_notification_html(submission: DiagnosticSubmission) -> str:
         ("Correo", submission.email),
         ("Telefono", submission.phone or "-"),
         ("Empresa", submission.company or "-"),
+        ("Giro de empresa", submission.industry or "-"),
         ("Idioma", submission.locale),
         ("Servicio recomendado", primary_name),
         ("Servicio secundario", secondary_name or "-"),

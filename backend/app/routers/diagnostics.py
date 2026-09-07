@@ -231,6 +231,7 @@ def submit_diagnostic(
         email=body.email,
         phone=body.phone,
         company=body.company,
+        industry=body.industry,
         locale=body.locale,
         raw_answers_json=body.answers,
         normalized_answers_en_json=normalized_answers,

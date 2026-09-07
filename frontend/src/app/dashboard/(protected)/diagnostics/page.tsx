@@ -177,7 +177,7 @@ export default function DiagnosticsPage() {
           email: submission.email,
           phone,
           company: submission.company || "",
-          industry: "",
+          industry: submission.industry || "",
           service: serviceLabel,
           status: "meeting_to_schedule",
           source: "Diagnóstico GO",
@@ -283,9 +283,15 @@ export default function DiagnosticsPage() {
                       <td className="px-4 py-3.5">
                         <p className="font-montserrat font-semibold text-dark-blue text-sm">{submission.name}</p>
                         <p className="font-montserrat text-dark-blue/40 text-xs">{submission.email}</p>
+                        {submission.phone && (
+                          <p className="font-montserrat text-dark-blue/40 text-xs">{submission.phone}</p>
+                        )}
                       </td>
                       <td className="px-4 py-3.5">
                         <span className="font-montserrat text-dark-blue/70 text-sm">{submission.company || "—"}</span>
+                        {submission.industry && (
+                          <p className="font-montserrat text-dark-blue/40 text-xs mt-0.5">{submission.industry}</p>
+                        )}
                       </td>
                       <td className="px-4 py-3.5">
                         <span className="font-montserrat text-dark-blue/60 text-sm">

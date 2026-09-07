@@ -195,6 +195,19 @@ def ensure_industry_address_schema() -> None:
                 connection.execute(text("ALTER TABLE prospects ADD COLUMN industry VARCHAR(120)"))
 
 
+def ensure_diagnostic_industry_schema() -> None:
+    if engine.dialect.name != "mysql":
+        return  # SQLite/pytest builds the columns from the models
+    inspector = inspect(engine)
+    if "diagnostic_submissions" in inspector.get_table_names():
+        cols = {c["name"] for c in inspector.get_columns("diagnostic_submissions")}
+        if "industry" not in cols:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE diagnostic_submissions ADD COLUMN industry VARCHAR(120)")
+                )
+
+
 Base.metadata.create_all(bind=engine)
 ensure_user_management_schema()
 ensure_leads_prospects_swap()
@@ -203,6 +216,7 @@ ensure_diagnostic_conversion_schema()
 ensure_email_delivery_tracking_schema()
 ensure_prospect_status_schema()
 ensure_industry_address_schema()
+ensure_diagnostic_industry_schema()
 
 _seed_db = SessionLocal()
 try:

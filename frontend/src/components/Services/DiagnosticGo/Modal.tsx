@@ -21,6 +21,7 @@ interface ContactFormState {
   email: string;
   company: string;
   phone: string;
+  industry: string;
 }
 
 export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
@@ -32,7 +33,7 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [stepIndex, setStepIndex] = useState(0);
-  const [contact, setContact] = useState<ContactFormState>({ name: "", email: "", company: "", phone: "" });
+  const [contact, setContact] = useState<ContactFormState>({ name: "", email: "", company: "", phone: "", industry: "" });
   const [contactErrors, setContactErrors] = useState<Partial<Record<keyof ContactFormState, boolean>>>({});
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -207,6 +208,7 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
         email: contact.email,
         phone: contact.phone,
         company: contact.company,
+        industry: contact.industry,
         locale,
         answers: visibleAnswers,
         turnstile_token: turnstileToken,
@@ -375,6 +377,13 @@ export default function DiagnosticGoModal({ onClose }: DiagnosticGoModalProps) {
                   placeholder={t("companyPlaceholder")}
                   value={contact.company}
                   onChange={(e) => setContact({ ...contact, company: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-lyratech-purple"
+                />
+                <input
+                  type="text"
+                  placeholder={t("industryPlaceholder")}
+                  value={contact.industry}
+                  onChange={(e) => setContact({ ...contact, industry: e.target.value })}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-lyratech-purple"
                 />
                 <input

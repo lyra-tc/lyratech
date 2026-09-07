@@ -78,6 +78,7 @@ class DiagnosticSubmitRequest(BaseModel):
     email: EmailStr
     phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     locale: str
     answers: Dict[str, List[str]]
     turnstile_token: str
@@ -89,6 +90,7 @@ class DiagnosticSubmissionResponse(BaseModel):
     email: str
     phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     locale: str
     raw_answers_json: dict
     normalized_answers_en_json: dict
@@ -113,7 +115,9 @@ class DiagnosticSubmissionListItem(BaseModel):
     id: int
     name: str
     email: str
+    phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     locale: str
     recommended_primary_service: str
     recommended_secondary_service: Optional[str] = None
