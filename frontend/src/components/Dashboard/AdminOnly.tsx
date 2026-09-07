@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 import { useCurrentUser } from "@/lib/userContext";
 
 /**
@@ -19,9 +21,16 @@ export default function AdminOnly({ children }: { children: React.ReactNode }) {
           <h1 className="font-montserrat-bold text-dark-blue text-xl mb-2">
             Sección restringida
           </h1>
-          <p className="font-montserrat text-dark-blue/50 text-sm">
+          <p className="font-montserrat text-dark-blue/50 text-sm mb-6">
             No tienes permiso para ver esta sección. Contacta a un administrador.
           </p>
+          <Link
+            href="/dashboard/prospects"
+            className="inline-flex items-center gap-2 bg-lyratech-purple hover:bg-button-light-purple text-white font-montserrat font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-button hover:scale-[1.02] text-sm"
+          >
+            <HiOutlineArrowLeft size={16} />
+            Volver a prospectos
+          </Link>
         </div>
       </div>
     );
