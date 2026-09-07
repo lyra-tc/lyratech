@@ -16,10 +16,12 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 25m
           script: |
             set -e
             cd /var/www/dev.lyratech
             git pull origin develop
-            docker compose -f docker-compose.dev.yml build --pull backend frontend
+            export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
+            docker compose -f docker-compose.dev.yml build backend frontend
             docker compose -f docker-compose.dev.yml up -d --no-deps --force-recreate backend frontend
             docker image prune -f
