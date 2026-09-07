@@ -11,7 +11,7 @@ export default function Ezzat() {
             <Profile
                 imageSrc={EzzatImage}
                 name="Ezzat Alzahouri Campos"
-                position="Co-Founder & CTO"
+                position="Co-Founder & CEO"
             />
             <ButtonLanguage />
             <Contact

@@ -11,7 +11,7 @@ export default function DanielC() {
             <Profile
                 imageSrc={DaniCImage}
                 name="Daniel Contreras Chávez"
-                position="Co-Founder & CEO"
+                position="Co-Founder & CTO"
             />
             <ButtonLanguage />
             <Contact
