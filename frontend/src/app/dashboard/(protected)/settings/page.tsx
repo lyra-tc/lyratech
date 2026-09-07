@@ -8,7 +8,7 @@ import {
   HiOutlineEye,
   HiOutlineEyeOff,
 } from "react-icons/hi";
-import { auth, getCachedUser } from "@/lib/api";
+import { auth } from "@/lib/api";
 import type { UserInfo } from "@/lib/api";
 
 type Tab = "cuenta" | "seguridad";
@@ -43,12 +43,6 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    const cached = getCachedUser();
-    if (cached) {
-      setUser(cached);
-      setFullName(cached.full_name);
-      setEmail(cached.email);
-    }
     loadUser();
   }, [loadUser]);
 
@@ -59,7 +53,6 @@ export default function SettingsPage() {
     try {
       const updated = await auth.updateProfile({ full_name: fullName, email });
       setUser(updated);
-      localStorage.setItem("lyratech_user", JSON.stringify(updated));
       setProfileMsg({ type: "ok", text: "Perfil actualizado correctamente." });
     } catch (err: unknown) {
       setProfileMsg({ type: "err", text: err instanceof Error ? err.message : "Error al guardar" });

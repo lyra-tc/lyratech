@@ -1,9 +1,9 @@
 from app.core import email as email_module
 from app.config import settings
-from app.models.prospect import Prospect
+from app.models.lead import Lead
 
 
-def _make_prospect(**overrides):
+def _make_lead(**overrides):
     defaults = dict(
         id=1,
         name="Ada Lovelace",
@@ -14,11 +14,11 @@ def _make_prospect(**overrides):
         message="Quiero saber más",
     )
     defaults.update(overrides)
-    return Prospect(**defaults)
+    return Lead(**defaults)
 
 
-def test_build_html_includes_prospect_fields():
-    html = email_module.build_prospect_notification_html(_make_prospect())
+def test_build_html_includes_lead_fields():
+    html = email_module.build_lead_notification_html(_make_lead())
     assert "Ada Lovelace" in html
     assert "ada@example.com" in html
     assert "Acme" in html
@@ -26,14 +26,14 @@ def test_build_html_includes_prospect_fields():
 
 def test_build_html_includes_dashboard_link_when_frontend_url_set(monkeypatch):
     monkeypatch.setattr(settings, "FRONTEND_URL", "https://lyratech.com.mx")
-    html = email_module.build_prospect_notification_html(_make_prospect())
-    assert "https://lyratech.com.mx/dashboard/prospects" in html
+    html = email_module.build_lead_notification_html(_make_lead())
+    assert "https://lyratech.com.mx/dashboard/leads" in html
 
 
 def test_build_html_omits_dashboard_link_when_frontend_url_empty(monkeypatch):
     monkeypatch.setattr(settings, "FRONTEND_URL", "")
-    html = email_module.build_prospect_notification_html(_make_prospect())
-    assert "dashboard/prospects" not in html
+    html = email_module.build_lead_notification_html(_make_lead())
+    assert "dashboard/leads" not in html
 
 
 def test_build_test_html_includes_notifications_link_when_frontend_url_set(monkeypatch):
@@ -46,7 +46,7 @@ def test_send_skips_when_no_recipients(monkeypatch):
     calls = []
     monkeypatch.setattr(email_module.httpx, "post", lambda *a, **k: calls.append((a, k)))
     monkeypatch.setattr(settings, "RESEND_API_KEY", "test-key")
-    email_module.send_prospect_notification_email(_make_prospect(), [])
+    email_module.send_lead_notification_email(_make_lead(), [])
     assert calls == []
 
 
@@ -54,7 +54,7 @@ def test_send_skips_when_api_key_missing(monkeypatch):
     calls = []
     monkeypatch.setattr(email_module.httpx, "post", lambda *a, **k: calls.append((a, k)))
     monkeypatch.setattr(settings, "RESEND_API_KEY", "")
-    email_module.send_prospect_notification_email(_make_prospect(), ["team@lyratech.com.mx"])
+    email_module.send_lead_notification_email(_make_lead(), ["team@lyratech.com.mx"])
     assert calls == []
 
 
@@ -64,6 +64,9 @@ def test_send_posts_to_resend_with_expected_payload(monkeypatch):
     class FakeResponse:
         def raise_for_status(self):
             pass
+
+        def json(self):
+            return {"id": "resend-test-id"}
 
     def fake_post(url, json, headers, timeout):
         captured["url"] = url
@@ -76,16 +79,46 @@ def test_send_posts_to_resend_with_expected_payload(monkeypatch):
     monkeypatch.setattr(settings, "NOTIFICATION_FROM_EMAIL", "notificaciones@lyratech.com.mx")
     monkeypatch.setattr(settings, "NOTIFICATION_FROM_NAME", "Lyratech")
 
-    email_module.send_prospect_notification_email(
-        _make_prospect(), ["team@lyratech.com.mx"]
+    email_module.send_lead_notification_email(
+        _make_lead(), ["team@lyratech.com.mx"]
     )
 
     assert captured["url"] == "https://api.resend.com/emails"
     assert captured["json"]["to"] == ["team@lyratech.com.mx"]
     assert captured["json"]["reply_to"] == "ada@example.com"
     assert captured["json"]["from"] == "Lyratech <notificaciones@lyratech.com.mx>"
-    assert captured["json"]["subject"] == "Nuevo prospecto: Ada Lovelace"
+    assert captured["json"]["subject"] == "Nuevo lead: Ada Lovelace"
     assert captured["headers"]["Authorization"] == "Bearer test-key"
+
+
+def test_send_omits_reply_to_when_lead_has_no_email(monkeypatch):
+    captured = {}
+
+    class FakeResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"id": "resend-test-id"}
+
+    def fake_post(url, json, headers, timeout):
+        captured["json"] = json
+        return FakeResponse()
+
+    monkeypatch.setattr(email_module.httpx, "post", fake_post)
+    monkeypatch.setattr(settings, "RESEND_API_KEY", "test-key")
+
+    email_module.send_lead_notification_email(
+        _make_lead(email=None), ["team@lyratech.com.mx"]
+    )  # must not raise
+
+    assert "reply_to" not in captured["json"]
+    assert captured["json"]["to"] == ["team@lyratech.com.mx"]
+
+
+def test_build_html_handles_lead_without_email():
+    html = email_module.build_lead_notification_html(_make_lead(email=None))
+    assert "Ada Lovelace" in html
 
 
 def test_send_swallows_http_errors(monkeypatch):
@@ -97,8 +130,8 @@ def test_send_swallows_http_errors(monkeypatch):
     monkeypatch.setattr(email_module.httpx, "post", fake_post)
     monkeypatch.setattr(settings, "RESEND_API_KEY", "test-key")
 
-    email_module.send_prospect_notification_email(
-        _make_prospect(), ["team@lyratech.com.mx"]
+    email_module.send_lead_notification_email(
+        _make_lead(), ["team@lyratech.com.mx"]
     )  # must not raise
 
 
@@ -108,6 +141,9 @@ def test_send_test_posts_to_resend_with_expected_payload(monkeypatch):
     class FakeResponse:
         def raise_for_status(self):
             pass
+
+        def json(self):
+            return {"id": "resend-test-id"}
 
     def fake_post(url, json, headers, timeout):
         captured["url"] = url
@@ -130,8 +166,8 @@ def test_send_test_posts_to_resend_with_expected_payload(monkeypatch):
 
 
 def test_build_html_escapes_html_special_characters():
-    prospect = _make_prospect(message="<script>alert(1)</script>")
-    html = email_module.build_prospect_notification_html(prospect)
+    lead = _make_lead(message="<script>alert(1)</script>")
+    html = email_module.build_lead_notification_html(lead)
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
     assert "<script>alert(1)</script>" not in html
 
@@ -141,10 +177,10 @@ def test_send_swallows_errors_during_payload_construction(monkeypatch):
         raise RuntimeError("boom during html build")
 
     monkeypatch.setattr(
-        email_module, "build_prospect_notification_html", raise_during_build
+        email_module, "build_lead_notification_html", raise_during_build
     )
     monkeypatch.setattr(settings, "RESEND_API_KEY", "test-key")
 
-    email_module.send_prospect_notification_email(
-        _make_prospect(), ["team@lyratech.com.mx"]
+    email_module.send_lead_notification_email(
+        _make_lead(), ["team@lyratech.com.mx"]
     )  # must not raise

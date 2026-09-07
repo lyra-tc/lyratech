@@ -7,6 +7,7 @@
     "namePlaceholder": "Full name",
     "emailPlaceholder": "Email address",
     "companyPlaceholder": "Company",
+    "industryPlaceholder": "Industry",
     "phonePlaceholder": "Phone",
     "requiredField": "This field is required",
     "backButton": "Back",
@@ -128,10 +129,10 @@
     "title": "Our team",
     "photoAlt": "Photo of {name}",
     "desc1": "Visionary strategist who turns ideas into high-impact digital products.",
-    "desc2": "Orchestrates processes and teams so every project ships on time with excellence.",
+    "desc2": "Leads the engineering team and turns technical vision into solid, well-built product.",
     "desc3": "Architect of solid, scalable, and cutting-edge technological solutions.",
     "desc4": "Connects the Lyratech brand with the world through creative strategies and data.",
-    "desc5": "Ensures the financial health and sustainable growth of the team."
+    "desc5": "Orchestrates processes, teams, and operations so every project ships on time with excellence."
   },
   "diagnostico": {
     "label": "Strategic Diagnosis",

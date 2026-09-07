@@ -15,7 +15,7 @@ export default function RicardoV4() {
                     </div>
                     <div>
                         <p className="text-sm font-bold text-[#272a33] leading-none font-montserrat-bold">Ricardo Sierra Roa</p>
-                        <p className="text-xs text-[#5f66ae] font-montserrat">Co-Founder & CFO at LyraTech</p>
+                        <p className="text-xs text-[#5f66ae] font-montserrat">Co-Founder & COO at LyraTech</p>
                     </div>
                 </div>
                 <a

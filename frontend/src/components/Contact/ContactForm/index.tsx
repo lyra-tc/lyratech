@@ -9,7 +9,7 @@ import { FaBuilding } from "react-icons/fa";
 import { HiChevronDown, HiCalendar } from "react-icons/hi";
 import BookingModal from "@/components/shared/BookingModal";
 import { useTranslations } from "next-intl";
-import { submitProspect, ApiError } from "@/lib/api";
+import { submitLead, ApiError } from "@/lib/api";
 
 type FormState = {
     name: string;
@@ -141,7 +141,7 @@ export default function ContactForm() {
         submitLockRef.current = true;
         setSubmitting(true);
         try {
-            await submitProspect({
+            await submitLead({
                 name: form.name,
                 email: form.email,
                 phone: form.phone,

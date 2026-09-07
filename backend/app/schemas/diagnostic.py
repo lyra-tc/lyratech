@@ -78,6 +78,7 @@ class DiagnosticSubmitRequest(BaseModel):
     email: EmailStr
     phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     locale: str
     answers: Dict[str, List[str]]
     turnstile_token: str
@@ -89,6 +90,7 @@ class DiagnosticSubmissionResponse(BaseModel):
     email: str
     phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     locale: str
     raw_answers_json: dict
     normalized_answers_en_json: dict
@@ -102,6 +104,8 @@ class DiagnosticSubmissionResponse(BaseModel):
     llm_status: str
     email_delivery_status: str
     email_delivery_error: Optional[str] = None
+    conversion_status: str
+    converted_prospect_id: Optional[int] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -111,14 +115,28 @@ class DiagnosticSubmissionListItem(BaseModel):
     id: int
     name: str
     email: str
+    phone: Optional[str] = None
     company: Optional[str] = None
+    industry: Optional[str] = None
     locale: str
     recommended_primary_service: str
     recommended_secondary_service: Optional[str] = None
     email_delivery_status: str
+    email_provider_id: Optional[str] = None
+    conversion_status: str
+    converted_prospect_id: Optional[int] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class DiagnosticSubmissionPage(BaseModel):
+    items: list[DiagnosticSubmissionListItem]
+    total: int
+
+
+class DiagnosticMarkConvertedRequest(BaseModel):
+    prospect_id: int
 
 
 class DiagnosticSubmitResult(BaseModel):

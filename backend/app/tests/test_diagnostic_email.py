@@ -61,6 +61,9 @@ def test_send_notification_posts_expected_payload(monkeypatch):
         def raise_for_status(self):
             pass
 
+        def json(self):
+            return {"id": "resend-test-id"}
+
     def fake_post(url, json, headers, timeout):
         captured["json"] = json
         return FakeResponse()
@@ -119,6 +122,9 @@ def test_send_result_email_posts_with_llm_subject(monkeypatch):
         def raise_for_status(self):
             pass
 
+        def json(self):
+            return {"id": "resend-test-id"}
+
     def fake_post(url, json, headers, timeout):
         captured["json"] = json
         return FakeResponse()
@@ -126,7 +132,7 @@ def test_send_result_email_posts_with_llm_subject(monkeypatch):
     monkeypatch.setattr(email_module.httpx, "post", fake_post)
     monkeypatch.setattr(settings, "RESEND_API_KEY", "test-key")
 
-    email_module.send_diagnostic_result_email(
+    returned = email_module.send_diagnostic_result_email(
         to_email="ada@example.com",
         locale="es",
         llm_result={
@@ -136,6 +142,6 @@ def test_send_result_email_posts_with_llm_subject(monkeypatch):
         },
         submission_name="Ada",
     )
-
+    assert returned == "resend-test-id"
     assert captured["json"]["to"] == ["ada@example.com"]
     assert captured["json"]["subject"] == "Tu diagnostico personalizado"

@@ -11,7 +11,7 @@ export default function Ricardo() {
             <Profile
                 imageSrc={RichieImage}
                 name="Ricardo Sierra Roa"
-                position="Co-Founder & CFO"
+                position="Co-Founder & COO"
             />
             <ButtonLanguage />
             <Contact

@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineX } from "react-icons/hi";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL ?? "";
 
@@ -13,18 +14,16 @@ interface BookingModalProps {
 }
 
 export default function BookingModal({ isOpen, onClose, title = "Agendar llamada" }: BookingModalProps) {
+    useScrollLock(isOpen);
+
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") onClose();
         };
         if (isOpen) {
-            document.body.style.overflow = "hidden";
             window.addEventListener("keydown", handleKey);
-        } else {
-            document.body.style.overflow = "";
         }
         return () => {
-            document.body.style.overflow = "";
             window.removeEventListener("keydown", handleKey);
         };
     }, [isOpen, onClose]);
