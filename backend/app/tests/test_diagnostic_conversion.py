@@ -124,7 +124,8 @@ def test_mark_converted_missing_prospect(auth_client):
     ).status_code == 404
 
 
-def test_mark_converted_requires_admin(non_admin_client):
+def test_mark_converted_allows_active_non_admin(non_admin_client):
+    # autenticado (no-admin) pasa la guarda; la submission no existe -> 404
     assert non_admin_client.post(
         "/api/diagnostics/submissions/1/mark-converted", json={"prospect_id": 1}
-    ).status_code == 403
+    ).status_code == 404

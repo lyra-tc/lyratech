@@ -82,8 +82,8 @@ def test_list_questions_requires_admin(non_admin_client):
     assert non_admin_client.get("/api/diagnostics/questions").status_code == 403
 
 
-def test_list_submissions_requires_admin(non_admin_client):
-    assert non_admin_client.get("/api/diagnostics/submissions").status_code == 403
+def test_list_submissions_allows_active_non_admin(non_admin_client):
+    assert non_admin_client.get("/api/diagnostics/submissions").status_code == 200
 
 
 def test_create_and_list_questions(auth_client):

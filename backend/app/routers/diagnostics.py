@@ -8,7 +8,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, R
 from sqlalchemy.orm import Session
 
 from ..config import settings
-from ..core.deps import get_current_admin, get_db
+from ..core.deps import get_current_admin, get_current_user, get_db
 from ..core.diagnostic_scoring import (
     compute_service_scores,
     determine_automation_approach,
@@ -276,7 +276,7 @@ def list_submissions(
     page: int = Query(1, ge=1),
     page_size: int = Query(25, ge=1, le=100),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     query = db.query(DiagnosticSubmission)
     if search:
@@ -304,7 +304,7 @@ def list_submissions(
 )
 def refresh_email_status(
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     _refresh_email_delivery_statuses(db)
     return (
@@ -322,7 +322,7 @@ def mark_submission_converted(
     submission_id: int,
     body: DiagnosticMarkConvertedRequest,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     submission = (
         db.query(DiagnosticSubmission)
@@ -352,7 +352,7 @@ def mark_submission_converted(
 def get_submission(
     submission_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    _: User = Depends(get_current_user),
 ):
     submission = (
         db.query(DiagnosticSubmission).filter(DiagnosticSubmission.id == submission_id).first()

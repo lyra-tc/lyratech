@@ -6,6 +6,31 @@
 """
 
 from app.core.lead_import import TEMPLATE_HEADERS
+from app.tests.conftest import TestingSessionLocal
+from app.models.diagnostic_submission import DiagnosticSubmission
+
+
+def _make_submission(**overrides) -> int:
+    db = TestingSessionLocal()
+    try:
+        row = DiagnosticSubmission(
+            name="Ada Lovelace",
+            email="ada@example.com",
+            locale="es",
+            raw_answers_json={},
+            normalized_answers_en_json={},
+            service_scores_json={},
+            recommended_primary_service="process_automation",
+            llm_status="ok",
+            email_delivery_status="pending",
+            **overrides,
+        )
+        db.add(row)
+        db.commit()
+        db.refresh(row)
+        return row.id
+    finally:
+        db.close()
 
 
 # --- Prospectos ---------------------------------------------------------------
@@ -82,3 +107,46 @@ def test_non_admin_cannot_delete_lead(non_admin_client, auth_client):
         "/api/leads/manual", json={"name": "Temp Lead", "phone": "5"}
     ).json()["id"]
     assert non_admin_client.delete(f"/api/leads/{lead_id}").status_code == 403
+
+
+# --- Diagnósticos -----------------------------------------------------------
+
+def test_non_admin_lists_submissions(non_admin_client):
+    assert non_admin_client.get("/api/diagnostics/submissions").status_code == 200
+
+
+def test_non_admin_reads_submission_detail(non_admin_client):
+    sid = _make_submission()
+    assert non_admin_client.get(f"/api/diagnostics/submissions/{sid}").status_code == 200
+
+
+def test_non_admin_refreshes_email_status(non_admin_client):
+    assert non_admin_client.post(
+        "/api/diagnostics/submissions/refresh-email-status"
+    ).status_code == 200
+
+
+def test_non_admin_marks_submission_converted(non_admin_client):
+    sid = _make_submission()
+    pid = non_admin_client.post(
+        "/api/prospects/", json={"name": "Conv", "email": "c@example.com", "source": "Web"}
+    ).json()["id"]
+    resp = non_admin_client.post(
+        f"/api/diagnostics/submissions/{sid}/mark-converted", json={"prospect_id": pid}
+    )
+    assert resp.status_code == 200
+    assert resp.json()["conversion_status"] == "prospect"
+
+
+def test_non_admin_cannot_delete_submission(non_admin_client):
+    sid = _make_submission()
+    assert non_admin_client.delete(f"/api/diagnostics/submissions/{sid}").status_code == 403
+
+
+def test_non_admin_cannot_touch_questions(non_admin_client):
+    assert non_admin_client.get("/api/diagnostics/questions").status_code == 403
+    assert non_admin_client.post("/api/diagnostics/questions", json={}).status_code == 403
+    assert non_admin_client.put("/api/diagnostics/questions/1", json={}).status_code == 403
+    assert non_admin_client.patch(
+        "/api/diagnostics/questions/reorder", json={"ordered_ids": []}
+    ).status_code == 403
