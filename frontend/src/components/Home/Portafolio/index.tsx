@@ -6,37 +6,24 @@ import { CiCirclePlus } from "react-icons/ci";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import Image from "next/image";
 import Link from "next/link";
-import {useTranslations} from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import ProjectLinkButtons from "@/components/Portfolio/ProjectLinkButtons";
+import type { PortfolioProject } from "@/lib/api";
+import { isUnoptimizedImage, pickDescription } from "@/lib/portfolio";
 
-//import Avalia from "@/assets/images/Home/Portafolio/Avalia.png";
-import Finnova from "@/assets/images/Home/Portafolio/Finnova.png";
-import RavePass from "@/assets/images/Home/Portafolio/RavePass.svg";
-import Indeleble from "@/assets/images/Home/Portafolio/Indeleble.png";
-import PulsoVital from "@/assets/images/Home/Portafolio/PulsoVital.png";
-import CSV from "@/assets/images/Home/Portafolio/CSV.png";
-import Verderaiz from "@/assets/images/Home/Portafolio/Verderaiz.png";
-import NuovaVita from "@/assets/images/Home/Portafolio/NuovaVita.png";
-import MindScope from "@/assets/images/Home/Portafolio/MindScope.svg";
-import OnceUponATime from "@/assets/images/Home/Portafolio/OnceUponATime.png";
-//import PlenusHopeMun from "@/assets/images/Home/Portafolio/PlenusHopeMun.png";
-
-function Portafolio() {
+function Portafolio({ projects }: { projects: PortfolioProject[] }) {
     const t = useTranslations("portafolioHome");
+    const tGrid = useTranslations("portfolioGrid");
     const tNavbar = useTranslations("navbar");
+    const locale = useLocale();
 
-    const projects = [
-        //{ name: "Avalia Dental Group", img: Avalia, content: t("avalia"), link: "https://avaliadentalgroup.com/" },
-        { name: "Finnova", img: Finnova, content: t("finnova"), link: "https://finnova.com.mx/" },
-        { name: "RavePass", img: RavePass, content: t("ravepass"), link: "https://www.ravepass.com.mx/" },
-        { name: "Indeleble", img: Indeleble, content: t("indeleble"), link: "https://indeleble.com.mx/" },
-        { name: "Pulso Vital", img: PulsoVital, content: t("pulsoVital"), link: "https://pulsovital.com.mx/" },
-        { name: "CSV Logistics", img: CSV, content: t("csv"), link: "https://www.csvlogistics.com.mx/" },
-        { name: "Verderaiz", img: Verderaiz, content: t("verderaiz"), link: "https://verderaiz.com.mx/" },
-        { name: "Nuova Vita", img: NuovaVita, content: t("nuovaVita"), link: "https://nuova-vita.netlify.app/" },
-        { name: "MindScope", img: MindScope, content: t("mindScope"), link: "https://mindscope-landing.netlify.app/" },
-        { name: "Once Upon a Time", img: OnceUponATime, content: t("onceUponATime"), link: "https://once-upona-time.netlify.app/" },
-        //{ name: "Plenus HopeMun", img: PlenusHopeMun, content: t("plenusHopeMun"), link: "https://plenus.edu.mx/hopemun/" },
-    ];
+    const linkLabels = {
+        visit: t("viewMore"),
+        playStore: tGrid("playStore"),
+        appStore: tGrid("appStore"),
+        watchVideo: tGrid("watchVideo"),
+        closeVideo: tGrid("closeVideo"),
+    };
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [visibleSlides, setVisibleSlides] = useState(1);
@@ -132,92 +119,101 @@ function Portafolio() {
                 </p>
             </div>
 
-            {/* Slider */}
-            <div className="relative overflow-hidden my-28 mx-6 md:mx-16 lg:mx-20 xl:mx-28">
-                <div
-                    ref={sliderRef}
-                    className={`flex ${!isDragging ? "transition-transform duration-300 ease-in-out" : ""}`}
-                    style={{ transform: `translateX(${-currentIndex * slideWidth + dragTranslate}px)` }}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={endDrag}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={endDrag}
-                    onMouseLeave={endDrag}
-                >
-                    {projects.map((project, index) => {
-                        const isExpanded = expandedSlideId === index;
-                        return (
-                            <div
-                                key={index}
-                                className="flex-shrink-0 flex flex-col items-center justify-center px-2"
-                                style={{ flex: `0 0 calc(100% / ${visibleSlides})` }}
-                                ref={index === 0 ? slideRef : null}
-                            >
-                                <div className="relative rounded-[30px] h-80 border border-black w-full overflow-hidden flex flex-col justify-center">
-                                    {/* Botón más con animación */}
-                                    {!isExpanded && (
-                                        <div className="pl-6 pt-6">
-                                            <button
-                                                onClick={() => handlePlusClick(index)}
-                                                onTransitionEnd={() => handleAnimationEnd(index)}
-                                                className={`transform transition-transform duration-500 ease-in-out ${
-                                                    animatingSlideId === index ? "rotate-[360deg] scale-125" : ""
-                                                }`}
-                                            >
-                                                <CiCirclePlus className="text-dark-blue" size={45} />
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {/* Imagen */}
-                                    <div className="flex items-center justify-center py-10 px-4">
-                                        <div className="relative h-[70px] w-[180px]">
-                                            <Image alt={project.name} src={project.img} fill className="object-contain" sizes="180px" />
-                                        </div>
-                                    </div>
-
-                                    {/* Título */}
-                                    {!isExpanded && (
-                                        <p className="pb-6 text-center text-xl">{project.name}</p>
-                                    )}
-
-                                    {/* Overlay expandido */}
-                                    {isExpanded && (
-                                        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col justify-between text-white p-4">
-                                            <button
-                                                onClick={handleClose}
-                                                className="absolute top-6 right-6 hover:text-gray-300"
-                                            >
-                                                <IoIosCloseCircleOutline size={40} />
-                                            </button>
-                                            <div className="mt-28 text-center px-2">{project.content}</div>
-                                            <div className="flex justify-center mb-10">
-                                                <a href={project.link} target="_blank" rel="noopener noreferrer">
-                                                    <button className="border border-white rounded-[15px] lg:rounded-[20px] px-6 py-2 font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
-                                                        {t("viewMore")}
-                                                    </button>
-                                                </a>
+            {/* Slider (hidden when the API returned nothing) */}
+            {totalSlides > 0 && (
+                <div className="relative overflow-hidden my-28 mx-6 md:mx-16 lg:mx-20 xl:mx-28">
+                    <div
+                        ref={sliderRef}
+                        className={`flex ${!isDragging ? "transition-transform duration-300 ease-in-out" : ""}`}
+                        style={{ transform: `translateX(${-currentIndex * slideWidth + dragTranslate}px)` }}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={endDrag}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={endDrag}
+                        onMouseLeave={endDrag}
+                    >
+                        {projects.map((project, index) => {
+                            const isExpanded = expandedSlideId === index;
+                            return (
+                                <div
+                                    key={project.uuid}
+                                    className="flex-shrink-0 flex flex-col items-center justify-center px-2"
+                                    style={{ flex: `0 0 calc(100% / ${visibleSlides})` }}
+                                    ref={index === 0 ? slideRef : null}
+                                >
+                                    <div className="relative rounded-[30px] h-80 border border-black w-full overflow-hidden flex flex-col justify-center">
+                                        {/* Botón más con animación */}
+                                        {!isExpanded && (
+                                            <div className="pl-6 pt-6">
+                                                <button
+                                                    onClick={() => handlePlusClick(index)}
+                                                    onTransitionEnd={() => handleAnimationEnd(index)}
+                                                    className={`transform transition-transform duration-500 ease-in-out ${
+                                                        animatingSlideId === index ? "rotate-[360deg] scale-125" : ""
+                                                    }`}
+                                                >
+                                                    <CiCirclePlus className="text-dark-blue" size={45} />
+                                                </button>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                                        )}
 
-                {/* Botones */}
-                <div className="flex justify-center items-center mt-10 gap-4 mb-1">
-                    <button onClick={handlePrev} className="text-dark-blue hover:scale-125 transition-transform">
-                        <FaRegArrowAltCircleLeft size={30} />
-                    </button>
-                    <button onClick={handleNext} className="text-dark-blue hover:scale-125 transition-transform">
-                        <FaRegArrowAltCircleRight size={30}/>
-                    </button>
+                                        {/* Imagen */}
+                                        {!isExpanded && (
+                                            <div className="flex items-center justify-center py-10 px-4">
+                                                <div className="relative h-[70px] w-[180px]">
+                                                    <Image
+                                                        alt={project.name}
+                                                        src={project.logo_url}
+                                                        fill
+                                                        className="object-contain"
+                                                        sizes="180px"
+                                                        unoptimized={isUnoptimizedImage(project.logo_url)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Título */}
+                                        {!isExpanded && (
+                                            <p className="pb-6 text-center text-xl">{project.name}</p>
+                                        )}
+
+                                        {/* Overlay expandido */}
+                                        {isExpanded && (
+                                            <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col justify-between text-white p-4">
+                                                <button
+                                                    onClick={handleClose}
+                                                    className="absolute top-6 right-6 hover:text-gray-300"
+                                                >
+                                                    <IoIosCloseCircleOutline size={40} />
+                                                </button>
+                                                <div className="mt-28 text-center px-2">{pickDescription(project, locale)}</div>
+                                                <div className="mb-10">
+                                                    <ProjectLinkButtons project={project} labels={linkLabels} variant="pill" />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Botones (ocultos si todos los proyectos caben en una sola vista) */}
+                    {maxIndex > 0 && (
+                        <div className="flex justify-center items-center mt-10 gap-4 mb-1">
+                            <button onClick={handlePrev} className="text-dark-blue hover:scale-125 transition-transform">
+                                <FaRegArrowAltCircleLeft size={30} />
+                            </button>
+                            <button onClick={handleNext} className="text-dark-blue hover:scale-125 transition-transform">
+                                <FaRegArrowAltCircleRight size={30}/>
+                            </button>
+                        </div>
+                    )}
                 </div>
-            </div>
+            )}
 
             {/* Call to Action */}
             <div

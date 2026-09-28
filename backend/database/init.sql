@@ -182,3 +182,26 @@ CREATE TABLE IF NOT EXISTS used_turnstile_tokens (
     token_hash  CHAR(64) NOT NULL PRIMARY KEY,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS portfolio_projects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uuid CHAR(36) NOT NULL UNIQUE,
+    name VARCHAR(40) NOT NULL,
+    description_es VARCHAR(120) NOT NULL,
+    description_en VARCHAR(120) NOT NULL,
+    description_fr VARCHAR(120) NOT NULL,
+    description_de VARCHAR(120) NOT NULL,
+    technologies JSON NOT NULL,
+    categories JSON NOT NULL,
+    link_type ENUM('website','store','video') NOT NULL,
+    website_url VARCHAR(500) NULL,
+    play_store_url VARCHAR(500) NULL,
+    app_store_url VARCHAR(500) NULL,
+    logo_key VARCHAR(500) NOT NULL,
+    video_key VARCHAR(500) NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_published BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_portfolio_sort_order (sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -10,8 +10,34 @@ const productionSiteUrl = "https://lyratech.com.mx";
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || productionSiteUrl).replace(/\/$/, "");
 const isProductionSite = siteUrl === productionSiteUrl;
 
-// Same hosts next/image is allowed to optimize — reused below so the CSP can't drift from it.
+// Portfolio logos/videos are served straight from MinIO (public-read bucket prefix).
+// Parsed eagerly (and thrown on a malformed value) instead of silently falling
+// back to "no MinIO host", which would quietly break portfolio media in prod.
+function parseMediaUrl(): URL | null {
+    if (!process.env.NEXT_PUBLIC_MEDIA_URL) return null;
+    try {
+        return new URL(process.env.NEXT_PUBLIC_MEDIA_URL);
+    } catch (err) {
+        throw new Error(
+            `NEXT_PUBLIC_MEDIA_URL is not a valid URL: ${process.env.NEXT_PUBLIC_MEDIA_URL} (${(err as Error).message})`
+        );
+    }
+}
+const mediaUrl = parseMediaUrl();
+const mediaOrigin = mediaUrl ? mediaUrl.origin : "";
+
+// Plain https hosts next/image is allowed to optimize — reused below so the CSP
+// can't drift from it. MinIO is kept separate (see mediaRemotePattern) since it
+// may use a non-https scheme and/or a non-default port (e.g. local dev).
 const imageRemoteHosts = ["flagcdn.com", "upload.wikimedia.org"];
+
+const mediaRemotePattern: { protocol: "http" | "https"; hostname: string; port?: string } | null = mediaUrl
+    ? {
+          protocol: mediaUrl.protocol.replace(":", "") as "http" | "https",
+          hostname: mediaUrl.hostname,
+          ...(mediaUrl.port ? { port: mediaUrl.port } : {}),
+      }
+    : null;
 
 // The booking iframe's origin is derived from NEXT_PUBLIC_BOOKING_URL so a URL change
 // (e.g. switching providers) doesn't silently get blocked by a stale hardcoded CSP entry.
@@ -23,7 +49,8 @@ const CSP = [
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: ${imageRemoteHosts.map((h) => "https://" + h).join(" ")}`,
+    `img-src 'self' data: blob: ${[...imageRemoteHosts.map((h) => "https://" + h), ...(mediaOrigin ? [mediaOrigin] : [])].join(" ")}`,
+    `media-src 'self' blob: ${mediaOrigin}`.trim(),
     "font-src 'self' data:",
     `connect-src 'self' ${apiUrl}`,
     `frame-src https://challenges.cloudflare.com https://calendar.google.com ${bookingOrigin}`.trim(),
@@ -59,10 +86,13 @@ const nextConfig: NextConfig = {
 
     /* Configuration for remote images */
     images: {
-        remotePatterns: imageRemoteHosts.map((hostname) => ({
-            protocol: "https" as const,
-            hostname,
-        })),
+        remotePatterns: [
+            ...imageRemoteHosts.map((hostname) => ({
+                protocol: "https" as const,
+                hostname,
+            })),
+            ...(mediaRemotePattern ? [mediaRemotePattern] : []),
+        ],
     },
     reactStrictMode: true,
 
