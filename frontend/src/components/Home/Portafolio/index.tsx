@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { FaArrowRight, FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight } from "react-icons/fa";
+import { FaArrowRight, FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight, FaGooglePlay } from "react-icons/fa";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import Image from "next/image";
@@ -18,6 +18,7 @@ import Verderaiz from "@/assets/images/Home/Portafolio/Verderaiz.png";
 import NuovaVita from "@/assets/images/Home/Portafolio/NuovaVita.png";
 import MindScope from "@/assets/images/Home/Portafolio/MindScope.svg";
 import OnceUponATime from "@/assets/images/Home/Portafolio/OnceUponATime.png";
+import SacaLaBici from "@/assets/images/Home/Portafolio/SacaLaBici.png";
 //import PlenusHopeMun from "@/assets/images/Home/Portafolio/PlenusHopeMun.png";
 
 function Portafolio() {
@@ -35,6 +36,7 @@ function Portafolio() {
         { name: "Nuova Vita", img: NuovaVita, content: t("nuovaVita"), link: "https://nuova-vita.netlify.app/" },
         { name: "MindScope", img: MindScope, content: t("mindScope"), link: "https://mindscope-landing.netlify.app/" },
         { name: "Once Upon a Time", img: OnceUponATime, content: t("onceUponATime"), link: "https://once-upona-time.netlify.app/" },
+        { name: "Saca La Bici", img: SacaLaBici, content: t("sacaLaBici"), link: "https://play.google.com/store/apps/details?id=com.kotlin.sacalabici&hl=es_MX", isPlayStore: true },
         //{ name: "Plenus HopeMun", img: PlenusHopeMun, content: t("plenusHopeMun"), link: "https://plenus.edu.mx/hopemun/" },
     ];
 
@@ -172,11 +174,13 @@ function Portafolio() {
                                     )}
 
                                     {/* Imagen */}
-                                    <div className="flex items-center justify-center py-10 px-4">
-                                        <div className="relative h-[70px] w-[180px]">
-                                            <Image alt={project.name} src={project.img} fill className="object-contain" sizes="180px" />
+                                    {!isExpanded && (
+                                        <div className="flex items-center justify-center py-10 px-4">
+                                            <div className="relative h-[70px] w-[180px]">
+                                                <Image alt={project.name} src={project.img} fill className="object-contain" sizes="180px" />
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     {/* Título */}
                                     {!isExpanded && (
@@ -195,7 +199,8 @@ function Portafolio() {
                                             <div className="mt-28 text-center px-2">{project.content}</div>
                                             <div className="flex justify-center mb-10">
                                                 <a href={project.link} target="_blank" rel="noopener noreferrer">
-                                                    <button className="border border-white rounded-[15px] lg:rounded-[20px] px-6 py-2 font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
+                                                    <button className="flex items-center gap-2 border border-white rounded-[15px] lg:rounded-[20px] px-6 py-2 font-montserrat-bold transition-transform duration-500 ease-in-out hover:scale-75">
+                                                        {project.isPlayStore && <FaGooglePlay />}
                                                         {t("viewMore")}
                                                     </button>
                                                 </a>

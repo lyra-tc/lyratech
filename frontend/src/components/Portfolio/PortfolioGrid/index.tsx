@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineArrowRight } from "react-icons/hi";
+import { FaGooglePlay } from "react-icons/fa";
 
 import Finnova from "@/assets/images/Home/Portafolio/Finnova.png";
 import RavePass from "@/assets/images/Home/Portafolio/RavePass.svg";
@@ -15,6 +16,7 @@ import Verderaiz from "@/assets/images/Home/Portafolio/Verderaiz.png";
 import NuovaVita from "@/assets/images/Home/Portafolio/NuovaVita.png";
 import MindScope from "@/assets/images/Home/Portafolio/MindScope.svg";
 import OnceUponATime from "@/assets/images/Home/Portafolio/OnceUponATime.png";
+import SacaLaBici from "@/assets/images/Home/Portafolio/SacaLaBici.png";
 
 type Category = "all" | "web" | "mobile" | "ai";
 
@@ -30,6 +32,7 @@ export default function PortfolioGrid() {
         link: string;
         tech: string[];
         categories: Category[];
+        isPlayStore?: boolean;
     }[] = [
         {
             name: "Finnova",
@@ -102,6 +105,15 @@ export default function PortfolioGrid() {
             link: "https://once-upona-time.netlify.app/",
             tech: ["Next.js"],
             categories: ["web"],
+        },
+        {
+            name: "Saca La Bici",
+            img: SacaLaBici,
+            description: t("sacaLaBici"),
+            link: "https://play.google.com/store/apps/details?id=com.kotlin.sacalabici&hl=es_MX",
+            tech: ["Kotlin", "Node.js", "AWS"],
+            categories: ["mobile"],
+            isPlayStore: true,
         },
     ];
 
@@ -200,7 +212,11 @@ export default function PortfolioGrid() {
                                             aria-label={tGrid("visitProject")}
                                             className="bg-lyratech-purple/10 text-lyratech-purple w-11 h-11 rounded-full flex items-center justify-center hover:bg-lyratech-purple hover:text-white transition-colors duration-200"
                                         >
-                                            <HiOutlineArrowRight className="text-lg" />
+                                            {project.isPlayStore ? (
+                                                <FaGooglePlay className="text-lg" />
+                                            ) : (
+                                                <HiOutlineArrowRight className="text-lg" />
+                                            )}
                                         </a>
                                     </div>
                                 </div>
