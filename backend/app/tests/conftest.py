@@ -11,8 +11,10 @@ from sqlalchemy.pool import StaticPool
 from ..database import Base
 from ..core.deps import get_db, get_current_user
 from ..core.limiter import limiter
+from ..core.storage import get_storage
 from ..models.user import User
-from ..routers import auth, clients, diagnostics, leads, notifications, prospects, users
+from ..routers import auth, clients, diagnostics, leads, notifications, portfolio, prospects, users
+from .fake_storage import FakeStorage
 
 engine = create_engine(
     "sqlite:///:memory:",
@@ -20,6 +22,7 @@ engine = create_engine(
     poolclass=StaticPool,
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+_fake_storage = FakeStorage()
 
 
 def _override_get_db():
@@ -42,7 +45,9 @@ def _build_test_app() -> FastAPI:
     app.include_router(diagnostics.router, prefix="/api")
     app.include_router(leads.router, prefix="/api")
     app.include_router(clients.router, prefix="/api")
+    app.include_router(portfolio.router, prefix="/api")
     app.dependency_overrides[get_db] = _override_get_db
+    app.dependency_overrides[get_storage] = lambda: _fake_storage
     return app
 
 
@@ -65,6 +70,19 @@ def _force_test_cookie_settings(monkeypatch):
 
     monkeypatch.setattr(settings, "AUTH_COOKIE_NAME", "lyratech_session", raising=False)
     monkeypatch.setattr(settings, "AUTH_COOKIE_DOMAIN", "", raising=False)
+
+
+@pytest.fixture(autouse=True)
+def fake_storage(monkeypatch):
+    """Fresh in-memory storage per test, with storage settings pinned so URLs
+    and prefixes don't depend on the local .env."""
+    from ..config import settings
+
+    monkeypatch.setattr(settings, "MINIO_PUBLIC_URL", "https://media.test/", raising=False)
+    monkeypatch.setattr(settings, "MINIO_BUCKET", "lyratech", raising=False)
+    monkeypatch.setattr(settings, "STORAGE_ENV_PREFIX", "local", raising=False)
+    _fake_storage.reset()
+    return _fake_storage
 
 
 @pytest.fixture

@@ -205,7 +205,12 @@
     "filterWeb": "Web",
     "filterMobile": "Mobile",
     "filterAI": "AI & ML",
-    "visitProject": "Visit project"
+    "visitProject": "Visit project",
+    "playStore": "Get it on Google Play",
+    "appStore": "Download on the App Store",
+    "watchVideo": "Watch video",
+    "closeVideo": "Close video",
+    "empty": "New projects coming soon."
   },
   "faqContact": {
     "titleLine1": "Frequently asked",
@@ -284,18 +289,6 @@
     "title": "SUCCESSFUL PROJECTS",
     "description": "Each project is a success story. Discover how we have transformed ideas into digital solutions that exceed expectations.",
     "viewMore": "View More",
-    "finnova": "Personal finance app that centralizes money management and savings in one platform.",
-    "indeleble": "Corporate website for a marketing agency",
-    "csv": "Corporate website for a logistics services company",
-    "avalia": "Corporate website for dental clinic",
-    "mindScope": "Web application for psychometric testing",
-    "nuovaVita": "Corporate website for condominium management",
-    "plenusHopeMun": "Model United Nations website for educational institution",
-    "pulsoVital": "Web platform for finance training",
-    "verderaiz": "Website and blog with dashboard for environmental organization",
-    "onceUponATime": "Travel company website",
-    "ravepass": "Web platform to discover, buy and manage passes for all kinds of parties and events in Mexico.",
-    "sacaLaBici": "Social network app for Saca La Bici: announcements, events and live tracking of rides in Querétaro.",
     "callToActionTitle": "Ready for the next successful project?",
     "callToActionText": "Let’s transform your idea into a digital solution that exceeds all expectations.",
     "callToActionButton": "Start Your Project"

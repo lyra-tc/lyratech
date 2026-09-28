@@ -16,6 +16,7 @@ import {
   HiOutlineInboxIn,
   HiOutlineLogout,
   HiOutlineMail,
+  HiOutlinePhotograph,
   HiOutlineTrendingUp,
   HiOutlineUsers,
 } from "react-icons/hi";
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
   { label: "Diagnosticos", mobileLabel: "Diag.", href: "/dashboard/diagnostics", icon: HiOutlineChartBar },
   { label: "Preguntas", mobileLabel: "Preg.", href: "/dashboard/diagnostics/questions", icon: HiOutlineClipboardList, adminOnly: true },
   { label: "Notificaciones", mobileLabel: "Notif.", href: "/dashboard/notifications", icon: HiOutlineMail, adminOnly: true },
+  { label: "Portafolio", mobileLabel: "Portaf.", href: "/dashboard/portafolio", icon: HiOutlinePhotograph, adminOnly: true },
   { label: "Users", mobileLabel: "Users", href: "/dashboard/users", icon: HiOutlineUsers, adminOnly: true },
   { label: "Settings", mobileLabel: "Settings", href: "/dashboard/settings", icon: HiOutlineCog },
 ];

@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { buildAlternates } from "@/lib/metadata";
+import { getPublishedProjects } from "@/lib/portfolio";
 import Navbar from "@/components/Navbar/index";
 import Hero from "@/components/Home/HeroHome";
 import AboutUs from "@/components/Home/AboutUs";
@@ -31,7 +32,9 @@ export async function generateMetadata({
     };
 }
 
-export default function Home() {
+export default async function Home() {
+    const projects = await getPublishedProjects();
+
     return (
         <div className="">
             <Navbar />
@@ -42,7 +45,7 @@ export default function Home() {
             </Suspense>
             <AboutUs />
             <Services />
-            <Portafolio />
+            <Portafolio projects={projects} />
             <HelpAndSupport />
             <Footer />
         </div>

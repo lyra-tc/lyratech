@@ -1,3 +1,5 @@
+import type { PortfolioCategory, PortfolioLinkType, PortfolioLocale } from "@/lib/portfolioConstants";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export class ApiError extends Error {
@@ -634,5 +636,89 @@ export const diagnosticsApi = {
     request<void>("/api/diagnostics/questions/reorder", {
       method: "PATCH",
       body: JSON.stringify({ ordered_ids: orderedIds }),
+    }),
+};
+
+// --- Portafolio ------------------------------------------------------------
+
+export interface PortfolioProject {
+  uuid: string;
+  name: string;
+  descriptions: Record<PortfolioLocale, string>;
+  technologies: string[];
+  categories: PortfolioCategory[];
+  link_type: PortfolioLinkType;
+  website_url: string | null;
+  play_store_url: string | null;
+  app_store_url: string | null;
+  logo_url: string;
+  video_url: string | null;
+}
+
+export interface PortfolioProjectAdmin extends PortfolioProject {
+  id: number;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+/** Multipart upload with progress (fetch can't report upload progress). */
+function sendFormWithProgress<T>(
+  method: "POST" | "PATCH",
+  path: string,
+  body: FormData,
+  onProgress?: (percent: number) => void
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, `${API_URL}${path}`);
+    xhr.withCredentials = true;
+    xhr.responseType = "json";
+    if (onProgress) {
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
+      };
+    }
+    xhr.onload = () => {
+      if (xhr.status === 401) {
+        window.location.href = "/dashboard/login";
+        reject(new Error("No autorizado"));
+        return;
+      }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response as T);
+        return;
+      }
+      const detail = xhr.response?.detail;
+      const message = Array.isArray(detail)
+        ? detail.map((d: { msg?: string }) => d?.msg).filter(Boolean).join(", ")
+        : detail;
+      // A 413 comes from Nginx as HTML, so there's no JSON detail to show.
+      const fallback =
+        xhr.status === 413 ? "El archivo es demasiado grande para el servidor" : "Error en la solicitud";
+      reject(new ApiError(message || fallback, xhr.status));
+    };
+    xhr.onerror = () => reject(new ApiError("No se pudo conectar con el servidor", 0));
+    xhr.send(body);
+  });
+}
+
+export const portfolioApi = {
+  listAdmin: () => request<PortfolioProjectAdmin[]>("/api/portfolio/admin"),
+  create: (body: FormData, onProgress?: (percent: number) => void) =>
+    sendFormWithProgress<PortfolioProjectAdmin>("POST", "/api/portfolio", body, onProgress),
+  update: (id: number, body: FormData, onProgress?: (percent: number) => void) =>
+    sendFormWithProgress<PortfolioProjectAdmin>("PATCH", `/api/portfolio/${id}`, body, onProgress),
+  remove: (id: number) => request<void>(`/api/portfolio/${id}`, { method: "DELETE" }),
+  move: (id: number, direction: "up" | "down") =>
+    request<PortfolioProjectAdmin[]>(`/api/portfolio/${id}/move`, {
+      method: "POST",
+      body: JSON.stringify({ direction }),
+    }),
+  setPublished: (id: number, isPublished: boolean) =>
+    request<PortfolioProjectAdmin>(`/api/portfolio/${id}/publish`, {
+      method: "PATCH",
+      body: JSON.stringify({ is_published: isPublished }),
     }),
 };

@@ -1,5 +1,6 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Literal
 
 
 class Settings(BaseSettings):
@@ -29,6 +30,26 @@ class Settings(BaseSettings):
     OPENROUTER_MODEL: str = "openai/gpt-4o-mini"
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
     OPENROUTER_TIMEOUT_SECONDS: float = 20.0
+
+    # Object storage (MinIO) for portfolio logos/videos. STORAGE_ENV_PREFIX is
+    # the top-level folder inside the bucket, so local/dev/prod never collide.
+    MINIO_ENDPOINT: str = ""
+    MINIO_SECURE: bool = True
+    MINIO_ACCESS_KEY: str = ""
+    MINIO_SECRET_KEY: str = ""
+    MINIO_BUCKET: str = "lyratech"
+    MINIO_PUBLIC_URL: str = ""
+    STORAGE_ENV_PREFIX: Literal["local", "dev", "prod"] = "local"
+
+    @field_validator("STORAGE_ENV_PREFIX", mode="before")
+    @classmethod
+    def _default_storage_env_prefix(cls, value):
+        # A blank value (e.g. a copied .env.example, or docker-compose's own
+        # default not applying because the var was set-but-empty) must not
+        # crash startup — treat it the same as leaving the setting unset.
+        if not value:
+            return "local"
+        return value
 
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
