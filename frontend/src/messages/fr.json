@@ -205,7 +205,12 @@
     "filterWeb": "Web",
     "filterMobile": "Mobile",
     "filterAI": "IA & ML",
-    "visitProject": "Voir le projet"
+    "visitProject": "Voir le projet",
+    "playStore": "Disponible sur Google Play",
+    "appStore": "Télécharger dans l'App Store",
+    "watchVideo": "Voir la vidéo",
+    "closeVideo": "Fermer la vidéo",
+    "empty": "De nouveaux projets arrivent bientôt."
   },
   "faqContact": {
     "titleLine1": "Questions",
@@ -284,17 +289,6 @@
     "title": "PROJETS RÉUSSIS",
     "description": "Chaque projet est une histoire de succès. Découvrez comment nous avons transformé des idées en solutions numériques qui dépassent les attentes.",
     "viewMore": "Voir plus",
-    "finnova": "Application de finances personnelles qui centralise la gestion d'argent et l'épargne en une seule plateforme.",
-    "indeleble": "Site web corporatif pour une agence de marketing",
-    "csv": "Site web corporatif pour une entreprise de services logistiques",
-    "avalia": "Site web d’entreprise pour clinique dentaire",
-    "mindScope": "Application web de tests psychométriques",
-    "nuovaVita": "Site web d’entreprise pour gestion de copropriétés",
-    "plenusHopeMun": "Site web de Modèle des Nations Unies pour établissement scolaire",
-    "pulsoVital": "Plateforme web de formation en finances",
-    "verderaiz": "Site web et blog avec tableau de bord pour organisation écologique",
-    "onceUponATime": "Site web d'une entreprise de voyage",
-    "ravepass": "Plateforme web pour découvrir, acheter et gérer des passes pour toutes sortes de fêtes et événements au Mexique.",
     "callToActionTitle": "Prêt pour le prochain projet réussi?",
     "callToActionText": "Transformons votre idée en une solution numérique qui dépasse toutes vos attentes.",
     "callToActionButton": "Lancer Votre Projet"

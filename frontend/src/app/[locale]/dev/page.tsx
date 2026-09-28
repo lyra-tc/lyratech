@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import { getPublishedProjects } from "@/lib/portfolio";
 import Navbar from "@/components/Navbar/index";
 import Hero from "@/components/Home/HeroHome";
 import AboutUs from "@/components/Home/AboutUs";
@@ -8,7 +9,9 @@ import HelpAndSupport from "@/components/Home/HelpAndSupport";
 import ButtonLanguage from "@/components/ButtonLanguage";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export default async function Home() {
+    const projects = await getPublishedProjects();
+
     return (
         <div className="">
             <Navbar />
@@ -18,7 +21,7 @@ export default function Home() {
             </Suspense>
             <AboutUs />
             <Services />
-            <Portafolio />
+            <Portafolio projects={projects} />
             <HelpAndSupport />
             <Footer />
         </div>

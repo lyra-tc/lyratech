@@ -205,7 +205,12 @@
     "filterWeb": "Web",
     "filterMobile": "Mobil",
     "filterAI": "KI & ML",
-    "visitProject": "Projekt ansehen"
+    "visitProject": "Projekt ansehen",
+    "playStore": "Jetzt bei Google Play",
+    "appStore": "Im App Store laden",
+    "watchVideo": "Video ansehen",
+    "closeVideo": "Video schließen",
+    "empty": "Neue Projekte folgen in Kürze."
   },
   "faqContact": {
     "titleLine1": "Häufig gestellte",
@@ -284,17 +289,6 @@
     "title": "ERFOLGREICHE PROJEKTE",
     "description": "Jedes Projekt ist eine Erfolgsgeschichte. Entdecken Sie, wie wir Ideen in digitale Lösungen verwandelt haben, die Erwartungen übertreffen.",
     "viewMore": "Mehr ansehen",
-    "finnova": "Persönliche Finanz-App, die Geldverwaltung und Sparen in einer Plattform vereint.",
-    "indeleble": "Unternehmenswebsite für eine Marketingagentur",
-    "csv": "Unternehmenswebsite für ein Logistikdienstleistungsunternehmen",
-    "avalia": "Unternehmenswebsite für Zahnklinik",
-    "mindScope": "Webanwendung für psychometrische Tests",
-    "nuovaVita": "Unternehmenswebsite für Wohnungsverwaltung",
-    "plenusHopeMun": "Model-United-Nations-Website für Bildungseinrichtung",
-    "pulsoVital": "Webplattform für Finanzschulungen",
-    "verderaiz": "Website und Blog mit Dashboard für Umweltorganisation",
-    "onceUponATime": "Website eines Reiseunternehmens",
-    "ravepass": "Webplattform zum Entdecken, Kaufen und Verwalten von Pässen für Partys und Veranstaltungen aller Art in Mexiko.",
     "callToActionTitle": "Bereit für das nächste erfolgreiche Projekt?",
     "callToActionText": "Lassen Sie uns Ihre Idee in eine digitale Lösung verwandeln, die alle Erwartungen übertrifft.",
     "callToActionButton": "Projekt starten"
